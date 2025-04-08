@@ -1,0 +1,422 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Session;
+use DB;
+use Illuminate\Validation\Rule;
+use Mail;
+
+class frontController extends Controller
+{
+    public function index()
+    {  
+        
+       $show['pro'] = DB::table('product_tb')->selectRaw('c_id, count(id) as count_id')->groupBy('c_id')->get();
+        
+        $show['allproduct'] = DB::table('product_tb')->orderby('id','desc')->limit(3)->get(); 
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['about'] = DB::table('about_tb')->orderby('id','desc')->get(); 
+    	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.tax','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+		return view('front/index')->with($show);
+    }
+    
+    public function aboutus()
+    {   
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+		$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['about'] = DB::table('about_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+		return view('front/about')->with($show);
+    }
+
+   public function product($c_id)
+    { 
+        $details['user_details'] = DB::table('user_login')->orderby('id','desc')->get();   
+        $details['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $details['pro'] = DB::table('product_tb')->where('c_id', $c_id)->paginate(9);
+        $details['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $details['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+        
+        $details['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $details['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $details['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $details['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        return view('front/product')->with($details);
+    }
+
+    public function subproduct($subcategory_id)
+    {
+        $showss['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $showss['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $showss['product_detail'] = DB::table('product_tb')->where('subcategory_id', $subcategory_id)->paginate(9);
+        $showss['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $showss['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $showss['go_to_cart'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        $showss['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $showss['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $showss['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $showss['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        return view('front/subproduct')->with($showss);
+    }
+
+    public function product_details($id)
+    {
+        $shows['comment'] = DB::table('comment_tb')->orderby('id','desc')->get(); 
+        $shows['reply_comm'] = DB::table('reply_comment_tb')->orderby('id','Asc')->get(); 
+        $shows['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $shows['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $shows['allproduct'] = DB::table('product_tb')->where('id', $id)->get();
+        $shows['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $ip = request()->ip();
+        
+        $shows['rate']=DB::table('rating_tb')->selectRaw('rating')->where('ip','=',$ip)->where('p_id','=',$id)->get();
+
+        $shows['rate_value']=DB::table('rating_tb')->selectRaw('rating')->where('ip','=',$ip)->where('p_id','=',$id)->count();
+
+        $shows['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $shows['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $shows['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $shows['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $shows['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        $shows['product_go_to_cart'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->where('p_id',$id )->count();
+
+        return view('front/product_details')->with($shows);
+    }
+    public function contact()
+    {  
+        $show['cont'] = DB::table('contact_details_tb')->orderby('id','desc')->get();  
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get();  
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        return view('front/contact')->with($show);
+    }
+
+    public function submit_query(Request $req)
+    {
+
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get();
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        request()->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'subject' => 'required',
+            'mesage' => 'required'
+        ]);     
+        $data = array(
+            'name'=>$req->post('name'),
+            'email'=>$req->post('email'),
+            'subject'=>$req->post('subject'),
+            'mesage'=>$req->post('mesage'),
+            'date'=>date('y/m/d')
+        );      
+        $result=DB::table('contact_tb')->insert($data);
+
+        $email=$req->post('email'); 
+        
+            $details = DB::table('contact_tb')->where('email',$email)->get();
+            $emails=array();
+            foreach ($details as $key) 
+            {
+                $emails[]= $key->email;
+                
+            }
+
+           $datas=array(
+                'name'=>"Mellow Element"
+            );
+
+        if ($result==true) 
+        {
+            session(['message' =>'success', 'errmsg' =>'Enquiry Submit Successfully. We Will Contact You Very Soon...']);
+            
+            Mail::send('contact_us_mail', $datas, function($message) use ($emails) {
+                $message->to($emails)->subject('Mellow Element');
+                $message->from('payalmahendra143@gmail.com', 'Mellow Elements');
+                
+            });
+
+            return view('front/contact_thankyou')->with($show);
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg' =>'Enquiry Submit failed. Please Try Again....']);
+            return redirect()->back();
+        }           
+    }
+
+     public function privacy()
+    {   
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['privacy'] = DB::table('privacy_policy_tb')->orderby('id','desc')->get();
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        return view('front/privacy')->with($show);
+    }
+
+     public function term()
+    {  
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['term'] = DB::table('term_tb')->orderby('id','desc')->get(); 
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        return view('front/term')->with($show);
+    }
+
+    public function download($id)
+    { 
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+         $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+
+        if(!empty(Session::get('user_login_id'))) {
+
+            $u_id = Session::get('user_login_id');
+            $use = DB::table('order_tb')->where([['u_id','=' , $u_id],['payment_status', 'SUCCESS'],['p_id','=' , $id]])->count();
+            if($use > 0 )
+            {
+                $show= DB::table('order_tb')->where([['u_id','=' , $u_id],['payment_status', 'SUCCESS'],['p_id','=' , $id]])->get();
+                foreach($show as $s)            
+                {
+                    $p_id=$s->p_id;
+                    $details = DB::table('product_tb')->where('id','=',$p_id)->first();
+                   
+                    $file = $details->source_code;
+                    $myFile = public_path('upload/source_code/'.$file);
+                    return response()->download($file); 
+                }
+            }
+            else
+            {
+                session(['message' =>'danger', 'errmsg'=>'Payment not complete']); 
+                return redirect()->back();
+            }
+        }
+        else
+        {
+            return view('front/registration')->with($show);
+        }
+    }
+
+    public function commercial_license()
+    {  
+        $show['license'] = DB::table('license_tb')->orderby('id','desc')->get(); 
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['about'] = DB::table('about_tb')->orderby('id','desc')->get(); 
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        
+        return view('front/commercial_license')->with($show);
+    }
+    
+    public function order_history()
+    {   
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['about'] = DB::table('about_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $show['order_history'] = DB::table('order_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.id','order_tb.u_id','order_tb.p_id','order_tb.date')
+        ->join('product_tb','product_tb.id', '=', 'order_tb.p_id')
+        ->get();
+
+
+        $show['dev_order_history'] = DB::table('developer_order_tb')
+        ->select('developer_details_tb.name','developer_details_tb.image','developer_details_tb.perhr','developer_details_tb.dev_id','developer_order_tb.u_id','developer_order_tb.dev_id','developer_order_tb.date')
+        ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        return view('front/order_history')->with($show);
+    }
+
+
+    public function faq()
+    {  
+        
+        $show['pro'] = DB::table('product_tb')->selectRaw('c_id, count(id) as count_id')->groupBy('c_id')->get();
+        $show['faq_details'] = DB::table('faq_tb')->orderby('id','desc')->get(); 
+        $show['allproduct'] = DB::table('product_tb')->orderby('id','desc')->limit(3)->get(); 
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['about'] = DB::table('about_tb')->orderby('id','desc')->get(); 
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+
+
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $u_id=Session::get('user_login_id'); 
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+        return view('front/faq')->with($show);
+    }
+}
+
+

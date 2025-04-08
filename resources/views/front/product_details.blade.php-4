@@ -1,0 +1,306 @@
+@extends('front.layout')
+@section('content')
+    
+
+<section class="about pt-0">
+    <?php
+    foreach($allproduct as $ap) { 
+    $p_id=$ap->id;
+    session(['p_id' => $p_id]); ?>
+
+        <header>
+            <div class="container">
+                <h2 class="title"><?php echo $ap->name; ?></h2>
+                <div class="text"><p>FILE TYPE : <?php echo $ap->pro_type; ?></p></div>
+            </div>
+        </header>
+
+        <div class="container-fluid">
+            <div class="image">
+                <img src="<?php echo URL::asset('public/upload/product/'.$ap->image.'') ?>" alt="" width="100%" />
+            </div>
+        </div>
+    <?php } ?>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="download">
+                       <a href="{{route('download', $ap->id )}}" type="button" class="btn btn-danger"><i class="fa fa-download"></i>  Download</a>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="preview">
+                        <a href="<?php echo $ap->link; ?>" target="_blank" type="button" class="btn btn-primary"><i class="fa fa-bookmark"></i> Live Preview</a>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="rating">
+                        <a href="javascript:void();" class="stars" id="star1" value="1"><span  class="fa fa-star checked"></span></a>
+                        <a href="javascript:void();" class="stars" id="star2" value="2"><span  class="fa fa-star checked"></span></a>
+                        <a href="javascript:void();" class="stars" id="star3" value="3"><span  class="fa fa-star checked"></span></a>
+                        <a href="javascript:void();" class="stars" id="star4" value="4"><span  class="fa fa-star checked"></span></a>
+                        <a href="javascript:void();" class="stars" id="star5" value="5"><span  class="fa fa-star checked"></span></a>
+                    <?php 
+                        foreach ($rate as $key) { ?>
+                        <p style="font-size:15px; padding-left: 13px;">Rated <?php echo $p = $key->rating; ?> Out Of 5</p>
+                    <?php } ?>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+</section>
+
+
+<section class="team">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-3">
+                <article>
+                    <div class="image">
+                        <h5>Template Details</h5><hr>
+                        @foreach ($allproduct as $key => $ap)      
+                            <ul><li><b>Size : </b><a href="#">{{$ap->pro_size}}</a></li></ul>
+                            <ul><li><b>Price : </b><a href="#">Rs.{{$ap->price}}</a></li></ul>
+                            <ul><li><b class="title">Commercial License : </b><br><a href="{{route('commercial_license')}}"> - Further Information</a></li></ul>
+                        @endforeach
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-md-9">
+                <article>
+                    <div class="product-details">
+                       <div class="container">
+                            <ul class="nav nav-pills nav-pills-flat justify-content-center" id="pills-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="tab-review-tab" data-toggle="tab" href="#tab-review" role="tab">
+                                        Overviews
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-desc-tab" data-toggle="tab" href="#tab-desc" role="tab">
+                                        Addition
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-info-tab" data-toggle="tab" href="#tab-shipping" role="tab">
+                                        Feature
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane fade show active" id="tab-review">
+                                    <div class="col-md-8 offset-md-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-12">
+                                                <p><?php echo $ap->overview; ?></p>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div> 
+
+                                <div class="tab-pane fade" id="tab-desc">
+                                    <div class="col-md-8 offset-md-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-12">
+                                                <p><?php echo $ap->additions; ?></p>
+                                            </div>
+                                        </div>  
+                                    </div> 
+                                </div> 
+
+                                <div class="tab-pane fade" id="tab-shipping">
+                                    <div class="col-md-8 offset-md-2">
+                                        <div class="row">
+                                            <div class="col-12">
+                                               <p><?php echo $ap->description; ?></p>
+                                            </div>
+                                        </div> 
+                                    </div> 
+                                </div>
+                            </div> 
+                        </div>
+                    </div>  
+                </article>
+            </div>
+        </div> 
+    </div>
+</section>
+
+
+<section class="blog">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                <div class="comments">
+                    <div class="comment-header">
+                        <div class="h3 m-0">Recent comments</div>
+                    </div>
+
+                    <?php
+                    foreach($comment as $com) { 
+                        if( $ap->id === $com->p_id ) { 
+                            ?>
+                    <div class="comment-wrapper">
+                        <div class="comment-block">
+                            <div class="comment-user">
+                                <div>
+                                    <h5>
+                                        <span><?php echo $com->name; ?></span>
+                                        <span class="pull-right">
+                                            <i class="fa fa-star active"></i>
+                                            <i class="fa fa-star active"></i>
+                                            <i class="fa fa-star active"></i>
+                                            <i class="fa fa-star active"></i>
+                                            <i class="fa fa-star"></i>
+                                        </span>
+                                        <small><?php echo $com->date; ?></small>
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="comment-desc">
+                                <p><?php echo $com->comment; ?></p>
+                            </div>
+
+                            <?php
+                            foreach($reply_comm as $reply_com) { 
+                            if( $ap->id === $reply_com->p_id && $reply_com->comment_id === $com->id) { 
+                            ?>
+                                <div class="comment-block">
+                                    <div class="comment-user">
+                                        <div>
+                                            <h5>Comment<small><?php echo $reply_com->date; ?></small></h5>
+                                        </div>
+                                    </div>
+                                    <div class="comment-desc">
+                                        <p><?php echo $reply_com->reply_comment; ?></p>
+                                    </div>
+                                </div>
+                            <?php }
+                            } ?>
+
+                            <form  method="post" action="{{route('reply')}}">
+                            @csrf
+                                <input type="hidden" class="form-control" name="p_id" value="<?php foreach($allproduct as $b) {echo $b->id ;} ?>" placeholder="Enter Your Name">
+                                <input type="hidden" class="form-control" name="comment_id" value="<?php echo $com->id ; ?>" placeholder="Enter Your Name">
+                                
+                                <div class="form-group">
+                                    <textarea class="form-control" name="reply_comment" placeholder="Reply"></textarea>
+                                     @if ($errors->has('reply_comment'))
+                                        <strong class="text-danger">{{ $errors->first('reply_comment') }}</strong>                                  
+                                    @endif
+                                </div>
+                                <div class="clearfix">
+                                    <button type="submit" class="btn btn-primary">Reply</button>
+                                </div>
+                            </form>
+                            <hr/>
+                        </div>                              
+                    </div>
+                    <?php }
+                    } ?>
+
+                    <div class="comment-add">
+                        <div class="row">
+                            <div class="col-lg-8 ml-auto mr-auto">
+                                @if(Session::has('errmsg'))                 
+                                    <div class="alert alert-{{Session::get('message')}} alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
+                                           <strong>{{Session::get('errmsg')}}</strong>
+                                    </div>
+                                    {{Session::forget('message')}}
+                                    {{Session::forget('errmsg')}}
+                                @endif
+                                <br><br>
+                            </div>
+                        </div>
+                        <div class="comment-reply-message">
+                            <div class="h3 title">Leave a Comment </div>
+                        </div>
+
+                        <form  method="post" action="{{route('leave_comment')}}">
+                            @csrf
+                            <input type="hidden" class="form-control" name="p_id" value="<?php foreach($allproduct as $b) {echo $b->id ;} ?>" placeholder="Enter Your Name">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="name" placeholder="Your Name" />
+                                @if ($errors->has('name'))
+                                    <strong class="text-danger">{{ $errors->first('name') }}</strong>                                  
+                                @endif
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="email" placeholder="Your Email" />
+                                @if ($errors->has('email'))
+                                    <strong class="text-danger">{{ $errors->first('email') }}</strong>                                  
+                                @endif
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" name="comment" placeholder="Your comment"></textarea>
+                                 @if ($errors->has('comment'))
+                                    <strong class="text-danger">{{ $errors->first('comment') }}</strong>                                  
+                                @endif
+                            </div>
+                            <div class="clearfix text-center">
+                                <button type="submit" class="btn btn-primary">Add comment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    
+$('body').on('click','.stars',function()
+{
+    var rating = $(this).attr('value');
+    var v_token = "{{csrf_token()}}";
+    
+    $.ajax(
+    {
+        type: "POST",
+        async: false,
+        url: "{{route('submit_rating')}}",
+        data: {rating:rating,_token:v_token},
+        cache: false,           
+        success: function(response)
+        {     
+             location.reload();
+            /*if(response == 1){
+                $('#star1').css('color', 'green');
+            }else if(response == 2){
+                $('#star1').css('color', 'green');
+                $('#star2').css('color', 'green');
+            }else if(response == 3){
+                $('#star1').css('color', 'green');
+                $('#star2').css('color', 'green');
+                $('#star3').css('color', 'green');
+            }else if(response == 4){
+                $('#star1').css('color', 'green');
+                $('#star2').css('color', 'green');
+                $('#star3').css('color', 'green');
+                $('#star4').css('color', 'green');
+            }else if(response == 5){
+                $('#star1').css('color', 'green');
+                $('#star2').css('color', 'green');
+                $('#star3').css('color', 'green');
+                $('#star4').css('color', 'green');
+                $('#star5').css('color', 'green');
+            }else{
+                $('#star1').css('color', 'black');
+                $('#star2').css('color', 'black');
+                $('#star3').css('color', 'black');
+                $('#star4').css('color', 'black');
+                $('#star5').css('color', 'black');
+            }*/
+        }
+    })
+});
+    
+</script>
+@endsection

@@ -1,0 +1,249 @@
+@extends('front.layout')
+@section('content')
+
+<section class="header-content">
+    <header>
+        <div class="container-fluid">
+            <div class="owl-slider owl-carousel owl-theme" data-autoplay="true">
+                <?php
+                foreach($banner as $b) { ?>
+                    <div class="item d-flex align-items-center">
+                        <img src="<?php echo URL::asset('public/upload/banner/'.$b->image.'') ?>" alt="" width="100%" /> 
+                    </div>  
+                <?php
+                } ?>
+            </div> 
+        </div>
+    </header>
+</section>
+
+<section class="products">
+    <header class="product_header">
+        <div class="container">
+            <h2 class="title">POPULAR PRODUCTS</h2>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <?php
+                foreach($category as $d) {
+                $url = route('product',['id'=>''.$d->id.'']); ?>
+            <div class="col-6 col-lg-4 col-sm-4 col-md-4">
+                <article>
+                    <div class="info">
+                        <span>
+                            <a href="<?php echo $url; ?>"  data-title="Quick wiew">
+                                <i class="icon icon-eye"></i>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="figure-grid">
+                        <div class="image">
+                            <a href="<?php echo $url; ?>">
+                               <img src="<?php echo URL::asset('public/upload/category/'.$d->image.'') ?>" alt="" />
+                            </a>
+                        </div>
+                        <div class="text">
+                            <h2 class="title h4">
+                                <a href="<?php echo $url; ?>" style="font-size:15px;"><?php echo $d->name; ?></a>
+                            </h2>                          
+                            +
+                           <?php 
+                            foreach($pro as $ss) {
+                               if($d->id == $ss->c_id){ ?>
+                                    <?php echo $ss->count_id; ?>
+                            <?php } 
+                            } ?>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <?php } ?>
+        </div> 
+    </div>
+</section>
+
+<section class="products">
+    <center>
+        <header class="blog_header">
+            <div class="container">
+                <h2 class="h2 title">Hire Now</h2>
+                <div class="text">
+                    <p>Hire High-Performance Individual/Team, On Your Terms</p>
+                </div>
+            </div>
+        </header>
+    </center>
+    <div class="container">
+            <div class="row">
+                <?php
+                foreach($higher_professional as $hp) {
+                $url = route('dev_details',['id'=>''.$hp->id.'']); ?>
+                <div class="col-6 col-lg-3 col-sm-3 col-md-3">
+                    <article>
+                        <div class="figure-grid">
+                            <div class="image">
+                                <a href="<?php echo $url; ?>">
+                                   <img src="<?php echo URL::asset('public/upload/hig_prof/'.$hp->image.'') ?>" alt=""/> 
+                                </a>
+                            </div>
+                            <div class="text">
+                                <h2 class="title h4">
+                                    <a href="<?php echo $url; ?>" style="font-size:15px;"><?php echo $hp->heading; ?></a>
+                                </h2>
+                               
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <?php
+                } ?>
+            </div>
+    </div>
+    
+</section>
+
+<section class="benefits">
+    <header >
+        <div class="container">
+            <h2 class="h2 title">Why Mellow Elements?</h2>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-lg-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-download"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>Unlimited downloads</strong> <br />
+                            <small>Freedom to play, experiment and create.</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-6 col-lg-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-picture"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>55+ million assets</strong> <br />
+                            <small>All the creative assets you need under one subscription.</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+
+            <div class="col-6 col-lg-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-license"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>Simple licensing</strong> <br />
+                            <small>All Mellow Elements assets are covered by our lifetime commercial license.</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+
+            <div class="col-6 col-lg-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-diamond"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>VIP discounts</strong> <br />
+                            <small>Become VIP member</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div> 
+    </div>
+</section>
+
+
+<section class="blog blog-widget blog-animated">
+    <center>
+        <header class="blog_header">
+            <div class="container">
+                <h2 class="h2 title">Design stories</h2>
+                <div class="text">
+                    <p>Work with hand-selected talent, customized to fix at your scale.</p>
+                    <?php
+                        if(empty(Session::get('user_login_id'))) { ?>
+                            <a href="{{route('registration')}}" class="btn btn-success">Create Account Now</a>
+                    <?php }else{ ?>
+                            <a href="" class="btn btn-success">Already you're member!</a>
+                    <?php } ?>
+                </div>
+            </div>
+        </header>
+    </center>
+
+    <div class="container">
+        <div class="row">
+            <?php 
+            foreach($allproduct as $apro) { 
+                $url = route('product_details',['id'=>''.$apro->id.'']); ?>
+                <div class="col-6 col-lg-4 col-sm-4 col-md-4">
+                    <article>
+                        <a href="<?php echo $url; ?>" class="blog-link">
+                            <?php if($apro->image == ''){ ?>
+                                <div>
+                                    <video controls controlsList="nodownload" data-play="hover" muted="muted" onmouseover="this.play()" onmouseout="this.pause();" ><source class="embed-responsive-item" src="<?php echo URL::asset('public/upload/video/'.$apro->video.'') ?>" type="video/mp4" allowfullscreen></video>
+                                </div>
+                            <?php }else{ ?>
+                                <div>
+                                    <img src="<?php echo URL::asset('public/upload/product/'.$apro->image.'') ?>" style="width:100%;height:200px;"/> 
+                                </div>
+                            <?php } ?>
+                            <div class="entry entry-table">
+                                <div class="title">
+                                    <h2 class="h5" style="font-size:15px;"><?php echo $apro->name; ?></h2>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                </div>
+            <?php
+            } ?>
+        </div> 
+    </div> 
+</section>
+
+
+
+
+
+<!--<section class="banner">
+    <div class="container-fluid">
+        <div class="banner-image" style="background-color:#606060">
+            <header>
+                <div class="container">
+
+                    <h2 class="h2 title">Subscribe today!</h2>
+                    <div class="text">
+                        <p>Be first to know about all new updates!</p>
+                    </div>
+
+                </div>
+            </header>
+            <div class="container">
+                <form  method="post" action="{{route('store')}}">
+                @csrf
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <input type="email" class="form-control" name="email" value="" placeholder="Enter your e-mail">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-clean">Subscribe now</button>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div> 
+</section>-->
+
+@endsection

@@ -1,0 +1,117 @@
+@extends('front.layout')
+@section('content')
+      
+    <section class="checkout pt-0">
+        <?php 
+            if($developer_cart_empty > 0) { ?>
+           
+            <header>
+                <div class="container">
+                    <h2 class="title">Cart Item!</h2>
+                    <div class="text">
+                        <p>Proceed your order details</p>
+                    </div>
+                </div>
+            </header>
+
+           <div class="container">            
+                <div class="cart-wrapper">
+                    <div class="cart-block cart-block-header clearfix">
+                        <div><span>Developer</span></div>
+                        <div><span>&nbsp;</span></div>
+                        <div><span>Full Name</span></div>
+                        <div class="text-right"><span>Hour/Rate</span></div>
+                    </div>
+                    <?php 
+                    $id= Session::get('user_login_id');
+                    $tperhr=0;
+                    foreach($developer_cart as $dcart) { 
+                        if($id == $dcart->u_id )
+                        {
+                        $dev_id=$dcart->dev_id;
+                        $tperhr+=$dcart->perhr;
+                        session(['dev_id' => $dev_id]);
+                        session(['tperhr' => $tperhr]);
+                        //$url = route('product_details',['id'=>''.$dcart->dev_id.'']);
+                    ?>
+                    <div class="clearfix">
+                        <div class="cart-block cart-block-item clearfix">
+                            <div class="image">
+                                <a href="#"><img src="<?php echo URL::asset('public/upload/developer/'.$dcart->image);?>" alt="" /></a>
+                            </div>
+                            <div class="title">
+            
+                            </div>
+                            <div class="quantity">
+                                <div class="h4"><a href=""><?php echo $dcart->name; ?></a></div>
+                            </div>
+                            <div class="price">
+                                <span class="final h3"><?php echo $dcart->perhr; ?></span>
+                            </div>
+                            <a href="<?php echo route('delete_developer_cart',['dev_id'=>''.$dcart->dev_id.'']) ?>"><span class="icon icon-cross icon-delete"></span></a>
+                        </div>
+                    </div>
+                    <?php }
+                    } ?>
+                    <div class="row">
+                        <div class="col-md-4 offset-md-8">
+                          
+                            <div class="cart-block cart-block-footer clearfix">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="clearfix">
+                        <div class="cart-block cart-block-footer cart-block-footer-price clearfix">
+                            <div>
+                                <span class="checkbox">
+                                    <span class="alert alert-warning">Total Price</span>
+                                </span>
+                            </div>
+                            <div>
+                                <div class="h2 title">Rs. {{$tperhr}}</div>
+                            </div>
+
+                        </div>
+
+                        
+                        <div class="row">
+                            <div class="col-4">
+                                
+                            </div>
+                            <div class="col-8 text-right">
+                                <a href="{{route('developer_proceed_checkout')}}" class="btn btn-outline-warning"><span class="icon icon-cart"></span> Proceed to Checkout</a>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+
+                
+            </div> 
+
+        <?php }
+        else {
+        ?>
+
+        <div class="container">            
+            <div class="cart-wrapper">
+                <div class="row">
+                    <div class="col-md-12">
+                       <center> <h5><img src="https://i.imgur.com/dCdflKN.png" class="rounded-circle" width="120px" height="120px"></h5>
+                            <h1 class="card-title">Your cart is currently empty.</h1>
+                            <small>Before proceed to checkout you must add some products to your shopping cart.<br> You will find a lot of interesting products on our "Mellow Elements" page.</small>
+                            <h5>Thank You!</h5>
+                            <hr style="width:520px;">
+                            <a class="btn btn-primary btn-lg" href="{{route('index')}}" role="button">CONTINUE SHOPPING</a> 
+                        </center> 
+                    </div>
+                </div> 
+            </div>
+        </div> 
+
+    <?php } ?>
+</section>
+
+@endsection

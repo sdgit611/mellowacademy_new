@@ -1,0 +1,1720 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
+use Session;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+use DB;
+use Illuminate\Validation\Rule;
+use Image;
+use Mail;
+
+class admincontroller extends Controller
+{
+    public function adminindex()
+    {   
+        return view('admin/index');
+    }
+
+    public function login_verification(Request $request)
+    {
+        request()->validate(['email' => 'required|email','password' => 'required']);
+        
+        $email=$request->post('email');
+        $password=$request->post('password');
+        $use = DB::table('admin_tb')->where('email_id','=',$email)->where('pass_id','=',md5($password))->count();
+        if($use > 0)
+        {
+            $details= DB::table('admin_tb')->where('email_id','=',$email)->get();
+            foreach($details as $d)
+            {
+                $id=$d->id;
+                $role=$d->role;
+            }
+            session(['admin_login_id' => $id,'admin_email_login' => $email,'admin_login_role' => $role]);
+            session(['message' =>'success', 'errmsg' =>'Login Successfully.']);
+            return redirect('dashboard');
+        }
+        else
+        {
+            session(['message' =>'danger','errmsg' =>'Login Failed ? Username and Password Wrong....']);
+            return redirect()->back();
+        }                   
+    }
+
+    public function logout()
+    {
+        Session::forget('admin_login_id');
+        Session::forget('admin_email_login');
+        Session::forget('admin_login_role');
+        Session::flush();
+        return redirect()->route('adminindex');
+    }
+
+     private function logged_in()
+    {
+        $user_id=Session::get('admin_email_login');   
+        if($user_id==null)
+        {
+            return redirect('adminindex');
+        }
+    }
+     public function dashboard()
+    {   
+        $this->logged_in();
+        $show['total_contact'] = DB::table('contact_tb')->count();
+        $show['higher_professional'] = DB::table('higher_professional_tb')->count();
+        $show['total_product'] = DB::table('product_tb')->count();
+        $show['popular_product'] = DB::table('product_tb')->orderby('id','desc')->get();
+        $show['total_saving'] = DB::table('order_tb')->orderby('id','desc')->get();
+
+        $show['transaction'] = DB::table('order_tb')
+        ->select('product_tb.name','product_tb.id','order_tb.order_id','order_tb.p_id','order_tb.tprice','order_tb.payment_status')
+        ->join('product_tb','product_tb.id', '=', 'order_tb.p_id')
+        ->get();
+
+        return view('admin/dashboard')->with($show);;
+    }
+    public function category()
+    {   
+        $this->logged_in();
+        $data['details'] = DB::table('category_tb')->orderby('id','desc')->get();
+        return view('admin/category')->with($data);
+    }
+    public function submit_category(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'title' => 'required',
+            'name' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'multiple_image.*' => 'required|image|mimes:jpg,png,jpeg,gif,|max:5120',
+        ]);
+
+
+        $images=array();
+        $img=array();
+        if($files=$request->file('multiple_image'))
+        {
+            $img=array();
+            foreach($files as $file)
+            {
+                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
+                $path = public_path('upload/category/'.$getimageName);
+                Image::make($file)->save($path);   
+                $img[]=$getimageName;
+            }           
+            $multiple_image=implode(",",$img);          
+        }       
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/category/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+
+
+        $data=array(
+            'title'=>$request->post('title'),
+            'name'=>$request->post('name'),
+            'image'=>$getimageName,
+            'multiple_image'=>$multiple_image
+        );
+
+        $result=DB::table('category_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Category Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Category Added Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function update_category(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'title' => 'required',
+            'name' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            'multiple_image.*' => 'image|mimes:jpg,png,jpeg,gif,|max:5120',
+        ]);  
+
+        if(!empty($files=$request->file('multiple_image')))
+        {
+            $img=array();
+            foreach($files as $file)
+            {
+                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
+                $path = public_path('upload/category/'.$getimageName);
+                Image::make($file)->save($path);   
+                $img[]=$getimageName;
+            }           
+            $multiple_image=implode(",",$img);          
+        }
+        else
+        {
+            $multiple_image=$request->post('old_multiple_image');
+        }
+        if(!empty($files=$request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/category/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+        
+        $data=array(
+            'title'=>$request->post('title'),
+            'name'=>$request->post('name'), 
+             'image'=>$getimageName,
+            'multiple_image'=>$multiple_image           
+        );
+        $id=$request->post('update');       
+        $result=DB::table('category_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Category Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Category Details Update   Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_category($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('category_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Category Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Category Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    }  
+
+     public function subcategory()
+    {   
+        $this->logged_in();
+        $data['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $data['subcategory'] = DB::table('subcategory_tb')->orderby('id','desc')->get();
+        return view('admin/subcategory')->with($data);
+    }
+    public function submit_subcategory(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'category_id' => 'required',
+            'heading' => 'required',
+            'name' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);
+        $images=array();
+        $img=array();
+             
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/subcategory/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+            
+
+        $data=array(
+            'category_id'=>$request->post('category_id'),
+            'heading'=>$request->post('heading'),
+            'name'=>$request->post('name'),
+            'image'=>$getimageName
+        );
+
+        $result=DB::table('subcategory_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Sub Category Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Sub Category Added Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function update_subcategory(Request $request)
+    {    
+        $this->logged_in();
+        request()->validate(
+        [
+            'category_id' => 'required',
+            'heading' => 'required',
+            'name' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);  
+        if(!empty($files=$request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/subcategory/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+
+        $data=array(
+            'category_id'=>$request->post('category_id'),
+            'heading'=>$request->post('heading'),
+            'name'=>$request->post('name'),
+            'image'=>$getimageName            
+        );
+        $id=$request->post('update');       
+        $result=DB::table('subcategory_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Sub Category Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Sub Category Details Update   Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_subcategory($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('subcategory_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Sub Category Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Sub Category Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    }  
+
+    public function about()
+    {   
+        $this->logged_in();
+        $data['detail'] = DB::table('about_tb')->orderby('id','desc')->get();
+        return view('admin/about')->with($data);
+    }
+
+    public function submit_about(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);             
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/about/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description'),
+            'image'=>$getimageName
+        );
+        $result=DB::table('about_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'About Details Upload Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'About Details Upload Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    } 
+
+    public function update_about(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+
+        ]);
+        if(!empty($request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/about/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+        
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description'),
+            'image'=>$getimageName
+        );
+        $id=$request->post('update');       
+        $result=DB::table('about_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'About Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'About Details Update  Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_about($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('about_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'About Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'About Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    } 
+
+
+     public function service()
+    {   
+        $this->logged_in();
+        $data['detail'] = DB::table('service_tb')->orderby('id','desc')->get();
+        return view('admin/service')->with($data);
+    }
+
+    public function submit_service(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);             
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/service/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'image'=>$getimageName
+        );
+        $result=DB::table('service_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Service Details Upload Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Service Details Upload Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    } 
+
+    public function update_service(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+
+        ]);
+        if(!empty($request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/service/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+        
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'image'=>$getimageName
+        );
+        $id=$request->post('update');       
+        $result=DB::table('service_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Service Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Service Details Update  Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_service($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('service_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Service Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Service Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    } 
+    public function banner()
+    {   
+        $this->logged_in();
+        $data['detail'] = DB::table('banner_tb')->orderby('id','desc')->get();
+        return view('admin/slider')->with($data);
+    }
+    public function submit_banner(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);
+
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/banner/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+            
+
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'image'=>$getimageName,
+        );
+
+        $result=DB::table('banner_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Banner Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Banner Added Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function update_banner(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);  
+
+        if(!empty($files=$request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/banner/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'image'=>$getimageName,
+        );
+        $id=$request->post('update');       
+        $result=DB::table('banner_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Banner Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Banner Details Update   Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_banner($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('banner_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Banner Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Banner Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    }  
+  
+    public function products()
+    {   
+        $this->logged_in();
+
+        $data['product'] = DB::table('product_tb')->orderby('id','desc')->get();
+        $data['details'] = DB::table('subcategory_tb')->orderby('id','desc')->get();
+        $data['cat'] = DB::table('category_tb')->orderby('id','desc')->get();
+        return view('admin/products')->with($data);
+    }
+    public function show(Request $request)
+    {   
+        $c_id = $request->post('c_id');
+
+        $this->logged_in();
+       
+        $show = DB::table('subcategory_tb')->where('category_id', '=' , $c_id)->count();
+       
+       if($show > 1)
+       {
+        $data = DB::table('subcategory_tb')->where('category_id', '=' , $c_id)->get();
+        foreach ($data as $dd) {            
+            $output='<option value="'.$dd->id.'">'.$dd->name.'</option>'; 
+            echo $output; }
+        }
+        else
+        {
+            $output='<option value="0">No Any Data</option>'; 
+            echo $output;
+        }    
+    }
+    public function submit_product(Request $request)
+    {   
+        $this->logged_in();
+
+        $details = DB::table('subscribe_tb')->get();
+        $emails=array();
+        foreach ($details as $key) 
+        {
+            $emails[]= $key->email;
+        }
+
+        request()->validate(
+        [
+            'subcategory_id' => 'required',
+            'c_id' => 'required',
+            'name' => 'required',
+            'description' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'multiple_image.*' => 'required|image|mimes:jpg,png,jpeg,gif,|max:5120',
+            'pro_type' => 'required',
+            'price' => 'required',
+            'tax' => 'required',
+            'pro_size' => 'required',
+            'additions' => 'required',
+            'overview' => 'required', 
+            'link' => 'required', 
+            'source_code' => ['required', 'mimes:zip','max:5000gb'],
+
+        ]);
+
+        $images=array();
+        $img=array();
+        if($files=$request->file('multiple_image'))
+        {
+            $img=array();
+            foreach($files as $file)
+            {
+                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
+                $path = public_path('upload/product/'.$getimageName);
+                Image::make($file)->save($path);   
+                $img[]=$getimageName;
+            }           
+            $multiple_image=implode(",",$img);          
+        }       
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/product/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->resize(400,400)->save($path);
+
+
+        if($files=$request->file('source_code'))
+        {
+            $new_name = rand().'.'.$request->source_code->getClientOriginalExtension();
+            $getsourcecode = $request->source_code->move(public_path('upload\source_code'),$new_name); 
+        }
+
+        $data=array(
+            'subcategory_id'=>$request->post('subcategory_id'),
+            'c_id'=>$request->post('c_id'),
+            'name'=>$request->post('name'),
+            'description'=>$request->post('description'),
+            'image'=>$getimageName,
+            'multiple_image'=>$multiple_image,
+            'pro_type'=>$request->post('pro_type'),
+            'price'=>$request->post('price'),
+            'tax'=>$request->post('tax'),
+            'pro_size'=>$request->post('pro_size'),
+            'additions'=>$request->post('additions'),
+            'overview'=>$request->post('overview'),
+            'link'=>$request->post('link'),
+            'source_code'=>$getsourcecode
+        );
+
+        $result=DB::table('product_tb')->insert($data);
+
+        $pro = DB::table('product_tb')->get();
+        foreach($pro as $b) {
+        $url = route('product_details',['id'=>''.$b->id.'']); 
+        $name = $b->name;
+        $description = $b->description;
+        }
+
+        $datas=array(
+            'name'=>$name,
+            'description'=>substr(strip_tags($description), 0,100),
+            'link'=>$url
+        );
+        $files = [
+                public_path('upload/product/'.$getimageName.'')
+            ];
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Product Added Successfully...']);
+            Mail::send('mail', $datas, function($message) use ($emails , $files)
+        {
+            $message->to($emails)->subject('Mellow Element');
+            foreach ($files as $file){
+                $message->attach($file); }
+            $message->from('payalmahendra143@gmail.com', 'Mellow Elements');
+            
+        });
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Product Added Failed. Due To Internal Server Error..']); 
+            return redirect()->back();
+        }
+    }
+    public function product_updates($id)
+    {  
+        $this->logged_in();
+
+        $data['product'] = DB::table('product_tb')->where('id',$id)->orderby('id','desc')->get();
+        $data['details'] = DB::table('subcategory_tb')->orderby('id','desc')->get();
+        $data['cat'] = DB::table('category_tb')->orderby('id','desc')->get(); 
+        return view('admin/product_updates')->with($data);
+    }
+    public function update_product(Request $request)
+    {
+        $this->logged_in();
+
+       
+
+        request()->validate(
+        [
+            'subcategory_id' => 'required',
+            'c_id' => 'required',
+            'name' => 'required',
+            'pro_type' => 'required',
+            'price' => 'required',
+            'pro_size' => 'required',
+            'source_code' => ['mimes:zip','max:5000gb'],
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            'multiple_image.*' => 'image|mimes:jpg,png,jpeg,gif,|max:5120',
+            'description' => 'required',
+            'additions' => 'required',
+            'overview' => 'required',
+        ]);  
+
+       if(!empty($files=$request->file('multiple_image')))
+        {
+            $img=array();
+            foreach($files as $file)
+            {
+                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
+                $path = public_path('upload/product/'.$getimageName);
+                Image::make($file)->save($path);  
+                $img[]=$getimageName;
+            }          
+            $multiple_image=implode(",",$img);          
+        }
+        else
+        {
+            $multiple_image=$request->post('old_multiple_image');
+        }
+        if(!empty($files=$request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();      
+            $path = public_path('upload/product/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+
+
+       if(!empty($files=$request->file('source_code')))
+        {
+            $new_name = rand().'.'.$request->source_code->getClientOriginalExtension();
+            $getsourcecode = $request->source_code->move(public_path('upload\source_code'),$new_name);
+        }
+        else
+        {
+            $getsourcecode=$request->post('old_source_code');
+        }
+
+        $data=array(
+
+            'subcategory_id'=>$request->post('subcategory_id'),
+            'c_id'=>$request->post('c_id'),
+            'name'=>$request->post('name'),
+            'description'=>$request->post('description'),
+            'image'=>$getimageName,
+            'multiple_image'=>$multiple_image,
+            'pro_type'=>$request->post('pro_type'),
+            'price'=>$request->post('price'),
+            'tax'=>$request->post('tax'),
+            'pro_size'=>$request->post('pro_size'),
+            'additions'=>$request->post('additions'),
+            'overview'=>$request->post('overview'),
+            'link'=>$request->post('link'),
+            'source_code'=>$getsourcecode
+        );
+        $id=$request->post('update');      
+        $result=DB::table('product_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            $data['product'] = DB::table('product_tb')->orderby('id','desc')->get();
+        $data['details'] = DB::table('subcategory_tb')->orderby('id','desc')->get();
+        $data['cat'] = DB::table('category_tb')->orderby('id','desc')->get();
+            session(['message' =>'success', 'errmsg' =>'Product Details Update Successfully...']);
+           return view('admin/products')->with($data);
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Product Details Update Failed. Due To Internal Server Error..']);
+            return redirect()->back();
+        }
+    }
+
+    public function delete_product($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('product_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Product Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Product Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    }  
+    
+    public function contactus()
+    {  
+        $this->logged_in(); 
+        $data['info'] = DB::table('contact_tb')->orderby('id','desc')->get();
+        return view('admin/contactus')->with($data);
+    }
+
+    public function all_rating()
+    {  
+        $this->logged_in(); 
+
+        $show['info_details'] = DB::table('rating_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.id','rating_tb.p_id','rating_tb.rating','rating_tb.date','rating_tb.ip')
+        ->join('product_tb','product_tb.id', '=', 'rating_tb.p_id')
+        ->get();
+
+        return view('admin/all_rating')->with($show);
+    }
+
+     public function free_consultations()
+    {  
+        $this->logged_in(); 
+        $data['free_consultation'] = DB::table('free_consultation_tb')->orderby('id','desc')->get();
+        return view('admin/free_consultation')->with($data);
+    }
+
+    public function change_password()
+    {
+        $this->logged_in();
+        return view('admin/change_password');
+    }
+
+    public function update_password(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(['con' => 'required','new' => 'required','old' => 'required']);
+        
+        $new=$request->post('new'); 
+        $con=$request->post('con');
+        $old=$request->post('old');
+        if($new==$con)
+        {   
+            $use = DB::table('admin_tb')->where('pass_id','=',md5($old))->count();
+            if($use > 0)
+            {           
+                $data=array('pass_id'=>md5($new),'show_pass'=>$new);
+                $update_result=DB::table('admin_tb')->where('id',1)->update($data);
+                if($update_result==true)
+                {
+                    session(['message' =>'success', 'errmsg' =>'Password Change Successfully.']);
+                    return redirect()->back();
+                }
+                else
+                {
+                    session(['message' =>'danger', 'errmsg'=>'Password Change Failed. Due To Internal Server Error..']); 
+                    return redirect()->back();
+                }
+            }
+            else
+            {
+                session(['message' =>'danger', 'errmsg'=>'Old Password Does Not Matched. Please Try Again.....']); 
+                return redirect()->back();              
+            }
+        }
+        else
+        {
+            session(['message' =>'warning', 'errmsg'=>'New Password & Confrim Password Do Not Matched.']); 
+            return redirect()->back();
+        }     
+    }
+    public function privacy_policy()
+    {
+        $this->logged_in();
+        $data['privacy_policy'] = DB::table('privacy_policy_tb')->orderby('id','desc')->get();
+        return view('admin/privacy_policy')->with($data);
+    }
+    public function submit_privacy_policy(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+        ]);
+
+        $data=array(
+           
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description')
+        );
+
+        $result=DB::table('privacy_policy_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Privacy Policy Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Privacy Policy Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function update_privacy_policy(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required'
+        ]);  
+
+        $data=array(
+
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description')
+        );
+        $id=$request->post('update');       
+        $result=DB::table('privacy_policy_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Privacy Policy Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Privacy Policy Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_privacy_policy($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('privacy_policy_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Privacy Policy Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Privacy Policy Delete Failed']); 
+            return redirect()->back();
+        }
+    }  
+
+    public function term_condition()
+    {
+        $this->logged_in();
+        $data['term_condition'] = DB::table('term_tb')->orderby('id','desc')->get();
+        return view('admin/term_condition')->with($data);
+    }
+    public function submit_term_condition(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+        ]);
+
+        $data=array(
+           
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description')
+        );
+
+        $result=DB::table('term_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Term Condition Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Term Condition Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function update_term_condition(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required'
+        ]);  
+
+        $data=array(
+
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description')
+        );
+        $id=$request->post('update');       
+        $result=DB::table('term_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Term Condition Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Term Condition Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_term_condition($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('term_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Term Condition Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Term Condition Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    } 
+
+    public function add_contact()
+    {   
+        $this->logged_in();
+        $data['contact_details'] = DB::table('contact_details_tb')->orderby('id','desc')->get();
+        return view('admin/add_contact')->with($data);
+    } 
+    public function submit_add_contact(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'address' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
+        ]);
+
+        $data=array(
+           
+            'address'=>$request->post('address'),
+            'email'=>$request->post('email'),
+            'phone'=>$request->post('phone'),
+        );
+
+        $result=DB::table('contact_details_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Contact Details Add Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Contact Details Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function update_add_contact(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'address' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
+        ]);  
+
+        $data=array(
+            'address'=>$request->post('address'),
+            'email'=>$request->post('email'),
+            'phone'=>$request->post('phone'),
+        );
+        $id=$request->post('update');       
+        $result=DB::table('contact_details_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Contact Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Contact Details Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_add_contact($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('contact_details_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Contact Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Contact Details Delete Failed ? Due To Internal Server Error...']); 
+            return redirect()->back();
+        }
+    } 
+    public function hig_prof()
+    {   
+        $this->logged_in();
+        $data['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        return view('admin/higher_professionals')->with($data);
+    }
+    public function submit_hig_prof(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);
+
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/hig_prof/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+            
+
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'image'=>$getimageName,
+        );
+
+        $result=DB::table('higher_professional_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Higher Professional Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Higher Professional Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function update_hig_prof(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);  
+
+        if(!empty($files=$request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/hig_prof/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'image'=>$getimageName,
+        );
+        $id=$request->post('update');       
+        $result=DB::table('higher_professional_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Higher Professional Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Higher Professional Details Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_hig_prof($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('higher_professional_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Higher Professional Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Higher Professional Details Delete Failed.']); 
+            return redirect()->back();
+        }
+    }  
+
+    public function developer_details()
+    {   
+        $this->logged_in();
+
+        $data['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $data['developer_details'] = DB::table('developer_details_tb')
+        ->select('higher_professional_tb.id as ids','higher_professional_tb.heading','developer_details_tb.dev_id','developer_details_tb.pro_id','developer_details_tb.name','developer_details_tb.description','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.total_hours','developer_details_tb.rating','developer_details_tb.address','developer_details_tb.language','developer_details_tb.education','developer_details_tb.skills','developer_details_tb.completed_job','developer_details_tb.portfolio_image','developer_details_tb.screenshot_image','developer_details_tb.resume')
+        ->join('higher_professional_tb','higher_professional_tb.id' , '=' , 'developer_details_tb.pro_id')
+        ->orderby('id','desc')->get();
+        return view('admin/developer_details')->with($data);
+    }
+
+    
+    public function submit_developer_details(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'pro_id' => 'required',
+            'name' => 'required',
+            'phone' => 'required',
+            'email' => 'required',
+            'description' => 'required',
+            'job' => 'required',
+            'total_hours' => 'required',
+            'perhr' => 'required',
+            'rating' => 'required',
+            'address' => 'required',
+            'language' => 'required',
+            'education' => 'required',
+            'skills' => 'required',
+            
+            'completed_job' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'portfolio_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            
+            'resume' => ['required', 'mimes:pdf','max:1000mb']
+        ]);
+
+            
+        
+
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/developer/'.$getimageName);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+
+
+        $getportfolioimage = time().'.'.$request->portfolio_image->getClientOriginalExtension();       
+        $path = public_path('upload/portfolio/'.$getportfolioimage);
+        $img = Image::make($request->file('portfolio_image')->getRealPath())->save($path);  
+
+        if($files=$request->file('resume'))
+        {
+            $new_name = rand().'.'.$request->resume->getClientOriginalExtension();
+            $getresume = $request->resume->move(public_path('upload/resume/'),$new_name); 
+        }
+
+        $data=array(
+            'pro_id'=>$request->post('pro_id'),
+            'name'=>$request->post('name'),
+            'phone'=>$request->post('phone'),
+            'email'=>$request->post('email'),
+            'description'=>$request->post('description'),
+            'job'=>$request->post('job'),
+            'total_hours'=>$request->post('total_hours'),
+            'perhr'=>$request->post('perhr'),
+            'rating'=>$request->post('rating'),
+            'address'=>$request->post('address'),
+            'language'=>$request->post('language'),
+            'education'=>$request->post('education'),
+            'skills'=>$request->post('skills'),
+            
+            'completed_job'=>$request->post('completed_job'),
+            'image'=>$getimageName,
+            'portfolio_image'=>$getportfolioimage,
+           
+            'resume'=>$getresume
+        );
+
+        $result=DB::table('developer_details_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Developer Details Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Developer Details Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function developer_details_update($dev_id)
+    {  
+        $this->logged_in();
+        $data['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $data['developer_details'] = DB::table('developer_details_tb')
+        ->select('higher_professional_tb.id as ids','higher_professional_tb.heading','developer_details_tb.dev_id','developer_details_tb.pro_id','developer_details_tb.name','developer_details_tb.description','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.total_hours','developer_details_tb.rating','developer_details_tb.address','developer_details_tb.language','developer_details_tb.education','developer_details_tb.skills','developer_details_tb.completed_job','developer_details_tb.portfolio_image','developer_details_tb.screenshot_image','developer_details_tb.resume','developer_details_tb.project_link')
+        ->join('higher_professional_tb','higher_professional_tb.id' , '=' , 'developer_details_tb.pro_id')
+        ->where('dev_id',$dev_id)
+        ->orderby('id','desc')->get();
+        return view('admin/developer_details_update')->with($data);
+    }
+    public function update_developer_details(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'pro_id' => 'required',
+            'name' => 'required',
+            'phone' => 'required',
+            'email' => 'required',
+            'description' => 'required',
+            'job' => 'required',
+            'total_hours' => 'required',
+            'perhr' => 'required',
+            'rating' => 'required',
+            'address' => 'required',
+            'language' => 'required',
+            'education' => 'required',
+            'skills' => 'required',
+            
+            'completed_job' => 'required',
+            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            'portfolio_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            
+            'resume' => ['mimes:pdf','max:1000mb']
+        ]);  
+
+
+        if(!empty($files=$request->file('image')))
+        {
+            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+            $path = public_path('upload/developer/'.$getimageName);
+            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getimageName=$request->post('old_image');
+        }
+
+        if(!empty($files=$request->file('portfolio_image')))
+        {
+            $getportfolioimage = time().'.'.$request->portfolio_image->getClientOriginalExtension();       
+            $path = public_path('upload/portfolio/'.$getportfolioimage);
+            $img = Image::make($request->file('portfolio_image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getportfolioimage=$request->post('old_portfolio_image');
+        }
+
+
+        if(!empty($files=$request->file('resume')))
+        {
+            $new_name = rand().'.'.$request->resume->getClientOriginalExtension();
+            $getresume = $request->resume->move(public_path('upload/resume/'),$new_name);             
+        }
+
+
+        $data=array(
+            'pro_id'=>$request->post('pro_id'),
+            'name'=>$request->post('name'),
+            'phone'=>$request->post('phone'),
+            'email'=>$request->post('email'),
+            'description'=>$request->post('description'),
+            'job'=>$request->post('job'),
+            'total_hours'=>$request->post('total_hours'),
+            'perhr'=>$request->post('perhr'),
+            'rating'=>$request->post('rating'),
+            'address'=>$request->post('address'),
+            'language'=>$request->post('language'),
+            'education'=>$request->post('education'),
+            'skills'=>$request->post('skills'),
+            
+            'completed_job'=>$request->post('completed_job'),
+            'image'=>$getimageName,
+            'portfolio_image'=>$getportfolioimage,
+            
+            'resume'=>$getresume
+        );
+        $dev_id=$request->post('update');       
+        $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Developer Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Developer Details Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_developer_details($dev_id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('developer_details_tb')->where('dev_id', $dev_id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Developer Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Developer Details Delete Failed.']); 
+            return redirect()->back();
+        }
+    } 
+
+    public function developer_project_details()
+    {   
+        $this->logged_in();
+        $data['all_developer_details'] = DB::table('developer_details_tb')->orderby('dev_id','desc')->get();
+        //$data['developer_project_details'] = DB::table('developer_project_details_tb')->get();
+
+
+        $data['developer_project_details'] = DB::table('developer_project_details_tb')
+        ->select('developer_details_tb.dev_id','developer_details_tb.name','developer_project_details_tb.developer_id','developer_project_details_tb.screenshot_image','developer_project_details_tb.project_link','developer_project_details_tb.id')
+        ->join('developer_details_tb','developer_details_tb.dev_id' , '=' , 'developer_project_details_tb.developer_id')
+        ->get();
+
+
+        return view('admin/developer_project_details')->with($data);
+    } 
+
+    public function submit_developer_project_details(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'developer_id' => 'required',
+            'project_link' => 'required',
+            'screenshot_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);
+
+        $getscreenshotimage = time().'.'.$request->screenshot_image->getClientOriginalExtension();       
+        $path = public_path('upload/screenshot/'.$getscreenshotimage);
+        $img = Image::make($request->file('screenshot_image')->getRealPath())->save($path);
+
+        $data=array(
+
+            'developer_id'=>$request->post('developer_id'),
+            'project_link'=>$request->post('project_link'),
+            'screenshot_image'=>$getscreenshotimage,
+        );
+
+        $result=DB::table('developer_project_details_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Developer Project Details Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Developer Project Details Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+
+    public function update_developer_project_details(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'developer_id' => 'required',
+            'project_link' => 'required',            
+            'screenshot_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);  
+
+        if(!empty($files=$request->file('screenshot_image')))
+        {
+            $getscreenshotimage = time().'.'.$request->screenshot_image->getClientOriginalExtension();       
+            $path = public_path('upload/screenshot/'.$getscreenshotimage);
+            $img = Image::make($request->file('screenshot_image')->getRealPath())->save($path);
+        }
+        else
+        {
+            $getscreenshotimage=$request->post('old_screenshot_image');
+        }
+
+        $data=array(
+            
+            'developer_id'=>$request->post('developer_id'),
+            'project_link'=>$request->post('project_link'),
+            'screenshot_image'=>$getscreenshotimage,
+        );
+       $id=$request->post('update');       
+       $result=DB::table('developer_project_details_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'Developer Project Details Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Developer Project Details Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+
+    public function delete_developer_project_details($developer_id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('developer_project_details_tb')->where('developer_id', $developer_id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'Developer Project Details Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Developer Project Details Delete Failed.']); 
+            return redirect()->back();
+        }
+    } 
+
+
+    public function License()
+    {
+        $this->logged_in();
+        $data['License'] = DB::table('license_tb')->orderby('id','desc')->get();
+        return view('admin/License')->with($data);
+    }
+    public function submit_License(Request $request)
+    {   
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+        ]);
+
+        $data=array(
+           
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description')
+        );
+
+        $result=DB::table('license_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'License Added Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'License Added Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function update_License(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required'
+        ]);  
+
+        $data=array(
+
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description')
+        );
+        $id=$request->post('update');       
+        $result=DB::table('license_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'License Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'License Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_License($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('license_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'License Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'License Delete Failed']); 
+            return redirect()->back();
+        }
+    }  
+
+
+    public function faqs()
+    {   
+        $this->logged_in();
+        $data['faq_detail'] = DB::table('faq_tb')->orderby('id','desc')->get();
+        return view('admin/faqs')->with($data);
+    }
+
+    public function submit_faqs(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+            
+        ]);  
+
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description'),
+        );           
+        
+        $result=DB::table('faq_tb')->insert($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'All Questions Upload Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'Questions Details Upload Failed.']); 
+            return redirect()->back();
+        }
+    } 
+
+    public function update_faqs(Request $request)
+    {
+        $this->logged_in();
+        request()->validate(
+        [
+            'heading' => 'required',
+            'description' => 'required',
+        ]);
+        
+        $data=array(
+            'heading'=>$request->post('heading'),
+            'description'=>$request->post('description'),
+        );
+        $id=$request->post('update');       
+        $result=DB::table('faq_tb')->where('id',$id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'errmsg' =>'All Questions Update Successfully...']);
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'All Questions Details Update Failed.']); 
+            return redirect()->back();
+        }
+    }
+    public function delete_faqs($id)
+    {
+        $this->logged_in();
+        $info_delete=DB::table('faq_tb')->where('id', $id)->delete();
+        if($info_delete==true)
+        {
+            session(['message' =>'success', 'errmsg'=>'All Questions Delete Successfully. ']); 
+            return redirect()->back();
+        }
+        else
+        {
+            session(['message' =>'danger', 'errmsg'=>'All Questions Delete Failed ?']); 
+            return redirect()->back();
+        }
+    } 
+    public function customer_details()
+    {   
+        $show['customer'] = DB::table('order_tb')->orderby('id','desc')->get();
+        return view('admin/customer_details')->with($show);
+    }
+    public function product_order()
+    {   
+        $show['product_order_details'] = DB::table('order_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.id','product_tb.price','order_tb.p_id','order_tb.order_id','order_tb.payment_status','order_tb.date','order_tb.u_id','order_tb.fname')
+        ->join('product_tb','product_tb.id', '=', 'order_tb.p_id')
+        ->orderby('id','desc')
+        ->get();
+        return view('admin/product_order')->with($show);
+    }
+    public function developer_order()
+    {   
+        $show['developer_order_details'] = DB::table('developer_order_tb')
+        ->select('developer_details_tb.name','developer_details_tb.image','developer_details_tb.dev_id','developer_details_tb.perhr','developer_order_tb.dev_id','developer_order_tb.order_id','developer_order_tb.payment_status','developer_order_tb.date','developer_order_tb.u_id','developer_order_tb.fname')
+        ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
+        ->orderby('id','desc')
+        ->get();
+        return view('admin/developer_order')->with($show);
+    }
+}

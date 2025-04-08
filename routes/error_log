@@ -1,0 +1,8 @@
+[23-Mar-2025 11:11:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home1/mellorbc/mellowvault.com/routes/web.php:16
+Stack trace:
+#0 {main}
+  thrown in /home1/mellorbc/mellowvault.com/routes/web.php on line 16
+[23-Mar-2025 11:11:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home1/mellorbc/mellowvault.com/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home1/mellorbc/mellowvault.com/routes/api.php on line 17
