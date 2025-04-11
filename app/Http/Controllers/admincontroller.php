@@ -14,6 +14,8 @@ use DB;
 use Illuminate\Validation\Rule;
 use Image;
 use Mail;
+use App\Models\developerPremiumPrice;
+use App\Models\Premium;
 
 class admincontroller extends Controller
 {
@@ -3191,5 +3193,64 @@ class admincontroller extends Controller
             }
     }
 
+    public function premium()
+    { 
+        $email= Session::get('admin_login_role');
+        $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+        // $data['web_hosting'] = DB::table('web_hosting_tb')->orderby('id','asc')->get();
 
+        $data['premium'] = Premium::all();
+        
+        $data['prices'] = developerPremiumPrice::all();
+
+        return view('admin/premium')->with($data);
+    }
+
+    public function premiumId(Request $request)
+    {   
+        $premium = Premium::where('id', $request->id)->first();
+
+        return response()->json(['success' => true, 'data' => $premium]);
+    }
+
+    public function premiumPointsStore(Request $request)
+    {   
+        Premium::create([
+            'name' => $request->points,
+        ]);
+
+        return redirect()->back()->with('success', 'Premium point added successfully.');
+
+
+    }
+
+    public function premiumPointsUpdate(Request $request)
+    {   
+        Premium::where('id', $request->id)->update([
+            'name' => $request->points,
+        ]);
+
+        return redirect()->back()->with('success', 'Premium point updated successfully.');
+
+
+    }
+    
+    public function premiumPointsDelete(Request $request)
+    {   
+        Premium::where('id', $request->id)->delete();
+        
+        return response()->json(['success' => true, 'massege' => "Successfully deleted"]);
+    }
+    
+        public function premiumPriceStore(Request $request)
+        {  
+            developerPremiumPrice::where('id', $request->name)->update([
+                'price' => $request->price,
+            ]);
+    
+            return redirect()->back()->with('success', 'Premium Price updated successfully.');
+    
+    
+        }
+    
 }

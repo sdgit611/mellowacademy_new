@@ -390,6 +390,7 @@ Route::post('work_space_details_updates','App\Http\Controllers\developercontroll
 Route::get('delete_work_space/{id}','App\Http\Controllers\developercontroller@delete_work_space')->name('delete_work_space');
 
 Route::get('developer_resource','App\Http\Controllers\developercontroller@developer_resource')->name('developer_resource');
+Route::get('developer-premium','App\Http\Controllers\developercontroller@developer_premium')->name('developer_premium');
 
 Route::get('developer_require_docs/{dev_id}/{u_id}','App\Http\Controllers\developercontroller@developer_require_docs')->name('developer_require_docs');
 Route::get('developer_require_download/{id}','App\Http\Controllers\developercontroller@developer_require_download')->name('developer_require_download');

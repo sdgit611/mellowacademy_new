@@ -86,6 +86,7 @@
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{{route('developer_log')}}">Log out</a>
                                 </div>
+                                
                             </li>
                         </ul>
                         <div class="collapse navbar-collapse" id="navbarNav">
@@ -138,6 +139,7 @@
                                         <li><a href="{{route('wallet_details')}}"><i class="material-icons">assignment</i> Wallet</a></li>
                                         <!-- <li><a href="{{route('all_transaction_details')}}"><i class="material-icons">settings</i> Transaction</a></li> -->
                                         <li><a href="{{route('developer_change_password')}}"><i class="material-icons">settings</i> Settings</a></li>
+                                        <li><a href="{{route('developer_premium')}}"> <i class="fas fa-coins"> </i> Try to Premium</a></li>
                                        
                                     </ul>
                                 </div>
