@@ -241,6 +241,9 @@
                                                 <li><a href="{{route('add_contact')}}">Add Contact Details</a></li>
                                                 <li><a href="{{route('contactus')}}">Contact Users </a></li>   
                                                 <li><a href="{{route('free_consultations')}}"> Free Consultation</a></li>
+                                                <li><a href="{{route('our_partner')}}"> Our Partners</a></li>
+                                                <li><a href="{{route('millaw_vault')}}"> Why Mellow Vault</a></li>
+                                                <li><a href="{{route('developer_details_admin')}}"> Developer Details</a></li>
                                             </ul>
                                         </li>
 
@@ -252,6 +255,10 @@
                                         <!--<li><a href="{{route('service')}}"><i class="material-icons">notification_important</i><i class="material-icons">save_alt</i><i class="material-icons">videocam</i> Service</a></li>-->
                                         
                                         <li><a href="{{route('web_setting')}}"><i class="material-icons">settings</i> Web Settings</a></li>
+
+                                
+
+
                                         <!--<li><a href="{{route('products')}}"><i class="material-icons">shopping_cart</i> Product</a></li>-->
                                         
                                     </ul>

@@ -14,6 +14,8 @@ use DB;
 use Illuminate\Validation\Rule;
 use Image;
 use Mail;
+use App\Models\Partner;
+use App\Models\MellowVault;
 
 class admincontroller extends Controller
 {
@@ -115,6 +117,244 @@ class admincontroller extends Controller
         ->get();
 
         return view('admin/dashboard')->with($show);;
+    }
+
+    public function our_partner()
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+        $show['partner_details'] = DB::table('partners')->orderby('id','desc')->get();
+        return view('admin/ourpartner/list-partner')->with($show);
+    }
+
+    public function add_partner(Request $req)
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+        if($req->method()=="GET")
+        {
+            return view('admin/ourpartner/add-partner')->with($show);
+        }else{
+
+             request()->validate(
+                [
+                    'name' => 'required',
+                    'description' => 'required',
+                    'profile' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+                ]);
+
+              if ($req->hasFile('profile'))
+              {
+                $getimageName = time().'.'.$req->profile->getClientOriginalExtension();       
+                $req->profile->move(public_path('/upload/partner/'), $getimageName);
+              }
+
+              $add_partner=new Partner;
+              $add_partner->name=$req->name;
+              $add_partner->description=$req->description;
+              $add_partner->image='/upload/partner/'.$getimageName;
+              $add_partner->save();
+
+              session(['message' =>'success', 'errmsg' =>'Partner Added Successfully...']);
+
+              return redirect()->back();
+        }
+    }
+
+    public function edit_partner(Request $req,$id=null)
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+        if($req->method()=="GET")
+        {
+            $show['Partnerdetails'] = DB::table('partners')->where('id',$id)->first();
+            return view('admin/ourpartner/edit-partner')->with($show);
+        }else
+        {
+                request()->validate(
+                [
+                    'name' => 'required',
+                    'description' => 'required',
+                    // 'profile' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+                ]);
+
+              $add_partner=Partner::Where('id',$id)->first();
+              if ($req->hasFile('profile'))
+              {
+                $getimageName = time().'.'.$req->profile->getClientOriginalExtension();       
+                $req->profile->move(public_path('/upload/partner/'), $getimageName);
+                 $add_partner->image='/upload/partner/'.$getimageName;
+              }
+
+              $add_partner->name=$req->name;
+              $add_partner->description=$req->description;
+              $add_partner->save();
+
+              session(['message' =>'success', 'errmsg' =>'Partner Edited Successfully...']);
+
+              return redirect()->back();
+        }
+    }
+
+    public function delete_partner($id)
+    {
+        DB::table('partners')->Where('id',$id)->delete();
+        session(['message' =>'success', 'errmsg' =>'Partner Edited Successfully...']);
+        return redirect()->back();
+    }
+
+    public function millaw_vault()
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+        $show['millaw_vault'] = DB::table('mellow_vaults')->get();
+        
+        return view('admin/millaw_vault/millaw_vault-list')->with($show); 
+    }
+
+    public function add_millaw_vault(Request $req)
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+
+        if($req->method()=="GET")
+        {
+            return view('admin/millaw_vault/add')->with($show);
+        }else{
+
+            request()->validate(
+                [
+                    'name' => 'required',
+                    'description' => 'required',
+                    'profile' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+                ]);
+
+            if ($req->hasFile('profile'))
+              {
+                $getimageName = time().'.'.$req->profile->getClientOriginalExtension();       
+                $req->profile->move(public_path('/upload/millaw_vault/'), $getimageName);
+                 
+              }
+
+              DB::table('mellow_vaults')->insert(['name'=>$req->name,'description'=>$req->description,'image'=>'/upload/millaw_vault/'.$getimageName]);
+
+              session(['message' =>'success', 'errmsg' =>'Millaw Vault Added Successfully...']);
+
+              return back();
+
+        }
+         
+    }
+
+    public function edit_millaw_vault(Request $req,$id)
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+
+        if($req->method()=="GET")
+        {
+            $show['data']=DB::table('mellow_vaults')->where('id',$id)->first();
+            return view('admin/millaw_vault/edit')->with($show);
+
+        }else{
+
+             request()->validate(
+                [
+                    'name' => 'required',
+                    'description' => 'required',
+                    // 'profile' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+                ]);
+
+             $millaw_vault=MellowVault::Where('id',$id)->first();
+            if ($req->hasFile('profile'))
+              {
+                $getimageName = time().'.'.$req->profile->getClientOriginalExtension();       
+                $req->profile->move(public_path('/upload/millaw_vault/'), $getimageName);
+                $millaw_vault->image='/upload/millaw_vault/'.$getimageName;
+              }
+
+              $millaw_vault->name=$req->name;
+              $millaw_vault->description=$req->description;
+              $millaw_vault->save();
+
+              session(['message' =>'success', 'errmsg' =>'Millaw Vault Edited Successfully...']);
+
+              return back();
+
+        }
+    }
+
+    public function delete_millaw_vault($id)
+    {
+        MellowVault::Where('id',$id)->delete();
+
+        session(['message' =>'success', 'errmsg' =>'Millaw Vault Deleted Successfully...']);
+
+        return back();
+    }
+
+    public function developer_details_admin()
+    {
+        $email= Session::get('admin_login_role');
+        $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+        $show['developer_details'] = DB::table('developer_details')->get();
+
+        return view('admin/developerdetails/index')->with($show);
+    }
+
+    public function add_developer_details_admin(Request $req,$id=null)
+    {
+        // $email= Session::get('admin_login_role');
+        // $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+
+        if($req->method()=="GET")
+        {
+            $email= Session::get('admin_login_role');
+            $show['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
+            if(!empty($id))
+            {
+              $show['developer_details'] = DB::table('developer_details')->Where('id',$id)->first();
+            }else{
+              $show['developer_details'] = DB::table('developer_details')->first();
+            }
+
+            return view('admin/developerdetails/add')->with($show); 
+        }
+
+        if(!empty($req->developerId))
+        {
+            DB::table('developer_details')->Where('id',$req->developerId)->update([
+                'total_developer'=>$req->total_developer,
+                'total_hours'=>$req->total_hours,
+                'total_project'=>$req->total_project,
+            ]);
+        session(['message' =>'success', 'errmsg' =>'Developer Details Updated Successfully...']);
+        }else
+        {
+             DB::table('developer_details')->insert([
+                'total_developer'=>$req->total_developer,
+                'total_hours'=>$req->total_hours,
+                'total_project'=>$req->total_project,
+            ]);
+        session(['message' =>'success', 'errmsg' =>'Developer Details Added Successfully...']);
+        }
+
+        return back();
+    }
+
+    public function delete_developer_details_admin($id)
+    {
+        DB::table('developer_details')->Where('id',$id)->delete();
+        session(['message' =>'success', 'errmsg' =>'Developer Details Deleted Successfully...']);
+        return back();
+    }
+
+    public function delete_developer_details_staus_admin($status,$id)
+    {
+        DB::table('developer_details')->Where('id',$id)->update(['status'=>$status]);
+
+        session(['message' =>'success', 'errmsg' =>'Developer Details Status Updated Successfully...']);
+        return back();
     }
     
     public function category()

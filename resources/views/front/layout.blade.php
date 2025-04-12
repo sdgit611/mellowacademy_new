@@ -78,7 +78,17 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"/>
+
+    <!-- Owl Carousel JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>-->
+
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
 
     
 
@@ -1052,9 +1062,27 @@
 
                            <hr>
 
-                            <form  method="post" action="{{route('free_consultation')}}" runat="server" onsubmit="ShowLoading()">
+                            <form  method="post" action="{{route('free_consultation')}}" runat="server" onsubmit="ShowLoading()" enctype="multipart/form-data">
 
                             @csrf
+
+                                 <div class="form-group">
+
+                                <label class="control-label col-sm-12" for="email">Name:</label>
+
+                                <div class="col-sm-12">
+
+                                  <input type="name" class="form-control" name="name" placeholder="Enter name" required="">
+
+                                  @if ($errors->has('name'))
+
+                                    <strong class="text-danger">{{ $errors->first('name') }}</strong>                                   
+
+                                    @endif
+
+                                </div>
+
+                              </div>
 
                               <div class="form-group">
 
@@ -1067,6 +1095,25 @@
                                   @if ($errors->has('email'))
 
                                     <strong class="text-danger">{{ $errors->first('email') }}</strong>                                   
+
+                                    @endif
+
+                                </div>
+
+                              </div>
+
+
+                                <div class="form-group">
+
+                                <label class="control-label col-sm-12" for="email">Mobile:</label>
+
+                                <div class="col-sm-12">
+
+                                  <input type="text" class="form-control" name="mobile" placeholder="Enter mobile" required="" maxlength="10" onkeypress="return isNumberKey(event)">
+
+                                  @if ($errors->has('mobile'))
+
+                                    <strong class="text-danger">{{ $errors->first('mobile') }}</strong>                                   
 
                                     @endif
 
@@ -1156,6 +1203,26 @@
 
                               <div class="form-group">
 
+                                <label class="control-label col-sm-12" for="pwd">Upload:</label>
+
+                                <div class="col-sm-12">
+
+                                  <input type="file" class="form-control" name="file" required="">
+
+                                  @if ($errors->has('file'))
+
+                                    <strong class="text-danger">{{ $errors->first('file') }}</strong>                                   
+
+                                    @endif
+
+                                </div>
+
+                              </div>
+
+                              <hr>
+
+                              <div class="form-group">
+
                                 <div class="col-sm-offset-2 col-sm-12">
 
                                   <button type="submit" class="btn btn-primary">Submit</button>
@@ -1174,7 +1241,55 @@
 
             </div>
 
-        </div>     
+        </div>  
+
+
+        <div class="modal" id="calender">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="row">
+                        <div class="col-lg-8 ml-auto mr-auto">
+                            @if(Session::has('freemsg'))                 
+                                <div class="alert alert-{{Session::get('message')}} alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
+                                       <strong>{{Session::get('freemsg')}}</strong>
+                                </div>
+                                {{Session::forget('message')}}
+                                {{Session::forget('freemsg')}}
+                            @endif
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <h4 style="color:black;">Book Appoinment</h4>
+                        <button type="button" style="float:right;margin-top:-43px;" class="btn btn-sm btn-danger" data-dismiss="modal">X</button>
+                           <hr>
+                            <form  method="post" action="{{route('free_consultation')}}" runat="server" onsubmit="ShowLoading()" enctype="multipart/form-data">
+                            @csrf
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-12" for="email">Name:</label>
+                                <div class="col-sm-12">
+                                  <input type="datetime-local" class="form-control" name="name" placeholder="Enter name" required="">
+                                </div>
+                              </div>
+
+                              <div class="form-group">
+                                <label class="control-label col-sm-12" for="email">Email:</label>
+                                <div class="col-sm-12">
+                                  <input type="datetime-local" class="form-control" name="email" placeholder="Enter email" required="">
+                                </div>
+                              </div>
+
+                              <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-12">
+                                  <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                              </div>
+                            </form> 
+                    </div>
+                </div>
+            </div>
+        </div>   
 
         @yield('content')
 
@@ -2390,6 +2505,76 @@ function hideChat(hide) {
 
 </script>
 
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        $("#verify_free_consultation").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                subject: {
+                    required: true
+                },
+                service: {
+                    required: true
+                },
+                message: {
+                    required: true
+                },
+                file: {
+                    required: true,
+                    extension: "jpg|jpeg|png|gif|pdf"
+                }
+            },
+            messages: {
+                name: {
+                    required: "Please enter your name"
+                },
+                email: {
+                    required: "Please enter your email",
+                    email: "Please enter a valid email"
+                },
+                subject: {
+                    required: "Please enter a subject"
+                },
+                service: {
+                    required: "Please select a service"
+                },
+                message: {
+                    required: "Please enter your message"
+                },
+                file: {
+                    required: "Please upload a file",
+                    extension: "Only image or PDF files are allowed"
+                }
+            },
+            submitHandler: function(form) {
+                // You can show a loader or disable the submit button here
+                form.submit(); // Submit the form
+            }
+        });
+
+  });
+
+
+    function isNumberKey(evt) {
+    var charCode = evt.which ? evt.which : evt.keyCode;
+    // Allow only numbers (0–9)
+    if (charCode >= 48 && charCode <= 57) {
+        return true;
+    }
+    return false;
+}
+
+    
+</script>
 
 
 

@@ -37,29 +37,14 @@
 
 
 <section class="products">
-
-    
-
     <header class="product_header">
-
         <div class="container">
-
-            
-
             <h2 class="title">Hire High-Performance Individual/Team, On Your Terms</h2>
-
         </div>
-
     </header>
-
-    
-
     <div class="container">
-
             <div class="row">
-
                 <?php
-
                 foreach($higher_professional as $hp) {
 
                 $url = route('dev_details',['id'=>''.$hp->id.'']); ?>
@@ -101,130 +86,128 @@
                 <?php
 
                 } ?>
+     <div class="text-center mt-4">
+        <a href="{{ route('higher_professional') }}" class="btn btn-primary" style="margin-left: 466px;
+    margin-top: -23px;">View More</a>
+    </div>
 
-            </div>
+    </div>
 
     </div> 
+</section>
 
+
+<section class="benefits">
+    <header >
+        <div class="container">
+            <h2 class="h2 title">Developer Details ?</h2>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-lg-3 g-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-picture"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>Total Developer</strong> <br />
+                            <small>{{@$total_count_developer}}</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+             <div class="col-6 col-lg-3 g-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-picture"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>Total Hours</strong> <br />
+                            <small>{{@$total_hours}}</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+             <div class="col-6 col-lg-3 g-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-picture"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>Total Projects</strong> <br />
+                            <small>
+                                {{ @$total_project }}
+                            </small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+             <!-- <div class="col-6 col-lg-3 g-3" data-tilt>
+                <figure>
+                    <div class="icon"><i class="icon icon-picture"></i></div>
+                    <figcaption>
+                        <span>
+                            <strong>Total Developer</strong> <br />
+                            <small>{{@$developer_count}}</small>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div> -->
+        </div> 
+    </div>
 </section>
 
 
 
 <section class="benefits">
-
     <header >
-
         <div class="container">
-
             <h2 class="h2 title">Why Mellow Vault?</h2>
-
         </div>
-
     </header>
-
-
-
     <div class="container">
-
         <div class="row">
-
+            @foreach($millaw_vault as $key=>$millaw)
             <div class="col-6 col-lg-3 g-3" data-tilt>
-
                 <figure>
-
-                    <div class="icon"><i class="icon icon-download"></i></div>
-
+                    <div class="icon"><img src="{{url('public'.$millaw->image)}}" /></i></div>
                     <figcaption>
-
                         <span>
-
-                            <strong>Hire with confidence—no upfront costs!</strong> <br />
-
-                            <small>Find the right candidates for your open positions, assess their fit, and pay only for the work you approve.</small>
-
+                            <strong>{{@$millaw->name}}</strong> <br />
+                            <small>{{@$millaw->description}}</small>
                         </span>
-
                     </figcaption>
-
                 </figure>
-
             </div>
-
-            <div class="col-6 col-lg-3 g-3" data-tilt>
-
-                <figure>
-
-                    <div class="icon"><i class="icon icon-picture"></i></div>
-
-                    <figcaption>
-
-                        <span>
-
-                            <strong>Schedule & Conduct Interviews</Tarea></strong> <br />
-
-                            <small>Gain insights into the quality of work you can expect when you hire through Talent Finder.</small>
-
-                        </span>
-
-                    </figcaption>
-
-                </figure>
-
-            </div>
-
-
-
-            <div class="col-6 col-lg-3 g-3" data-tilt>
-
-                <figure>
-
-                    <div class="icon"><i class="icon icon-license"></i></div>
-
-                    <figcaption>
-
-                        <span>
-
-                            <strong>Hire a Pro</strong> <br />
-
-                            <small>We connect busy professionals with the right opportunities, customizing solutions to fit your needs and fostering lasting partnerships for success..</small>
-
-                        </span>
-
-                    </figcaption>
-
-                </figure>
-
-            </div>
-
-
-
-            <div class="col-6 col-lg-3 g-3" data-tilt>
-
-                <figure>
-
-                    <div class="icon"><i class="icon icon-diamond"></i></div>
-
-                    <figcaption>
-
-                        <span>
-
-                            <strong>Take full control</strong> <br />
-
-                            <small>Take full control of when, where, and how you work! Mellow Vault ensures the perfect talent match for every role, boosting efficiency and meeting critical deadlines.</small>
-
-                        </span>
-
-                    </figcaption>
-
-                </figure>
-
-            </div>
-
+            @endforeach
         </div> 
-
     </div>
-
 </section>
+
+
+<!-- <section class="benefits">
+    <header >
+        <div class="container">
+            <h2 class="h2 title">Build Dream Team With Vault. Book 1: 1 Free Consultant Now</h2>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-lg-3 g-3" data-tilt>
+                <figure>
+                    <div class="icon">Build Dream Team With Vault. Book 1: 1 Free Consultant Now</div>
+                    <figcaption>
+                        <span>
+                        <form id="free_consultant_now">
+                                @csrf
+                                <input type="email" name="email" placeholder="Enter Email" class="form-group" required=""><br>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                        </span>
+                    </figcaption>
+                </figure>
+            </div>
+        </div> 
+    </div>
+</section> -->
 
 
 
@@ -268,63 +251,36 @@
 
 
 
-    <div class="container">
-
-        <div class="row">
-
-            <?php 
-
-            foreach($allproduct as $apro) { 
-
-                $url = route('product_details',['id'=>''.$apro->id.'']); ?>
-
-                <div class="col-6 col-lg-4 col-sm-4 col-md-4">
-
-                    <article>
-
-                        <a href="<?php echo $url; ?>" class="blog-link">
-
-                            <?php if($apro->image == ''){ ?>
-
-                                <div>
-
-                                    <video controls controlsList="nodownload" data-play="hover" muted="muted" onmouseover="this.play()" onmouseout="this.pause();" ><source class="embed-responsive-item" src="<?php echo URL::asset('public/upload/video/'.$apro->video.'') ?>" type="video/mp4" allowfullscreen></video>
-
-                                </div>
-
-                            <?php }else{ ?>
-
-                                <div>
-
-                                    <img src="<?php echo URL::asset('public/upload/product/'.$apro->image.'') ?>" style="width:100%;height:200px;"/> 
-
-                                </div>
-
-                            <?php } ?>
-
-                            <div class="entry entry-table">
-
-                                <div class="title">
-
-                                    <h2 class="h5" style="font-size:15px;"><?php echo $apro->name; ?></h2>
-
-                                </div>
-
+   <div class="container">
+    <div class="owl-carousel owl-theme">
+        <?php foreach($allproduct as $apro): 
+            $url = route('product_details', ['id' => $apro->id]); ?>
+            <div class="item">
+                <article>
+                    <a href="<?php echo $url; ?>" class="blog-link">
+                        <?php if ($apro->image == ''): ?>
+                            <div>
+                                <video controls controlsList="nodownload" muted onmouseover="this.play()" onmouseout="this.pause();" style="width: 100%; height: 200px;">
+                                    <source src="<?php echo URL::asset('public/upload/video/'.$apro->video); ?>" type="video/mp4">
+                                </video>
                             </div>
-
-                        </a>
-
-                    </article>
-
-                </div>
-
-            <?php
-
-            } ?>
-
-        </div> 
-
-    </div> 
+                        <?php else: ?>
+                            <div>
+                                <img src="<?php echo URL::asset('public/upload/product/'.$apro->image); ?>" style="width:100%; height:200px;" />
+                            </div>
+                        <?php endif; ?>
+                        <div class="entry entry-table">
+                            <div class="title">
+                                <h2 class="h5" style="font-size:15px;"><?php echo $apro->name; ?></h2>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+ 
 
     <div class="container">
     <div class="row">
@@ -405,23 +361,28 @@
 
     <div class="page-wrapper">
 
+    <div class="owl-carousel owl-theme">
+    @foreach($partner_details as $k=>$partners)
+
     <div class="profile-box">
 
-      <img src="https://mellowcorporation.com/public/upload/header/1628345113.png" alt="profile pic" class="img-pro">
+      <img src="{{url('public'.$partners->image)}}" alt="profile pic" class="img-pro" >
 
-      <h3 class="com-name"><a href="https://mellowcorporation.com/">Mellow Corporation</a></h3>
+      <h3 class="com-name"><a href="https://mellowcorporation.com/">{{@$partners->name}}</a></h3>
 
     </div>
+    @endforeach
+</div>
 
-    <div class="profile-box">
+  <!--   <div class="profile-box">
 
       <img src="https://placeimg.com/200/200/animal" alt="profile pic" class="img-pro">
 
       <h3 class="com-name"><a href="https://seminator.in/">Seminator Infosystem Pvt Ltd.</a></h3>
 
-    </div>
+    </div> -->
 
-    <div class="profile-box">
+    <!-- <div class="profile-box">
 
       <img src="http://mellowacademy.com/public/front/images/logo.png" alt="profile pic" class="img-pro">
 
@@ -435,12 +396,64 @@
 
       <h3 class="com-name"><a href="">James E. Sheldon</a></h3>
 
-    </div>
+    </div> -->
 
     </div>
 
 </section>
 
+
+<script>
+$(document).ready(function(){
+  $('.owl-carousel').owlCarousel({
+    loop: true,
+    margin: 15,
+    nav: true,
+    dots: false,
+    autoplay: true,
+    autoplayTimeout: 4000,
+    responsive:{
+      0:{ items:1 },
+      576:{ items:2 },
+      768:{ items:3 },
+      // 992:{ items:4 },
+      // 1200:{ items:5 }  // show 5 items per slide on large screens
+    }
+  });
+});
+
+
+
+$(document).ready(function(){
+
+    ShowCalender();
+
+});
+
+
+$("#free_consultant_now").on('submit', function(e){
+
+    e.preventDefault();
+    $.ajax({
+        type:"post",
+        url:"{{route('email_verify')}}",
+        data: $(this).serialize(),
+        success:function(resp)
+        {
+            console.log(resp.data);
+           if(resp.data==0)
+           {
+             window.location.href="{{route('contact')}}"
+           }else{
+            
+              $('#calender').modal('show');
+           }
+        }
+    });
+
+});
+
+</script>
 
 
 @endsection

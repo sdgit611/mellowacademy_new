@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('email_verify','App\Http\Controllers\frontController@email_verify')->name('email_verify');
+
+
 Route::get('/','App\Http\Controllers\frontController@index');
 Route::get('index','App\Http\Controllers\frontController@index')->name('index');
 Route::get('aboutus','App\Http\Controllers\frontController@aboutus')->name('aboutus');
@@ -173,6 +176,30 @@ Route::get('adminindex','App\Http\Controllers\admincontroller@adminindex')->name
 Route::post('login_verification_admin','App\Http\Controllers\admincontroller@login_verification_admin')->name('login_verification_admin');
 Route::get('dashboard','App\Http\Controllers\admincontroller@dashboard')->name('dashboard');
 Route::get('logout','App\Http\Controllers\admincontroller@logout')->name('logout');
+
+// Our Partners Start
+Route::get('our_partner','App\Http\Controllers\admincontroller@our_partner')->name('our_partner');
+Route::match(['GET','Post'],'add_partner','App\Http\Controllers\admincontroller@add_partner')->name('add_partner');
+Route::match(['GET','Post'],'edit_partner/{id?}','App\Http\Controllers\admincontroller@edit_partner')->name('edit_partner');
+Route::get('delete_partner/{id}','App\Http\Controllers\admincontroller@delete_partner')->name('delete_partner');
+// Our Partners Start
+
+// Mello Vault Start
+Route::get('millaw_vault','App\Http\Controllers\admincontroller@millaw_vault')->name('millaw_vault');
+Route::match(['GET','Post'],'add_millaw_vault','App\Http\Controllers\admincontroller@add_millaw_vault')->name('add_millaw_vault');
+Route::match(['GET','POST'],'edit_millaw_vault/{id}','\App\Http\Controllers\admincontroller@edit_millaw_vault')->name('edit_millaw_vault');
+Route::get('delete_millaw_vault/{id}','\App\Http\Controllers\admincontroller@delete_millaw_vault')->name('delete_millaw_vault');
+// Mellow Vault End
+
+// Developer Details Start
+Route::get('developer_details_admin','\App\Http\Controllers\admincontroller@developer_details_admin')->name('developer_details_admin');
+Route::match(['GET','POST'],'add_developer_details_admin/{id?}','\App\Http\Controllers\admincontroller@add_developer_details_admin')->name('add_developer_details_admin');
+Route::get('delete_developer_details_admin/{id}','\App\Http\Controllers\admincontroller@delete_developer_details_admin')->name('delete_developer_details_admin');
+
+Route::get('delete_developer_details_staus_admin/{status}/{id}','\App\Http\Controllers\admincontroller@delete_developer_details_staus_admin')->name('delete_developer_details_staus_admin');
+
+// Developer Details End
+
 
 Route::get('category','App\Http\Controllers\admincontroller@category')->name('category');
 Route::post('submit_category','App\Http\Controllers\admincontroller@submit_category')->name('submit_category');

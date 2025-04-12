@@ -1497,18 +1497,33 @@ class userController extends Controller
         $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
 
 	        request()->validate([
-	            
+	            'name' => 'required',
 	            'email' => 'required|email',
 	            'subject' => 'required',
 	            'service' => 'required',
-	            'message' => 'required'
-	        ]);     
+	            'message' => 'required',
+	            'file'   => 'required',
+	            'mobile' => 'required',
+	        ]);
+
+
+	        $path;
+	        if ($req->hasFile('file'))
+	        {
+			    $getimageName = time().'.'.$req->file->getClientOriginalExtension();       
+			    $req->file->move(public_path('/upload/support/'), $getimageName);
+			    $path='/upload/support/'.$getimageName;
+			}
+
 	        $data = array(
 	            'email'=>$req->post('email'),
 	            'subject'=>$req->post('subject'),
 	            'service'=>$req->post('service'),
 	            'message'=>$req->post('message'),
-	            'date'=>date('y/m/d')
+	            'date'=>date('y/m/d'),
+	            'name' => $req->post('name'),
+	            'file' => $path,
+	            'mobile'=>$req->mobile,
 	        );           
 	        $result=DB::table('free_consultation_tb')->insert($data);
 
@@ -1532,6 +1547,25 @@ class userController extends Controller
 	            $message->to($emails)->subject('Mellow Elements');
 	            $message->from('dev@mellowelements.in', 'Mellow Elements');
 	            });
+
+
+	            if(!empty($path))
+	            {
+	            	$extension = pathinfo($path, PATHINFO_EXTENSION);
+	            	if($extension=="pdf")
+	            	{
+	            		$mime='application/pdf';
+	            	}else{
+	            		$mime='image/jpeg';
+	            	}
+
+	            	$message->attach(url('public' . $path), [
+			                'as' => "document" ,
+			                'mime' => $mime,
+			            ]);
+	            }
+
+
 
 	            session(['message' =>'success', 'freemsg' =>'Enquiry Submit Successfully. We Will Contact You Very Soon...']);
 	            return redirect()->back(); 

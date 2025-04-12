@@ -26,13 +26,13 @@ class frontController extends Controller
     {  
         
         $show['pro'] = DB::table('product_tb')->selectRaw('c_id, count(id) as count_id')->groupBy('c_id')->get();
-        $show['allproduct'] = DB::table('product_tb')->orderby('id','desc')->limit(3)->get(); 
+        $show['allproduct'] = DB::table('product_tb')->orderby('id','desc')->inRandomOrder()->limit(3)->get(); 
         $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
         $show['about'] = DB::table('about_tb')->orderby('id','desc')->get(); 
     	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
         $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
         $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->limit(12)->get();
 
         $show['web_details'] = DB::table('web_setting')->get();
 
@@ -49,6 +49,35 @@ class frontController extends Controller
         $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
         $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
 
+        $show['partner_details'] = DB::table('partners')->orderby('id','desc')->get();
+
+        $show['millaw_vault'] = DB::table('mellow_vaults')->get();
+
+        // $show['developer_count']
+
+        $ddd_details_admin=DB::table('developer_details')->Where('status',1)->orderby('id','desc')->first();
+        if(!empty($ddd_details_admin))
+        {
+            $total_count_developer=$ddd_details_admin->total_developer;
+            $total_hours=$ddd_details_admin->total_hours;
+            $total_project=$ddd_details_admin->total_project;
+
+        }else
+        {
+          $details =DB::table('developer_details_tb')->get();
+
+          $total_count_developer=count($details);
+          $total_hours=$details->sum('total_hours');
+          $total_project=$details->pluck('completed_job')->filter(function($value) {
+                                    return is_numeric($value);
+                                    })->sum();
+        }
+
+        $show['total_count_developer']=$total_count_developer;
+        $show['total_hours']=$total_hours;
+        $show['total_project']=$total_project;
+
+
         $show['developer_order_details']=$this->developer_order_data();
 
         $ip = request()->ip();
@@ -64,7 +93,25 @@ class frontController extends Controller
             $result=DB::table('visitor_tb')->insert($data);
         }
 
+        $show['status']=0;
 		return view('front/index')->with($show);
+    }
+
+    public function email_verify(Request $req)
+    {
+        request()->validate([
+            'email' => 'required|email',
+        ]);
+
+       if (str_ends_with($req->email, '@mellowacademy.com'))
+       {
+         $status=1;
+         return response()->json(['data'=>$status]);
+       }else
+       {
+         $status=0;
+         return response()->json(['data'=>$status]);
+       }
     }
     
     public function aboutus()
