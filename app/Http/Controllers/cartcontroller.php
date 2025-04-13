@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Session;
 use DB;
 use Mail;
+use App\Models\Evalution;
 
 
 class cartcontroller extends Controller
@@ -613,11 +614,71 @@ class cartcontroller extends Controller
 
     	$show['sow_details'] = DB::table('sow_tb')->where('u_id' ,'=', $u_id )->where('sow_payment_status' ,'=', NULL )->get();
 
+
     	// $show['developer_data_details'] = DB::table('sow_tb')->count();
 
     	// $show['developer_data'] = DB::table('sow_tb')->where('sow_status' ,'=', '')->count();
 
 		return view('front/resource')->with($show);
+    }
+
+    public function Evalution(Request $req,$devId)
+    {
+    	if($req->method()=="GET")
+    	{
+	        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+	        $show['web_details'] = DB::table('web_setting')->get();
+	        $u_id=Session::get('user_login_id'); 
+
+	        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+	        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+	        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+	    	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+	        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+	        $show['developer_order_details']=$this->developer_order_data(); 
+
+	         $show['cart_details'] = DB::table('cart_tb')
+	        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+	        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+	        ->whereNull('status')
+	        ->get();
+	        $show['dev_id']=$devId;
+
+	        $show['evalution'] = DB::table('evalutions')->Where(['dev_id'=>$devId,'user_id'=>Session::get('user_login_id')])->first();
+	     }else
+	     {
+	     	// dd($req->all());
+	     	$evalution=Evalution::Where(['dev_id'=>$devId,'user_id'=>Session::get('user_login_id')])->first();
+	     	if(empty($evalution))
+	     	{
+	     		$evalution=new Evalution;
+	     	}
+
+	     	$evalution->dev_id=$devId;
+	     	$evalution->user_id=Session::get('user_login_id');
+	     	$evalution->feedback1=$req->q23_overallHow23;
+	     	$evalution->feedback2=$req->q25_afterThe25;
+	     	$evalution->feedback3=$req->q24_doYou;
+	     	$evalution->feedback4=$req->q30_whatWas;
+	     	$evalution->feedback5=$req->q26_wouldYou;
+	     	// $evalution->feedback6=$req->q31_presenter1[0];
+	     	// $evalution->feedback7=$req->q34_presenter2[0];
+	     	// $evalution->feedback8=$req->q33_presenter3[0];
+	     	// $evalution->feedback9=$req->q32_presenter4[0];
+	     	// $evalution->feedback10=$req->q32_presenter4[0];
+	     	$evalution->feedback11=$req->q17_howWas17;
+	     	$evalution->feedback12=$req->q50_wasThere;
+	     	$evalution->problems=$req->q37_whatProblems;
+	     	$evalution->suggestion_future_topics=$req->q45_anySuggestions45;
+	     	$evalution->final_comments=$req->q38_anyFinal38;
+	     	$evalution->save();
+
+	     	session(['message' =>'success', 'schedule_errmsg' =>'Evalution Added Successfully..']);
+
+	     	return back();
+	     }
+
+    	return view('front/evalution/index')->with($show);
     }
     
     public function schedule_interview_resource (Request $request)

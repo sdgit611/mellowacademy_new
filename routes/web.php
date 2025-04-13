@@ -147,6 +147,10 @@ Route::get('developer_thank_you','App\Http\Controllers\cartcontroller@developer_
 
 
 Route::get('resource','App\Http\Controllers\cartcontroller@resource')->name('resource');
+
+Route::match(['GET','POST'],'evalution/{devId}','App\Http\Controllers\cartcontroller@Evalution')->name('evalution');
+
+
 Route::post('submit_require_docs','App\Http\Controllers\cartcontroller@submit_require_docs')->name('submit_require_docs');
 Route::post('submit_short_message','App\Http\Controllers\cartcontroller@submit_short_message')->name('submit_short_message');
 Route::post('submit_sow_docs','App\Http\Controllers\cartcontroller@submit_sow_docs')->name('submit_sow_docs');

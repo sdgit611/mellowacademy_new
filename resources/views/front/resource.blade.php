@@ -51,6 +51,9 @@
                             <div class="profile-header">
                                 <h3><span>Interview Schedule</span></h3>
                             </div>
+                            <div class="clearfix">
+                                <a href="{{route('evalution',$resource->dev_id)}}" class="btn btn-success pull-right">Evalution</a>
+                            </div>
                             <div class="row profile-user-info">
                                 <div class="col-sm-12">
                                     <form method="post" action="{{route('schedule_interview_resource')}}" enctype="multipart/form-data">
