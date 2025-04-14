@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\DeveloperProjectDetail;
 use App\Models\Developer;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Premium;
+use App\Models\developerPayments;
+use App\Models\developerPremiumPrice;
 
 class developercontroller extends Controller
 {
@@ -623,6 +626,56 @@ class developercontroller extends Controller
         $show['resource_details'] = DB::table('developer_order_tb')->where('dev_id',$developer_id)->orderby('id','desc')->get();
 
         return view('developer/developer_resource')->with($show);
+    }
+
+    public function developerPremium()
+    {
+        
+        $developer_id=Session::get('developer_login_id'); 
+
+        $show['resource_details'] = DB::table('developer_order_tb')->where('dev_id',$developer_id)->orderby('id','desc')->get();
+        
+        $show['premium'] = Premium::all();
+        
+        $show['prices'] = developerPremiumPrice::where('status',true)->get();
+        
+        $show['date'] = developerPayments::where('developer_id', Session::get('developer_login_id'))->orderBy('id', 'DESC')->first();
+
+        return view('developer/developer_premium')->with($show);
+    }
+
+    public function developerPremiumPay(Request $request)
+    {
+        $developerPremiumPrice = DeveloperPremiumPrice::where('id', $request->razorpay_id)->first();
+
+        if ($developerPremiumPrice) {
+            // Determine expiry date based on the plan name
+            if ($developerPremiumPrice->name === "one time")
+                $expired = null;
+            elseif ($developerPremiumPrice->name === "monthly")
+                $expired = now()->addMonth();
+            elseif ($developerPremiumPrice->name === "quarterly")
+                $expired = now()->addMonths(3);
+            elseif ($developerPremiumPrice->name === "yearly")
+                $expired = now()->addYear();
+            else
+                $expired = null; // fallback if name doesn't match any known option
+            
+            developerPayments::create([
+                'developer_id' => Session::get('developer_login_id'),
+                'payment_id' => $request->razorpay_payment_id,
+                'order_id' => $request->razorpay_order_id,
+                'signature' => $request->razorpay_signature,
+                'developer_premium_prices_id' => $request->razorpay_id,
+                'expired' => $expired,
+            ]);
+        }
+    }
+
+    public function paymentSuccess(Request $request)
+    {
+        // Save the payment info if needed
+        return response()->json(['success' => true, 'message' => 'Payment successful!']);
     }
 
     public function developer_require_docs($dev_id,$u_id)

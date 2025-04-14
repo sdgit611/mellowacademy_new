@@ -100,13 +100,80 @@ window.location.href = "developer_admin";
                             <li class="nav-item">
                                 <a href="#" class="nav-link"></a>
                             </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link"></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link"></a>
+                            <li class="nav-item nav-profile dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img src="{{ URL::asset('public/front/assets/images/3d.png') }}" alt="profile image">
+                                   <?php if(!empty(Session::get('developer_name_login'))){?>
+                                    <span style=" text-transform: capitalize;">Hi,  
+
+                                       <?php echo $name =Session::get('developer_name_login'); ?>
+                                    </span><i class="material-icons dropdown-icon">keyboard_arrow_down</i>
+                                    <?php } ?>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="change_password">Settings</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{{route('developer_log')}}">Log out</a>
+                                </div>
+                                
                             </li>
                         </ul>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link"></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link"></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="navbar-search">
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" name="search" id="nav-search" placeholder="Search...">
+                                </div>
+                            </form>
+                        </div>
+                    </nav>
+                </div>
+                <div class="horizontal-bar">
+                    <div class="logo-box"><a href="#" class="logo-text">Connect</a></div>
+                    <a href="#" class="hide-horizontal-bar"><i class="material-icons">close</i></a>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="horizontal-bar-menu">
+                                    <ul>
+                                        <li><a href="{{route('developer_dashboard')}}" class="active"><i class="material-icons">dashboard</i> Dashboard</a></li>
+                                        <li><a href="{{route('developer_profile')}}"><i class="material-icons">face</i> Profile</a></li>
+                                        <li><a href="{{route('developer_interview_schedule_details')}}"><i class="material-icons">manage_accounts</i> Interview Schedule</a></li>
+                                        <li>
+                                            <a href="{{route('developer_kyc')}}"><i class="material-icons">subject</i> KYC</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{route('bank_details')}}"><i class="material-icons">note</i> Bank Details</a>
+                                        </li>
+                                        <!--<li>-->
+                                        <!--    <a href="{{route('work_space')}}"><i class="material-icons">input</i> Work Space</a>-->
+                                        <!--</li>-->
+                                        
+                                        <li>
+                                            <a href="{{route('developer_resource')}}"><i class="material-icons">info</i> Client Details</a>
+                                        </li>
+                                        
+                                        <li><a href="{{route('wallet_details')}}"><i class="material-icons">assignment</i> Wallet</a></li>
+                                        <!-- <li><a href="{{route('all_transaction_details')}}"><i class="material-icons">settings</i> Transaction</a></li> -->
+                                        <li><a href="{{route('developer_change_password')}}"><i class="material-icons">settings</i> Settings</a></li>
+                                        <li><a href="{{route('developer_premium')}}"> <i class="fas fa-coins"> </i> Try to Premium</a></li>
+                                       
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="navbar-search">
                         <form>
