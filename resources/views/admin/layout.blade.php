@@ -31,6 +31,7 @@
         <link href="{{ URL::asset('public/admin/assets/css/dark_theme.css') }}" rel="stylesheet">
         <link href="{{ URL::asset('public/admin/assets/css/custom.css') }}" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="{{ URL::asset('public/front/js/sweetalert2.js') }}"></script>
 
         <style>
         .geeks {
@@ -73,6 +74,10 @@
                             <li class="nav-item nav-profile dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <img src="{{ URL::asset('public/front/assets/images/Logo-01.png') }}" alt="profile image">
+                                    
+                                    
+                                    @if(isset($rolesdetails))
+                                    
                                     <?php
                                    
                                     $id=Session::get('admin_email_role');
@@ -88,6 +93,7 @@
                                     <span>Blogger</span><i class="material-icons dropdown-icon">keyboard_arrow_down</i>
                                     
                                     <?php } } ?>
+                                    @endif
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="change_password">Settings</a>
@@ -125,6 +131,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="horizontal-bar-menu">
+                                     @if(isset($rolesdetails))
                                     <?php
                                    
                                     $id=Session::get('admin_email_role');
@@ -190,7 +197,7 @@
                                            
                                             <li><a href="{{route('commission')}}"><i class="material-icons">percent</i> Commission</a></li>  
                                             
-                                        </li>
+                                        </li>                                        
                                         
                                         <li>
                                             <a href="#"><i class="material-icons">manage_accounts</i> Higher Professional<i class="material-icons">keyboard_arrow_down</i></a>
@@ -253,6 +260,9 @@
                                         
                                         <li><a href="{{route('web_setting')}}"><i class="material-icons">settings</i> Web Settings</a></li>
                                         <!--<li><a href="{{route('products')}}"><i class="material-icons">shopping_cart</i> Product</a></li>-->
+                                        <li><a href="{{route('premium')}}"><i class="fas fa-coins"> </i> Try to Premium</a></li>
+
+                                        
                                         
                                     </ul>
                                     
@@ -318,6 +328,7 @@
                                     </ul>
                                     
                                     <?php } } ?>
+                                    @endif
                                 </div>
                             </div>
                         </div>

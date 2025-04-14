@@ -336,6 +336,14 @@ Route::post('submit_web_hosting','App\Http\Controllers\admincontroller@submit_we
 Route::post('update_web_hosting','App\Http\Controllers\admincontroller@update_web_hosting')->name('update_web_hosting');
 Route::get('delete_web_hosting/{id}','App\Http\Controllers\admincontroller@delete_web_hosting')->name('delete_web_hosting');
 
+Route::get('premium','App\Http\Controllers\admincontroller@premium')->name('premium');
+Route::post('premium','App\Http\Controllers\admincontroller@premiumId')->name('premium_id');
+Route::post('premium-points-store','App\Http\Controllers\admincontroller@premiumPointsStore')->name('premium_points_store');
+Route::post('premium-points-update','App\Http\Controllers\admincontroller@premiumPointsUpdate')->name('premium_points_update');
+Route::post('premium-points-delete','App\Http\Controllers\admincontroller@premiumPointsDelete')->name('premium_points_delete');
+
+Route::post('premium-price-store','App\Http\Controllers\admincontroller@premiumPriceStore')->name('premium_price_store');
+
 /*
 ---------------------------------------------------------------------------------------------------------
 ........................................ Developer Panel Routes Section......................................
@@ -390,6 +398,8 @@ Route::post('work_space_details_updates','App\Http\Controllers\developercontroll
 Route::get('delete_work_space/{id}','App\Http\Controllers\developercontroller@delete_work_space')->name('delete_work_space');
 
 Route::get('developer_resource','App\Http\Controllers\developercontroller@developer_resource')->name('developer_resource');
+Route::get('developer-premium','App\Http\Controllers\developercontroller@developerPremium')->name('developer_premium');
+Route::post('developer-premium-pay','App\Http\Controllers\developercontroller@developerPremiumPay')->name('developer_premium_pay');
 
 Route::get('developer_require_docs/{dev_id}/{u_id}','App\Http\Controllers\developercontroller@developer_require_docs')->name('developer_require_docs');
 Route::get('developer_require_download/{id}','App\Http\Controllers\developercontroller@developer_require_download')->name('developer_require_download');
