@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FeedbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,8 @@ Route::get('index','App\Http\Controllers\frontController@index')->name('index');
 Route::get('aboutus','App\Http\Controllers\frontController@aboutus')->name('aboutus');
 Route::get('product/{id}','App\Http\Controllers\frontController@product')->name('product');
 Route::get('subproduct/{id}','App\Http\Controllers\frontController@subproduct')->name('subproduct');
+Route::view('rating','/feedback')->name('rating');
+Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
 Route::get('product_details/{id}','App\Http\Controllers\frontController@product_details')->name('product_details');
 

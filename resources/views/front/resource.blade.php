@@ -88,6 +88,7 @@
                                                     
                                         <div class="clearfix">
                                             <button type="submit" class="btn btn-success pull-right">Schedule</button>
+                                            <a href="{{route('rating')}}" class="btn btn-success btn-sm mb-3"> Feedback</a>
                                         </div>
                                     </form>
                                 </div>
