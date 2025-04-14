@@ -9,8 +9,9 @@ use Razorpay\Api\Api;
 use Illuminate\Support\Str;
 use Session;
 use DB;
-use Mail;
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use App\Services\GoogleCalendarService;
 
 class cartcontroller extends Controller
 {
@@ -559,7 +560,7 @@ class cartcontroller extends Controller
     	 //echo $show['developer_resources']; exit();
     	 
     	$show['developer_resources'] = DB::table('developer_order_tb')
-    	->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_order_tb.status','developer_order_tb.u_id','developer_order_tb.dev_id','developer_order_tb.qdate')
+    	->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_details_tb.available_start_date','developer_details_tb.available_end_date','developer_order_tb.status','developer_order_tb.u_id','developer_order_tb.dev_id','developer_order_tb.qdate')
         ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
         ->where('developer_order_tb.u_id' ,'=', $u_id )
         ->where('developer_order_tb.payment_status' ,'=', 'SUCCESS' )
@@ -620,66 +621,199 @@ class cartcontroller extends Controller
 		return view('front/resource')->with($show);
     }
     
-    public function schedule_interview_resource (Request $request)
-    {  
+    // public function schedule_interview_resource (Request $request)
+    // {  
 
     	    
     	
-	       	request()->validate(
-	        [
-	            'interviewdateone' => ['required'],
-	            'interviewdatetwo' => ['required'],
-	            'interviewdatethree' => ['required'],
-	        ]);
+	//        	request()->validate(
+	//         [
+	//             'interviewdateone' => ['required'],
+	//             'interviewdatetwo' => ['required'],
+	//             'interviewdatethree' => ['required'],
+	//         ]);
 	        
-	        $dev_id= Session::get('dev_id');
+	//         $dev_id= Session::get('dev_id');
 	       
-	       // echo $dev_id; exit();
+	//        // echo $dev_id; exit();
 
-       		$docs = DB::table('developer_order_tb')->where('dev_id',$dev_id)->get();
+    //    		$docs = DB::table('developer_order_tb')->where('dev_id',$dev_id)->get();
        		
-       		//dd($docs);
+    //    		//dd($docs);
 
-			foreach($docs as $c)
-			{
-		        $data=array(
+	// 		foreach($docs as $c)
+	// 		{
+	// 	        $data=array(
 
-		            'dev_id'=>$dev_id,
-		            'u_id'=>$c->u_id,
-		            'fname'=>$c->fname,
-		            'lname'=>$c->lname,
-		            'phone'=>$c->phone,
-		            'email'=>$c->email,
-		            'perhr'=>$c->perhr,
-		            'code'=>$c->code,
-		            'address_one'=>$c->address_one,
-		            'interviewdateone'=>$request->post('interviewdateone'),
-		            'interviewdatetwo'=>$request->post('interviewdatetwo'),
-		            'interviewdatethree'=>$request->post('interviewdatethree'),
-		            'status'=>'Interview Schedule',
-		        );
+	// 	            'dev_id'=>$dev_id,
+	// 	            'u_id'=>$c->u_id,
+	// 	            'fname'=>$c->fname,
+	// 	            'lname'=>$c->lname,
+	// 	            'phone'=>$c->phone,
+	// 	            'email'=>$c->email,
+	// 	            'perhr'=>$c->perhr,
+	// 	            'code'=>$c->code,
+	// 	            'address_one'=>$c->address_one,
+	// 	            'interviewdateone'=>$request->post('interviewdateone'),
+	// 	            'interviewdatetwo'=>$request->post('interviewdatetwo'),
+	// 	            'interviewdatethree'=>$request->post('interviewdatethree'),
+	// 	            'status'=>'Interview Schedule',
+	// 	        );
 		        
-		    }
+	// 	    }
 
-	        $result=DB::table('developer_interview_schedule')->insert($data);
+	//         $result=DB::table('developer_interview_schedule')->insert($data);
 	        
-	        $result=DB::table('developer_order_tb')->where('dev_id',$dev_id)->update($data);
+	//         $result=DB::table('developer_order_tb')->where('dev_id',$dev_id)->update($data);
 	        
 
-	        if($result==true)
-	        {
-	            session(['message' =>'success', 'schedule_errmsg' =>'Interview Schedule Successfully.']);
+	//         if($result==true)
+	//         {
+	//             session(['message' =>'success', 'schedule_errmsg' =>'Interview Schedule Successfully.']);
 	           
-	            return redirect()->back();
-	        }
-	        else
-	        {
-	            session(['message' =>'danger', 'schedule_errmsg'=>'Interview Schedule Not Successful.']); 
-	            return redirect()->back();
-	        }
+	//             return redirect()->back();
+	//         }
+	//         else
+	//         {
+	//             session(['message' =>'danger', 'schedule_errmsg'=>'Interview Schedule Not Successful.']); 
+	//             return redirect()->back();
+	//         }
 	    
-    }
+    // }
+
+	
+
+// public function schedule_interview_resource(Request $request)
+// {
+//     // $validator = Validator::make($request->all(), [
+//     //     'interviewdateone' => 'required|date',
+//     //     'from_time' => 'required',
+//     //     'to_time' => 'required',
+//     //     'name' => 'required|string|max:255',
+//     //     'email' => 'required|email',
+//     // ]);
+
+//     // if ($validator->fails()) {
+//     //     return response()->json(['errors' => $validator->errors()], 422);
+//     // }
+
+//     $dev_id = Session::get('dev_id');
+//     $docs = DB::table('developer_order_tb')->where('dev_id', $dev_id)->get();
+
+//     if ($docs->isEmpty()) {
+//         return response()->json(['message' => 'Developer not found'], 404);
+//     }
+
+//     $doc = $docs->first();
+//     // Generate fake Google Meet link
+//     $google_meet_link = 'https://meet.google.com/' . substr(md5(uniqid()), 0, 10);
+
+//     // Save all data
+//     $data = [
+//         'dev_id' => $dev_id,
+//         'u_id' => $doc->u_id,
+//         'fname' => $doc->fname,
+//         'lname' => $doc->lname,
+//         'phone' => $doc->phone,
+//         'email' => $request->email,
+//         'perhr' => $doc->perhr,
+//         'code' => $doc->code,
+//         'address_one' => $doc->address_one,
+//         'interviewdateone' => $request->interviewdateone,
+//         'from_time' => $request->from_time,
+//         'to_time' => $request->to_time,
+//         'meet_link' => $google_meet_link,
+//         'candidate_name' => $request->name,
+//         'candidate_email' => $request->email,
+//         'created_at' => now()
+//     ];
+
+//     // DB::table('developer_interview_schedule')->insert($data);
+
+//     // DB::table('developer_order_tb')->where('dev_id', $dev_id)->update([
+//     //     'interviewdateone' => $request->interviewdateone,
+//     //     'from_time' => $request->from_time,
+//     //     'to_time' => $request->to_time,
+//     //     'meet_link' => $google_meet_link,
+//     // ]);
+
+//     // Prepare raw HTML content
+//     $htmlContent = "
+//         <h2>Interview Scheduled</h2>
+//         <p><strong>Candidate:</strong> {$request->name}</p>
+//         <p><strong>Email:</strong> {$request->email}</p>
+//         <p><strong>Date:</strong> {$request->interviewdateone}</p>
+//         <p><strong>Time:</strong> {$request->from_time} - {$request->to_time}</p>
+//         <p><strong>Google Meet Link:</strong> <a href='{$google_meet_link}'>{$google_meet_link}</a></p>
+//         <br><p>Thanks,</p>
+//     ";
+
+//     // Send to admin, employer, candidate
+//     $recipients = [
+//         'adminsuper@email.com',
+//         $doc->email,
+//         $request->email,
+//     ];
+
+//     foreach ($recipients as $to) {
+// 		if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+// 			\Log::warning("Invalid email skipped: " . json_encode($to));
+// 			continue;
+// 		}
+	
+// 		Mail::html($htmlContent, function ($message) use ($to) {
+// 			$message->to($to)
+// 					->subject('Interview Scheduled');
+// 		});
+// 	}
+	
+	
+
+//     return 'Interview scheduled & email sent';
+// } working 
+
+public function schedule_interview_resource(Request $request)
+{
+    // $request->validate([
+    //     'name' => 'required|string',
+    //     'email' => 'required|email',
+    //     'interviewdateone' => 'required|date',
+    // ]);
+
+    $calendar = new GoogleCalendarService();
+
+    $meetLink = $calendar->createInterviewEvent(
+        $request->name,
+        $request->email,
+        $request->interviewdateone
+    );
+	
+// dd($calendar, $meetLink);
+    // Save to DB (optional)
+    // DB::table('developer_interview_schedule')->insert([
+    //     'dev_id' => Session::get('dev_id'),
+    //     'name' => $request->name,
+    //     'email' => $request->email,
+    //     'interviewdateone' => $request->interviewdateone,
+    //     'meet_link' => $meetLink,
+    //     'created_at' => now(),
+    // ]);
+
+    // Send email
+    Mail::raw("Interview Scheduled\n\nCandidate: {$request->name}\n\nEmail: {$request->email}\n\nDate: {$request->interviewdateone}\n\nGoogle Meet Link: {$meetLink}\n\nThanks", function($message) use ($request) {
+        $message->to(['admin@email.com', 'employer@email.com']);
+        $message->subject('Interview Scheduled');
+    });
+
+    return response()->json(['success' => true, 'meet_link' => $meetLink]);
+}
+
+public function success(){
+	return "successfully meeting schedule.";
+}
+
     
+	
     public function schedule_interview_qualified (Request $request)
     {  
 

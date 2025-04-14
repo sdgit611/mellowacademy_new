@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\Auth\Developer\ForgotPasswordController;
+use App\Http\Controllers\Auth\Developer\ResetPasswordController;
+use App\Http\Controllers\GoogleCalendarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +153,14 @@ Route::post('submit_short_message','App\Http\Controllers\cartcontroller@submit_s
 Route::post('submit_sow_docs','App\Http\Controllers\cartcontroller@submit_sow_docs')->name('submit_sow_docs');
 Route::post('schedule_interview_resource','App\Http\Controllers\cartcontroller@schedule_interview_resource')->name('schedule_interview_resource');
 Route::post('schedule_interview_qualified','App\Http\Controllers\cartcontroller@schedule_interview_qualified')->name('schedule_interview_qualified');
+
+Route::get('success','App\Http\Controllers\cartcontroller@success')->name('success');
+
+
+Route::get('/google-calendar/connect', [GoogleCalendarController::class, 'redirectToGoogle'])->name('google.connect');
+Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'handleGoogleCallback'])->name('google.callback');
+
+
 
 Route::get('assign_work','App\Http\Controllers\cartcontroller@assign_work')->name('assign_work');
 
@@ -346,6 +358,13 @@ Route::get('developer_registration','App\Http\Controllers\developercontroller@de
 Route::post('submit_developer_registration','App\Http\Controllers\developercontroller@submit_developer_registration')->name('submit_developer_registration');
 Route::get('developer_admin','App\Http\Controllers\developercontroller@developer_admin')->name('developer_admin');
 Route::post('login_verification','App\Http\Controllers\developercontroller@login_verification')->name('login_verification');
+// forget password routes 
+Route::get('developer-forget-password-form', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('dvlprFrgtPassForm');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('password-reset-form/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset.form');
+Route::post('password-new-set', [ResetPasswordController::class, 'reset'])->name('password.new.set');
+
+
 Route::get('developer_dashboard','App\Http\Controllers\developercontroller@developer_dashboard')->name('developer_dashboard');
 Route::get('developer_log','App\Http\Controllers\developercontroller@developer_log')->name('developer_log');
 
@@ -375,8 +394,8 @@ Route::get('update_developer_bank_details/{id}','App\Http\Controllers\developerc
 Route::post('update_developer_bank','App\Http\Controllers\developercontroller@update_developer_bank')->name('update_developer_bank');
 
 Route::get('developer_project','App\Http\Controllers\developercontroller@developer_project')->name('developer_project');
-Route::post('submit_project_details','App\Http\Controllers\developercontroller@submit_project_details')->name('submit_project_details');
-Route::post('update_project_details','App\Http\Controllers\developercontroller@update_project_details')->name('update_project_details');
+Route::post('submit_project_details','App\Http\Controllers\developercontroller@storeOrUpdateProjectDetails')->name('storeOrUpdateProjectDetails');
+// Route::post('update_project_details','App\Http\Controllers\developercontroller@update_project_details')->name('update_project_details');
 Route::get('delete_project_details/{developer_id}','App\Http\Controllers\developercontroller@delete_project_details')->name('delete_project_details');
 
 

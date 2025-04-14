@@ -177,12 +177,12 @@
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <select name="purpose" id="purpose" class="form-control">
-                                                                <option value="#">Select Purpose</option>
-                                                                <option value="For Myself">For Myself</option>
-                                                                <option value="For Organization">For Organization</option>
-                                                                <option value="For Designer">For Designer</option>
-                                                            </select>
+                                                        <select name="purpose" id="purpose" class="form-control">
+                                                            <option value="#">Select Purpose</option>
+                                                            <option value="For Myself" {{ $user->purpose == 'For Myself' ? 'selected' : '' }}>For Myself</option>
+                                                            <option value="For Organization" {{ $user->purpose == 'For Organization' ? 'selected' : '' }}>For Organization</option>
+                                                            <option value="For Designer" {{ $user->purpose == 'For Designer' ? 'selected' : '' }}>For Designer</option>
+                                                        </select>
                                                             @if ($errors->has('purpose'))
                                                                 <strong class="text-danger" style="font-size:10px">{{ $errors->first('purpose') }}</strong>                                   
                                                             @endif

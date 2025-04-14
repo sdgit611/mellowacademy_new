@@ -161,18 +161,16 @@
                                         <tr>
                                             <td><?php echo $dd->national_id_name; ?></td>
                                             
-                                            <td><div class="geeks"><a href="<?php echo URL::asset('public/upload/national_image/'.$dd->national_id_image.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/national_image/'.$dd->national_id_image.'') ?>"></a></div></td>
-                                            <td><div class="geeks"><a href="<?php echo URL::asset('public/upload/adhar_card/'.$dd->adharcard.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/adhar_card/'.$dd->adharcard.'') ?>"></a></div></td>
-                                            <td><div class="geeks"><a href="<?php echo URL::asset('public/upload/pan_card/'.$dd->pancard.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/pan_card/'.$dd->pancard.'') ?>"></a></div></td>
-                                            <td><div class="geeks"><a href="<?php echo URL::asset('public/upload/developer/'.$dd->image.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/developer/'.$dd->image.'') ?>"></a></div></td>
-                                            <td><div class="geeks"><a href="<?php echo URL::asset('public/upload/signature/'.$dd->signature.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/signature/'.$dd->signature.'') ?>"></a></div></td>
-                                            
+                                            <td><x-file-preview :fileName="$dd->national_id_image" filePath="upload/national_image" /></td>
+                                            <td><x-file-preview :fileName="$dd->adharcard" filePath="upload/adhar_card" /></td>
+                                            <td><x-file-preview :fileName="$dd->pancard" filePath="upload/pan_card" /></td>
+                                            <td><x-file-preview :fileName="$dd->image" filePath="upload/developer" /></td>
+                                            <td><x-file-preview :fileName="$dd->signature" filePath="upload/signature" /></td>
                                             <td>
                                                 <a class="btn btn-success btn-sm" href="<?php echo route('update_developer_kyc_details',['id'=>''.$dd->dev_id.'']) ?>" ><i class="fa fa-edit"></i></a>
                                                                                             
                                             </td>                                                                         
                                         </tr>
-                                        
                                         <?php $i++;
                                         } ?>
                                 </tbody>

@@ -74,11 +74,11 @@
                                             @endif
                                         </div>
                                         <div class="form-group">
-                                            <input type="checkbox" onclick="myFunction()"> Show Password
+                                            <input type="checkbox" onclick="myFunction()"> Show Password 
                                         </div>
                                         <a href="{{ route('developer_registration') }}"><span>Don't Have An Account?</span></a>
                                         <button type="submit" class="btn btn-primary btn-block btn-submit">Sign In</button>
-                                        
+                                        <a href="{{ route('dvlprFrgtPassForm') }}"><span>Forget Password</span></a>
                                     </form>
 
                                 </div>
