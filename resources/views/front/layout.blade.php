@@ -296,7 +296,7 @@
 
                             <li>
 
-                                <a href="javascript:void(0);" class="open-login" style="font-size: 19px;"><span><i class="icon icon-user"></i></span></a>
+                                <a href="javascript:void(0);" class="open-login open" style="font-size: 19px;"><span><i class="icon icon-user"></i></span></a>
 
                             </li>
 
@@ -572,7 +572,7 @@
 
                     if(empty(Session::get('user_login_id'))) { ?>
 
-                        <div class="login-wrapper">
+                        <div class="login-wrapper open">
 
                             <div class="row">
 

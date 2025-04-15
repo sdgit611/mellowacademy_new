@@ -839,533 +839,89 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
             <option value="Option 5">Option 5</option>
           </select> </div>
       </li> -->
-      <li class="form-line jf-required" data-type="control_scale" id="id_23">
-        <label class="form-label form-label-top form-label-auto" id="label_23" for="input_23" aria-hidden="false"> Overall, how entertaining was the event?<span class="form-required">*</span> </label>
-        <div id="cid_23" class="form-input-wide jf-required" data-layout="full"> <span class="form-sub-label-container" style="vertical-align:top">
-            <div role="radiogroup" aria-labelledby="label_23 sublabel_input_23_description" cellPadding="4" cellSpacing="0" class="form-scale-table" data-component="scale">
-              <div class="rating-item-group">
-                <div class="rating-item">
-                  <span class="rating-item-title for-from">
-                    <label for="input_23_worst" aria-hidden="true">Boring</label>
-                  </span>
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="1" id="input_23_1" required="" value="1" @if(@$evalution->feedback1 == 1) checked @endif />
-                  <label for="input_23_1">1</label>
-                </div>
+      <h3>Technical Role (Developer)</h3>
 
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="2" id="input_23_2" required="" value="2" @if(@$evalution->feedback1 == 2) checked @endif />
-                  <label for="input_23_2">2</label>
-                </div>
+      @foreach($evalution_question as $key=>$evalu)
+        <li class="form-line jf-required" data-type="control_scale" id="id_23">
+          <label class="form-label form-label-top form-label-auto" id="label_23" for="input_23" aria-hidden="false"> {{@$evalu->question}}?<span class="form-required">*</span> </label>
+          <div id="cid_23" class="form-input-wide jf-required" data-layout="full"> <span class="form-sub-label-container" style="vertical-align:top">
+              <div role="radiogroup" aria-labelledby="label_23 sublabel_input_23_description" cellPadding="4" cellSpacing="0" class="form-scale-table" data-component="scale">
+                <div class="rating-item-group">
 
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="3" id="input_23_3" required="" value="3" @if(@$evalution->feedback1 == 3) checked @endif />
-                  <label for="input_23_3">3</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="4" id="input_23_4" required="" value="4" @if(@$evalution->feedback1 == 4) checked @endif />
-                  <label for="input_23_4">4</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="5" id="input_23_5" required="" value="5" @if(@$evalution->feedback1 == 5) checked @endif />
-                  <label for="input_23_5">5</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="6" id="input_23_6" required="" value="6" @if(@$evalution->feedback1 == 6) checked @endif />
-                  <label for="input_23_6">6</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="7" id="input_23_7" required="" value="7" @if(@$evalution->feedback1 == 7) checked @endif />
-                  <label for="input_23_7">7</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="8" id="input_23_8" required="" value="8" @if(@$evalution->feedback1 == 8) checked @endif />
-                  <label for="input_23_8">8</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="9" id="input_23_9" required="" value="9" @if(@$evalution->feedback1 == 9) checked @endif />
-                  <label for="input_23_9">9</label>
-                </div>
-
-                <div class="rating-item">
-                  <span class="rating-item-title for-to">
-                    <label for="input_23_best" aria-hidden="true">Fantastic</label></span>
-                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="10" id="input_23_10" required="" value="10" @if(@$evalution->feedback1 == 10) checked @endif />
-                    <label for="input_23_10">10</label>
+                  @for ($i = 1; $i <= 10; $i++)
+                  <div class="rating-item">
+                    <span class="rating-item-title for-from">
+                      <!-- <label for="input_23_worst" aria-hidden="true">Boring</label> -->
+                    </span>
+                    <input type="radio" 
+                           name="feedback[{{ $evalu->id }}]" 
+                           id="input_{{ $key }}_{{ $i }}" 
+                           value="{{ $i }}" 
+                           class="form-radio" 
+                           @if(@$evalu->getEvalutionanswer->answer == $i) checked @endif>
+                    <label for="input_{{ $key }}_{{ $i }}">{{ $i }}</label>
                   </div>
-              </div>
-            </div><label class="form-sub-label" id="sublabel_input_23_description" style="border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">1 is Boring, 10 is Fantastic</label>
-          </span> </div>
-      </li>
-      <li class="form-line jf-required" data-type="control_scale" id="id_25">
-        <label class="form-label form-label-top form-label-auto" id="label_25" for="input_25" aria-hidden="false"> After the event, how inspired did you feel?
-          <span class="form-required">*</span>
-        </label>
+                   @endfor
 
-        <div id="cid_25" class="form-input-wide jf-required" data-layout="full">
-          <span class="form-sub-label-container" style="vertical-align:top">
-            <div role="radiogroup" aria-labelledby="label_25 sublabel_input_25_description" cellPadding="4" cellSpacing="0" class="form-scale-table" data-component="scale">
-              <div class="rating-item-group">
-                <div class="rating-item">
-                  <span class="rating-item-title for-from">
-                    <label for="input_25_worst" aria-hidden="true">None</label></span>
-                    <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="1" id="input_25_1" required="" value="1" @if(@$evalution->feedback2 == 1) checked @endif/>
-                    <label for="input_25_1">1</label>
+                  <!-- <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="2" id="input_23_2_{{$key}}" required="" value="2" @if(@$evalution->feedback1 == 2) checked @endif />
+                    <label for="input_23_2_{{$key}}">2</label>
+                  </div> -->
+
+                 <!--  <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="3" id="input_23_3_{{$key}}" required="" value="3" @if(@$evalution->feedback1 == 3) checked @endif />
+                    <label for="input_23_3_{{$key}}">3</label>
                   </div>
 
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="2" id="input_25_2" required="" value="2" @if(@$evalution->feedback2 == 2) checked @endif/>
-                  <label for="input_25_2">2</label>
-                </div>
+                  <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="4" id="input_23_4_{{$key}}" required="" value="4" @if(@$evalution->feedback1 == 4) checked @endif />
+                    <label for="input_23_4_{{$key}}">4</label>
+                  </div> -->
 
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="3" id="input_25_3" required="" value="3" @if(@$evalution->feedback2 == 3) checked @endif/>
-                  <label for="input_25_3">3</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="4" id="input_25_4" required="" value="4" @if(@$evalution->feedback2 == 4) checked @endif />
-                  <label for="input_25_4">4</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="5" id="input_25_5" required="" value="5"  @if(@$evalution->feedback2 == 5) checked @endif/>
-                  <label for="input_25_5">5</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="6" id="input_25_6" required="" value="6" @if(@$evalution->feedback2 == 6) checked @endif />
-                  <label for="input_25_6">6</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="7" id="input_25_7" required="" value="7" @if(@$evalution->feedback2 == 7) checked @endif />
-                  <label for="input_25_7">7</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="8" id="input_25_8" required="" value="8" @if(@$evalution->feedback2 == 8) checked @endif />
-                  <label for="input_25_8">8</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="9" id="input_25_9" required="" value="9" @if(@$evalution->feedback2 == 9) checked @endif />
-                  <label for="input_25_9">9</label>
-                </div>
-
-                <div class="rating-item">
-                  <span class="rating-item-title for-to">
-                    <label for="input_25_best" aria-hidden="true">Fired up!</label></span>
-                    <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="10" id="input_25_10" required="" value="10" @if(@$evalution->feedback2 == 10) checked @endif />
-                    <label for="input_25_10">10</label>
+                <!--   <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="5" id="input_23_5_{{$key}}" required="" value="5" @if(@$evalution->feedback1 == 5) checked @endif />
+                    <label for="input_23_5_{{$key}}">5</label>
                   </div>
-              </div>
-            </div><label class="form-sub-label" id="sublabel_input_25_description" style="border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">1 is None, 10 is Fired up!</label>
-          </span> </div>
-      </li>
-      <li class="form-line jf-required" data-type="control_scale" id="id_24"><label class="form-label form-label-top form-label-auto" id="label_24" for="input_24" aria-hidden="false"> Do you feel the day provided value for money?<span class="form-required">*</span> </label>
-        <div id="cid_24" class="form-input-wide jf-required" data-layout="full"> <span class="form-sub-label-container" style="vertical-align:top">
-            <div role="radiogroup" aria-labelledby="label_24 sublabel_input_24_description" cellPadding="4" cellSpacing="0" class="form-scale-table" data-component="scale">
-              <div class="rating-item-group">
-                <div class="rating-item"><span class="rating-item-title for-from"><label for="input_24_worst" aria-hidden="true">Not at all</label></span>
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="1" id="input_24_1" required="" value="1" @if(@$evalution->feedback3 == 1) checked @endif />
-                  <label for="input_24_1">1</label></div>
 
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="2" id="input_24_2" required="" value="2" @if(@$evalution->feedback3 == 2) checked @endif />
-                  <label for="input_24_2">2</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="3" id="input_24_3" required="" value="3" @if(@$evalution->feedback3 == 3) checked @endif />
-                  <label for="input_24_3">3</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="4" id="input_24_4" required="" value="4" @if(@$evalution->feedback3 == 4) checked @endif />
-                  <label for="input_24_4">4</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="5" id="input_24_5" required="" value="5" @if(@$evalution->feedback3 == 5) checked @endif /><label for="input_24_5">5</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="6" id="input_24_6" required="" value="6" @if(@$evalution->feedback3 == 6) checked @endif/>
-                  <label for="input_24_6">6</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="7" id="input_24_7" required="" value="7" @if(@$evalution->feedback3 == 7) checked @endif/>
-                  <label for="input_24_7">7</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="8" id="input_24_8" required="" value="8" @if(@$evalution->feedback3 == 8) checked @endif/>
-                  <label for="input_24_8">8</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="9" id="input_24_9" required="" value="9" @if(@$evalution->feedback3 == 9) checked @endif/>
-                  <label for="input_24_9">9</label>
-                </div>
-
-                <div class="rating-item">
-                  <span class="rating-item-title for-to">
-                    <label for="input_24_best" aria-hidden="true">Definitely</label></span>
-                    <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="10" id="input_24_10" required="" value="10" 
-                    @if(@$evalution->feedback3 == 10) checked @endif />
-                    <label for="input_24_10">10</label>
+                  <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="6" id="input_23_6_{{$key}}" required="" value="6" @if(@$evalution->feedback1 == 6) checked @endif />
+                    <label for="input_23_6_{{$key}}">6</label>
+                  </div> -->
+<!-- 
+                  <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="7" id="input_23_7_{{$key}}" required="" value="7" @if(@$evalution->feedback1 == 7) checked @endif />
+                    <label for="input_23_7_{{$key}}">7</label>
                   </div>
-              </div>
-            </div><label class="form-sub-label" id="sublabel_input_24_description" style="border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">1 is Not at all, 10 is Definitely</label>
-          </span> </div>
-      </li>
-      <li class="form-line jf-required" data-type="control_radio" id="id_30">
-        <label class="form-label form-label-top form-label-auto" id="label_30" aria-hidden="false"> What was the single best part of the event?<span class="form-required">*</span> 
-        </label>
-        <div id="cid_30" class="form-input-wide jf-required" data-layout="full">
-          <div class="form-single-column" role="group" aria-labelledby="label_30" data-component="radio">
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_0" name="q30_whatWas" required="" value="Option 1" @if(@$evalution->feedback4 == "Option 1") checked @endif/>
-            <label id="label_input_30_0" for="input_30_0">Option 1</label></span>
 
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_1" name="q30_whatWas" required="" value="Option 2" @if(@$evalution->feedback4 == "Option 2") checked @endif />
-            <label id="label_input_30_1" for="input_30_1">Option 2</label>
-          </span>
+                  <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="8" id="input_23_8_{{$key}}" required="" value="8" @if(@$evalution->feedback1 == 8) checked @endif />
+                    <label for="input_23_8_{{$key}}">8</label>
+                  </div> -->
 
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_2" name="q30_whatWas" required="" value="Option 3" @if(@$evalution->feedback4 == "Option 3") checked @endif /><label id="label_input_30_2" for="input_30_2">Option 3</label></span>
+                 <!--  <div class="rating-item">
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="9" id="input_23_9_{{$key}}" required="" value="9" @if(@$evalution->feedback1 == 9) checked @endif />
+                    <label for="input_23_9_{{$key}}">9</label>
+                  </div>
 
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_3" name="q30_whatWas" required="" value="Option 4" @if(@$evalution->feedback4 == "Option 4") checked @endif /><label id="label_input_30_3" for="input_30_3">Option 4</label></span>
+                  <div class="rating-item">
+                    <span class="rating-item-title for-to">
+                      <label for="input_23_best" aria-hidden="true">Fantastic</label></span>
+                      <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23_{{$key}}[]" title="10" id="input_23_10_{{$key}}" required="" value="10" @if(@$evalution->feedback1 == 10) checked @endif />
+                      <label for="input_23_10_{{$key}}">10</label>
+                    </div> -->
 
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_4" name="q30_whatWas" required="" value="Option 5" @if(@$evalution->feedback4 == "Option 5") checked @endif /><label id="label_input_30_4" for="input_30_4">Option 5</label></span>
+                </div>
+              </div><label class="form-sub-label" id="sublabel_input_23_description" style="border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">1 is Boring, 10 is Fantastic</label>
+            </span> </div>
+        </li>
+      @endforeach
 
-            <span class="form-radio-item formRadioOther" style="clear:left">
-              <input type="radio" class="form-radio-other form-radio validate[required]" name="q30_whatWas" id="other_30" tabindex="0" aria-label="Other" value="other" @if(@$evalution->feedback4 == "other") checked @endif />
-              <label id="label_other_30" style="text-indent:0" for="other_30">Other</label>
-
-              <span id="other_30_input" class="other-input-container" style="display:none">
-                <input type="text" class="form-radio-other-input form-textbox" name="q30_whatWas[other]" data-otherhint="Other" size="15" id="input_30" data-placeholder="Please type another option here" placeholder="Please type another option here" /></span></span>
-          </div>
-        </div>
-      </li>
-      <li class="form-line jf-required" data-type="control_radio" id="id_26"><label class="form-label form-label-top form-label-auto" id="label_26" aria-hidden="false"> Would you recommend a similar event to a friend?<span class="form-required">*</span> </label>
-        <div id="cid_26" class="form-input-wide jf-required" data-layout="full">
-          <div class="form-single-column" role="group" aria-labelledby="label_26" data-component="radio">
-            <span class="form-radio-item" style="clear:left">
-              <span class="dragger-item"></span>
-              <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_0" name="q26_wouldYou" required="" value="Yes, definitely" @if(@$evalution->feedback5 == "Yes, definitely") checked @endif />
-              <label id="label_input_26_0" for="input_26_0">Yes, definitely</label>
-            </span>
-
-              <span class="form-radio-item" style="clear:left">
-                <span class="dragger-item"></span>
-                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_1" name="q26_wouldYou" required="" value="Maybe, if the content was changed"  @if(@$evalution->feedback5 == "Maybe, if the content was changed") checked @endif />
-                <label id="label_input_26_1" for="input_26_1">Maybe, if the content was changed</label>
-              </span>
-
-              <span class="form-radio-item" style="clear:left">
-                <span class="dragger-item"></span>
-                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_2" name="q26_wouldYou" required="" value="Maybe, if it was cheaper" @if(@$evalution->feedback5 == "Maybe, if it was cheaper") checked @endif />
-                <label id="label_input_26_2" for="input_26_2">Maybe, if it was cheaper</label>
-              </span>
-
-              <span class="form-radio-item" style="clear:left">
-                <span class="dragger-item"></span>
-                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_3" name="q26_wouldYou" required="" value="No, never" @if(@$evalution->feedback5 == "No, never") checked @endif />
-                <label id="label_input_26_3" for="input_26_3">No, never</label>
-              </span>
-
-              </div>
-        </div>
-      </li>
-     <!--  <li id="cid_11" class="form-input-wide" data-type="control_head">
-        <div class="form-header-group  header-default">
-          <div class="header-text httal htvam">
-            <h2 id="header_11" class="form-header" data-component="header">The Presenters</h2>
-            <div id="subHeader_11" class="form-subHeader">Evaluate presenters on how they met the criteria below</div>
-          </div>
-        </div>
-      </li>
-      <li class="form-line" data-type="control_matrix" id="id_31"><label class="form-label form-label-top" id="label_31" for="input_31" aria-hidden="false"> Presenter 1 </label>
-        <div id="cid_31" class="form-input-wide" data-layout="full">
-          <table summary="" role="table" aria-labelledby="label_31" cellPadding="4" cellSpacing="0" class="form-matrix-table" data-component="matrix">
-            <tr class="form-matrix-tr form-matrix-header-tr">
-              <th class="form-matrix-th" style="border:none"> </th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_0"><label id="label_31_col_0">Not at all</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_1"><label id="label_31_col_1">Not really</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_2"><label id="label_31_col_2">Somewhat</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_3"><label id="label_31_col_3">Mostly</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_4"><label id="label_31_col_4">Definitely</label></th>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_31 label_31_row_0">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_31_row_0">Interesting and entertaining</label></th>
-              <td class="form-matrix-values"><input id="input_31_0_0" class="form-radio" type="radio" name="q31_presenter1[0]" aria-labelledby="label_31_col_0 label_31_row_0" aria-label="Cells Radio Button" value="Not at all" /><label for="input_31_0_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_0_1" class="form-radio" type="radio" name="q31_presenter1[0]" aria-labelledby="label_31_col_1 label_31_row_0" aria-label="Cells Radio Button" value="Not really" /><label for="input_31_0_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_0_2" class="form-radio" type="radio" name="q31_presenter1[0]" aria-labelledby="label_31_col_2 label_31_row_0" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_31_0_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_0_3" class="form-radio" type="radio" name="q31_presenter1[0]" aria-labelledby="label_31_col_3 label_31_row_0" aria-label="Cells Radio Button" value="Mostly" /><label for="input_31_0_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_0_4" class="form-radio" type="radio" name="q31_presenter1[0]" aria-labelledby="label_31_col_4 label_31_row_0" aria-label="Cells Radio Button" value="Definitely" /><label for="input_31_0_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_31 label_31_row_1">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_31_row_1">Relevant to you</label></th>
-              <td class="form-matrix-values"><input id="input_31_1_0" class="form-radio" type="radio" name="q31_presenter1[1]" aria-labelledby="label_31_col_0 label_31_row_1" aria-label="Cells Radio Button" value="Not at all" /><label for="input_31_1_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_1_1" class="form-radio" type="radio" name="q31_presenter1[1]" aria-labelledby="label_31_col_1 label_31_row_1" aria-label="Cells Radio Button" value="Not really" /><label for="input_31_1_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_1_2" class="form-radio" type="radio" name="q31_presenter1[1]" aria-labelledby="label_31_col_2 label_31_row_1" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_31_1_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_1_3" class="form-radio" type="radio" name="q31_presenter1[1]" aria-labelledby="label_31_col_3 label_31_row_1" aria-label="Cells Radio Button" value="Mostly" /><label for="input_31_1_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_1_4" class="form-radio" type="radio" name="q31_presenter1[1]" aria-labelledby="label_31_col_4 label_31_row_1" aria-label="Cells Radio Button" value="Definitely" /><label for="input_31_1_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_31 label_31_row_2">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_31_row_2">Inspiring</label></th>
-              <td class="form-matrix-values"><input id="input_31_2_0" class="form-radio" type="radio" name="q31_presenter1[2]" aria-labelledby="label_31_col_0 label_31_row_2" aria-label="Cells Radio Button" value="Not at all" /><label for="input_31_2_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_2_1" class="form-radio" type="radio" name="q31_presenter1[2]" aria-labelledby="label_31_col_1 label_31_row_2" aria-label="Cells Radio Button" value="Not really" /><label for="input_31_2_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_2_2" class="form-radio" type="radio" name="q31_presenter1[2]" aria-labelledby="label_31_col_2 label_31_row_2" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_31_2_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_2_3" class="form-radio" type="radio" name="q31_presenter1[2]" aria-labelledby="label_31_col_3 label_31_row_2" aria-label="Cells Radio Button" value="Mostly" /><label for="input_31_2_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_31_2_4" class="form-radio" type="radio" name="q31_presenter1[2]" aria-labelledby="label_31_col_4 label_31_row_2" aria-label="Cells Radio Button" value="Definitely" /><label for="input_31_2_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-          </table>
-        </div>
-      </li>
-      <li class="form-line" data-type="control_matrix" id="id_34"><label class="form-label form-label-top" id="label_34" for="input_34" aria-hidden="false"> Presenter 2 </label>
-        <div id="cid_34" class="form-input-wide" data-layout="full">
-          <table summary="" role="table" aria-labelledby="label_34" cellPadding="4" cellSpacing="0" class="form-matrix-table" data-component="matrix">
-            <tr class="form-matrix-tr form-matrix-header-tr">
-              <th class="form-matrix-th" style="border:none"> </th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_0"><label id="label_34_col_0">Not at all</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_1"><label id="label_34_col_1">Not really</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_2"><label id="label_34_col_2">Somewhat</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_3"><label id="label_34_col_3">Mostly</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_4"><label id="label_34_col_4">Definitely</label></th>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_34 label_34_row_0">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_34_row_0">Interesting and entertaining</label></th>
-              <td class="form-matrix-values"><input id="input_34_0_0" class="form-radio" type="radio" name="q34_presenter2[0]" aria-labelledby="label_34_col_0 label_34_row_0" aria-label="Cells Radio Button" value="Not at all" /><label for="input_34_0_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_0_1" class="form-radio" type="radio" name="q34_presenter2[0]" aria-labelledby="label_34_col_1 label_34_row_0" aria-label="Cells Radio Button" value="Not really" /><label for="input_34_0_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_0_2" class="form-radio" type="radio" name="q34_presenter2[0]" aria-labelledby="label_34_col_2 label_34_row_0" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_34_0_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_0_3" class="form-radio" type="radio" name="q34_presenter2[0]" aria-labelledby="label_34_col_3 label_34_row_0" aria-label="Cells Radio Button" value="Mostly" /><label for="input_34_0_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_0_4" class="form-radio" type="radio" name="q34_presenter2[0]" aria-labelledby="label_34_col_4 label_34_row_0" aria-label="Cells Radio Button" value="Definitely" /><label for="input_34_0_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_34 label_34_row_1">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_34_row_1">Relevant to you</label></th>
-              <td class="form-matrix-values"><input id="input_34_1_0" class="form-radio" type="radio" name="q34_presenter2[1]" aria-labelledby="label_34_col_0 label_34_row_1" aria-label="Cells Radio Button" value="Not at all" /><label for="input_34_1_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_1_1" class="form-radio" type="radio" name="q34_presenter2[1]" aria-labelledby="label_34_col_1 label_34_row_1" aria-label="Cells Radio Button" value="Not really" /><label for="input_34_1_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_1_2" class="form-radio" type="radio" name="q34_presenter2[1]" aria-labelledby="label_34_col_2 label_34_row_1" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_34_1_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_1_3" class="form-radio" type="radio" name="q34_presenter2[1]" aria-labelledby="label_34_col_3 label_34_row_1" aria-label="Cells Radio Button" value="Mostly" /><label for="input_34_1_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_1_4" class="form-radio" type="radio" name="q34_presenter2[1]" aria-labelledby="label_34_col_4 label_34_row_1" aria-label="Cells Radio Button" value="Definitely" /><label for="input_34_1_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_34 label_34_row_2">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_34_row_2">Inspiring</label></th>
-              <td class="form-matrix-values"><input id="input_34_2_0" class="form-radio" type="radio" name="q34_presenter2[2]" aria-labelledby="label_34_col_0 label_34_row_2" aria-label="Cells Radio Button" value="Not at all" /><label for="input_34_2_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_2_1" class="form-radio" type="radio" name="q34_presenter2[2]" aria-labelledby="label_34_col_1 label_34_row_2" aria-label="Cells Radio Button" value="Not really" /><label for="input_34_2_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_2_2" class="form-radio" type="radio" name="q34_presenter2[2]" aria-labelledby="label_34_col_2 label_34_row_2" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_34_2_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_2_3" class="form-radio" type="radio" name="q34_presenter2[2]" aria-labelledby="label_34_col_3 label_34_row_2" aria-label="Cells Radio Button" value="Mostly" /><label for="input_34_2_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_34_2_4" class="form-radio" type="radio" name="q34_presenter2[2]" aria-labelledby="label_34_col_4 label_34_row_2" aria-label="Cells Radio Button" value="Definitely" /><label for="input_34_2_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-          </table>
-        </div>
-      </li>
-      <li class="form-line" data-type="control_matrix" id="id_33"><label class="form-label form-label-top" id="label_33" for="input_33" aria-hidden="false"> Presenter 3 </label>
-        <div id="cid_33" class="form-input-wide" data-layout="full">
-          <table summary="" role="table" aria-labelledby="label_33" cellPadding="4" cellSpacing="0" class="form-matrix-table" data-component="matrix">
-            <tr class="form-matrix-tr form-matrix-header-tr">
-              <th class="form-matrix-th" style="border:none"> </th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_0"><label id="label_33_col_0">Not at all</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_1"><label id="label_33_col_1">Not really</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_2"><label id="label_33_col_2">Somewhat</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_3"><label id="label_33_col_3">Mostly</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_4"><label id="label_33_col_4">Definitely</label></th>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_33 label_33_row_0">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_33_row_0">Interesting and entertaining</label></th>
-              <td class="form-matrix-values"><input id="input_33_0_0" class="form-radio" type="radio" name="q33_presenter3[0]" aria-labelledby="label_33_col_0 label_33_row_0" aria-label="Cells Radio Button" value="Not at all" /><label for="input_33_0_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_0_1" class="form-radio" type="radio" name="q33_presenter3[0]" aria-labelledby="label_33_col_1 label_33_row_0" aria-label="Cells Radio Button" value="Not really" /><label for="input_33_0_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_0_2" class="form-radio" type="radio" name="q33_presenter3[0]" aria-labelledby="label_33_col_2 label_33_row_0" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_33_0_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_0_3" class="form-radio" type="radio" name="q33_presenter3[0]" aria-labelledby="label_33_col_3 label_33_row_0" aria-label="Cells Radio Button" value="Mostly" /><label for="input_33_0_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_0_4" class="form-radio" type="radio" name="q33_presenter3[0]" aria-labelledby="label_33_col_4 label_33_row_0" aria-label="Cells Radio Button" value="Definitely" /><label for="input_33_0_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_33 label_33_row_1">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_33_row_1">Relevant to you</label></th>
-              <td class="form-matrix-values"><input id="input_33_1_0" class="form-radio" type="radio" name="q33_presenter3[1]" aria-labelledby="label_33_col_0 label_33_row_1" aria-label="Cells Radio Button" value="Not at all" /><label for="input_33_1_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_1_1" class="form-radio" type="radio" name="q33_presenter3[1]" aria-labelledby="label_33_col_1 label_33_row_1" aria-label="Cells Radio Button" value="Not really" /><label for="input_33_1_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_1_2" class="form-radio" type="radio" name="q33_presenter3[1]" aria-labelledby="label_33_col_2 label_33_row_1" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_33_1_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_1_3" class="form-radio" type="radio" name="q33_presenter3[1]" aria-labelledby="label_33_col_3 label_33_row_1" aria-label="Cells Radio Button" value="Mostly" /><label for="input_33_1_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_1_4" class="form-radio" type="radio" name="q33_presenter3[1]" aria-labelledby="label_33_col_4 label_33_row_1" aria-label="Cells Radio Button" value="Definitely" /><label for="input_33_1_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_33 label_33_row_2">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_33_row_2">Inspiring</label></th>
-              <td class="form-matrix-values"><input id="input_33_2_0" class="form-radio" type="radio" name="q33_presenter3[2]" aria-labelledby="label_33_col_0 label_33_row_2" aria-label="Cells Radio Button" value="Not at all" /><label for="input_33_2_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_2_1" class="form-radio" type="radio" name="q33_presenter3[2]" aria-labelledby="label_33_col_1 label_33_row_2" aria-label="Cells Radio Button" value="Not really" /><label for="input_33_2_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_2_2" class="form-radio" type="radio" name="q33_presenter3[2]" aria-labelledby="label_33_col_2 label_33_row_2" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_33_2_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_2_3" class="form-radio" type="radio" name="q33_presenter3[2]" aria-labelledby="label_33_col_3 label_33_row_2" aria-label="Cells Radio Button" value="Mostly" /><label for="input_33_2_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_33_2_4" class="form-radio" type="radio" name="q33_presenter3[2]" aria-labelledby="label_33_col_4 label_33_row_2" aria-label="Cells Radio Button" value="Definitely" /><label for="input_33_2_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-          </table>
-        </div>
-      </li>
-      <li class="form-line" data-type="control_matrix" id="id_32"><label class="form-label form-label-top" id="label_32" for="input_32" aria-hidden="false"> Presenter 4 </label>
-        <div id="cid_32" class="form-input-wide" data-layout="full">
-          <table summary="" role="table" aria-labelledby="label_32" cellPadding="4" cellSpacing="0" class="form-matrix-table" data-component="matrix">
-            <tr class="form-matrix-tr form-matrix-header-tr">
-              <th class="form-matrix-th" style="border:none"> </th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_0"><label id="label_32_col_0">Not at all</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_1"><label id="label_32_col_1">Not really</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_2"><label id="label_32_col_2">Somewhat</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_3"><label id="label_32_col_3">Mostly</label></th>
-              <th scope="col" class="form-matrix-headers form-matrix-column-headers form-matrix-column_4"><label id="label_32_col_4">Definitely</label></th>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_32 label_32_row_0">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_32_row_0">Interesting and entertaining</label></th>
-              <td class="form-matrix-values"><input id="input_32_0_0" class="form-radio" type="radio" name="q32_presenter4[0]" aria-labelledby="label_32_col_0 label_32_row_0" aria-label="Cells Radio Button" value="Not at all" /><label for="input_32_0_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_0_1" class="form-radio" type="radio" name="q32_presenter4[0]" aria-labelledby="label_32_col_1 label_32_row_0" aria-label="Cells Radio Button" value="Not really" /><label for="input_32_0_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_0_2" class="form-radio" type="radio" name="q32_presenter4[0]" aria-labelledby="label_32_col_2 label_32_row_0" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_32_0_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_0_3" class="form-radio" type="radio" name="q32_presenter4[0]" aria-labelledby="label_32_col_3 label_32_row_0" aria-label="Cells Radio Button" value="Mostly" /><label for="input_32_0_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_0_4" class="form-radio" type="radio" name="q32_presenter4[0]" aria-labelledby="label_32_col_4 label_32_row_0" aria-label="Cells Radio Button" value="Definitely" /><label for="input_32_0_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_32 label_32_row_1">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_32_row_1">Relevant to you</label></th>
-              <td class="form-matrix-values"><input id="input_32_1_0" class="form-radio" type="radio" name="q32_presenter4[1]" aria-labelledby="label_32_col_0 label_32_row_1" aria-label="Cells Radio Button" value="Not at all" /><label for="input_32_1_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_1_1" class="form-radio" type="radio" name="q32_presenter4[1]" aria-labelledby="label_32_col_1 label_32_row_1" aria-label="Cells Radio Button" value="Not really" /><label for="input_32_1_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_1_2" class="form-radio" type="radio" name="q32_presenter4[1]" aria-labelledby="label_32_col_2 label_32_row_1" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_32_1_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_1_3" class="form-radio" type="radio" name="q32_presenter4[1]" aria-labelledby="label_32_col_3 label_32_row_1" aria-label="Cells Radio Button" value="Mostly" /><label for="input_32_1_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_1_4" class="form-radio" type="radio" name="q32_presenter4[1]" aria-labelledby="label_32_col_4 label_32_row_1" aria-label="Cells Radio Button" value="Definitely" /><label for="input_32_1_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-            <tr class="form-matrix-tr form-matrix-value-tr" aria-labelledby="label_32 label_32_row_2">
-              <th scope="row" class="form-matrix-headers form-matrix-row-headers"><label id="label_32_row_2">Inspiring</label></th>
-              <td class="form-matrix-values"><input id="input_32_2_0" class="form-radio" type="radio" name="q32_presenter4[2]" aria-labelledby="label_32_col_0 label_32_row_2" aria-label="Cells Radio Button" value="Not at all" /><label for="input_32_2_0" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_2_1" class="form-radio" type="radio" name="q32_presenter4[2]" aria-labelledby="label_32_col_1 label_32_row_2" aria-label="Cells Radio Button" value="Not really" /><label for="input_32_2_1" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_2_2" class="form-radio" type="radio" name="q32_presenter4[2]" aria-labelledby="label_32_col_2 label_32_row_2" aria-label="Cells Radio Button" value="Somewhat" /><label for="input_32_2_2" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_2_3" class="form-radio" type="radio" name="q32_presenter4[2]" aria-labelledby="label_32_col_3 label_32_row_2" aria-label="Cells Radio Button" value="Mostly" /><label for="input_32_2_3" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-              <td class="form-matrix-values"><input id="input_32_2_4" class="form-radio" type="radio" name="q32_presenter4[2]" aria-labelledby="label_32_col_4 label_32_row_2" aria-label="Cells Radio Button" value="Definitely" /><label for="input_32_2_4" class="matrix-choice-label matrix-radio-label" aria-hidden="true"></label></td>
-            </tr>
-          </table>
-        </div>
-      </li> -->
-      <li id="cid_12" class="form-input-wide" data-type="control_head">
-        <div class="form-header-group  header-default">
-          <div class="header-text httal htvam">
-            <h2 id="header_12" class="form-header" data-component="header">The Venue</h2>
-          </div>
-        </div>
-      </li>
-      <li class="form-line jf-required" data-type="control_radio" id="id_36">
-        <label class="form-label form-label-top form-label-auto" id="label_36" aria-hidden="false"> Overall, were you satisfied with the venue and were you able to see and hear the presentations clearly?<span class="form-required">*</span>
-        </label>
-        <div id="cid_36" class="form-input-wide jf-required" data-layout="full">
-          <div class="form-single-column" role="group" aria-labelledby="label_36" data-component="radio">
-
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_36" type="radio" class="form-radio validate[required]" id="input_36_0" name="q36_overallWere36" required="" value="Yes" @if(@$evalution->feedback6 == "Yes") checked @endif />
-            <label id="label_input_36_0" for="input_36_0">Yes</label></span>
-
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_36" type="radio" class="form-radio validate[required]" id="input_36_1" name="q36_overallWere36" required="" value="No" @if(@$evalution->feedback6 == "No") checked @endif />
-            <label id="label_input_36_1" for="input_36_1">No</label></span>
-          </div>
-        </div>
-      </li>
+      
       <li class="form-line" data-type="control_textarea" id="id_37"><label class="form-label form-label-top form-label-auto" id="label_37" for="input_37" aria-hidden="false"> What problems did you encounter? </label>
         <div id="cid_37" class="form-input-wide" data-layout="full">
           <textarea id="input_37" class="form-textarea" name="q37_whatProblems" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_37">{{@$evalution->problems}}</textarea>
         </div>
       </li>
-      <li class="form-line" data-type="control_scale" id="id_17"><label class="form-label form-label-top form-label-auto" id="label_17" for="input_17" aria-hidden="false"> How was the quality of the food? </label>
-        <div id="cid_17" class="form-input-wide" data-layout="full"> <span class="form-sub-label-container" style="vertical-align:top">
-            <div role="radiogroup" aria-labelledby="label_17 sublabel_input_17_description" cellPadding="4" cellSpacing="0" class="form-scale-table" data-component="scale">
-              <div class="rating-item-group">
-
-                <div class="rating-item">
-                  <span class="rating-item-title for-from">
-                    <label for="input_17_worst" aria-hidden="true">Terrible</label></span>
-                    <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="1" id="input_17_1" value="1" @if(@$evalution->feedback11 == 1) checked @endif />
-                    <label for="input_17_1">1</label>
-                  </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="2" id="input_17_2" value="2" @if(@$evalution->feedback11 == 2) checked @endif />
-                  <label for="input_17_2">2</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="3" id="input_17_3" value="3" @if(@$evalution->feedback11 == 3) checked @endif/>
-                  <label for="input_17_3">3</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="4" id="input_17_4" value="4" @if(@$evalution->feedback11 == 4) checked @endif />
-                  <label for="input_17_4">4</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="5" id="input_17_5" value="5"  @if(@$evalution->feedback11==5) checked @endif/>
-                  <label for="input_17_5">5</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="6" id="input_17_6" value="6" @if(@$evalution->feedback11 == 6) checked @endif/>
-                  <label for="input_17_6">6</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="7" id="input_17_7" value="7" @if(@$evalution->feedback11 == 7) checked @endif />
-                  <label for="input_17_7">7</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="8" id="input_17_8" value="8" @if(@$evalution->feedback11 == 8) checked @endif />
-                  <label for="input_17_8">8</label>
-                </div>
-
-                <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="9" id="input_17_9" value="9" @if(@$evalution->feedback11 == 9) checked @endif />
-                  <label for="input_17_9">9</label>
-                </div>
-
-                <div class="rating-item">
-                  <span class="rating-item-title for-to">
-                    <label for="input_17_best" aria-hidden="true">Great</label></span>
-                    <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="10" id="input_17_10" value="10" @if(@$evalution->feedback11 == 10) checked @endif />
-                    <label for="input_17_10">10</label>
-                  </div>
-              </div>
-            </div><label class="form-sub-label" id="sublabel_input_17_description" style="border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">1 is Terrible, 10 is Great</label>
-          </span> </div>
-      </li>
-      <li class="form-line" data-type="control_radio" id="id_50"><label class="form-label form-label-top form-label-auto" id="label_50" aria-hidden="false"> Was there a large enough selection of food? </label>
-        <div id="cid_50" class="form-input-wide" data-layout="full">
-          <div class="form-single-column" role="group" aria-labelledby="label_50" data-component="radio">
-
-            <span class="form-radio-item" style="clear:left">
-              <span class="dragger-item"></span>
-              <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_0" name="q50_wasThere" value="Heaps of choice" @if(@$evalution->feedback12 == "Heaps of choice") checked @endif />
-
-              <label id="label_input_50_0" for="input_50_0">Heaps of choice</label>
-            </span><span class="form-radio-item" style="clear:left">
-              <span class="dragger-item"></span>
-              <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_1" name="q50_wasThere" value="An adequate range" @if(@$evalution->feedback12 == "An adequate range") checked @endif />
-
-              <label id="label_input_50_1" for="input_50_1">An adequate range</label>
-            </span>
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_2" name="q50_wasThere" value="Some choice, but not what I wanted" @if(@$evalution->feedback12 == "Some choice, but not what I wanted") checked @endif />
-
-            <label id="label_input_50_2" for="input_50_2">Some choice, but not what I wanted</label></span><span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_3" name="q50_wasThere" value="Not enough" @if(@$evalution->feedback12 == "Not enough") checked @endif />
-            <label id="label_input_50_3" for="input_50_3">Not enough</label></span></div>
-        </div>
-      </li>
-
-     <!--  <li class="form-line" data-type="control_textarea" id="id_19"><label class="form-label form-label-top form-label-auto" id="label_19" for="input_19" aria-hidden="false"> In your opinion, what is the most important feature we should look for when choosing a venue? </label>
-        <div id="cid_19" class="form-input-wide" data-layout="full">
-          <textarea id="input_19" class="form-textarea" name="q19_inYour" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_19"></textarea>
-        </div>
-      </li> -->
 
       <li id="cid_27" class="form-input-wide" data-type="control_head">
         <div class="form-header-group  header-default">
@@ -1374,11 +930,6 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
           </div>
         </div>
       </li>
-
-     <!--  <li class="form-line" data-type="control_textarea" id="id_28"><label class="form-label form-label-top form-label-auto" id="label_28" for="input_28" aria-hidden="false"> If you were running the event, what would you have done differently? </label>
-        <div id="cid_28" class="form-input-wide" data-layout="full">
-          <textarea id="input_28" class="form-textarea" name="q28_ifYou" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_28">{{@$evalution->final_comments}}</textarea></div>
-      </li> -->
 
       <li class="form-line" data-type="control_textarea" id="id_45"><label class="form-label form-label-top form-label-auto" id="label_45" for="input_45" aria-hidden="false"> Any suggestions for future event topics? </label>
         <div id="cid_45" class="form-input-wide" data-layout="full"> <textarea id="input_45" class="form-textarea" name="q45_anySuggestions45" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_45">{{@$evalution->suggestion_future_topics}}</textarea> </div>
@@ -1389,42 +940,7 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
           <textarea id="input_38" class="form-textarea" name="q38_anyFinal38" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_38">{{@$evalution->final_comments}}</textarea>
         </div>
       </li>
-      <!-- <li id="cid_3" class="form-input-wide" data-type="control_head">
-        <div class="form-header-group  header-default">
-          <div class="header-text httal htvam">
-            <h2 id="header_3" class="form-header" data-component="header">Optional: Contact Details</h2>
-          </div>
-        </div>
-      </li>
-
-      <li class="form-line" data-type="control_fullname" id="id_4"><label class="form-label form-label-top form-label-auto" id="label_4" for="first_4" aria-hidden="false"> Your Name </label>
-        <div id="cid_4" class="form-input-wide" data-layout="full">
-          <div data-wrapper-react="true">
-            <span class="form-sub-label-container" style="vertical-align:top" data-input-type="first">
-              <input type="text" id="first_4" name="q4_yourName[first]" class="form-textbox" data-defaultvalue="" autoComplete="section-input_4 given-name" size="10" data-component="first" aria-labelledby="label_4 sublabel_4_first" value="" />
-              <label class="form-sub-label" for="first_4" id="sublabel_4_first" style="min-height:13px">First Name</label></span>
-              <span class="form-sub-label-container" style="vertical-align:top" data-input-type="last">
-                <input type="text" id="last_4" name="q4_yourName[last]" class="form-textbox" data-defaultvalue="" autoComplete="section-input_4 family-name" size="15" data-component="last" aria-labelledby="label_4 sublabel_4_last" value="" />
-                <label class="form-sub-label" for="last_4" id="sublabel_4_last" style="min-height:13px">Last Name</label></span></div>
-        </div>
-      </li>
-      <li class="form-line form-line-column form-col-1" data-type="control_email" id="id_5"><label class="form-label form-label-top form-label-auto" id="label_5" for="input_5" aria-hidden="false"> E-mail </label>
-        <div id="cid_5" class="form-input-wide" data-layout="half"> <input type="email" id="input_5" name="q5_email5" class="form-textbox validate[Email]" data-defaultvalue="" autoComplete="section-input_5 email" style="width:30px" size="30" placeholder="ex: myname@example.com" data-component="email" aria-labelledby="label_5" value="" /> </div>
-      </li>
-
-      <li class="form-line form-line-column form-col-2" data-type="control_phone" id="id_6"><label class="form-label form-label-top form-label-auto" id="label_6" for="input_6_area" aria-hidden="false"> Phone Number </label>
-        <div id="cid_6" class="form-input-wide" data-layout="half">
-          <div data-wrapper-react="true">
-            <span class="form-sub-label-container" style="vertical-align:top" data-input-type="areaCode">
-              <input type="tel" id="input_6_area" name="q6_phoneNumber6[area]" class="form-textbox" data-defaultvalue="" autoComplete="section-input_6 tel-area-code" data-component="areaCode" aria-labelledby="label_6 sublabel_6_area" value="" />
-              <span class="phone-separate" aria-hidden="true"> -</span>
-              <label class="form-sub-label" for="input_6_area" id="sublabel_6_area" style="min-height:13px">Area Code</label></span>
-              <span class="form-sub-label-container" style="vertical-align:top" data-input-type="phone">
-                <input type="tel" id="input_6_phone" name="q6_phoneNumber6[phone]" class="form-textbox" data-defaultvalue="" autoComplete="section-input_6 tel-local" data-component="phone" aria-labelledby="label_6 sublabel_6_phone" value="" />
-                <label class="form-sub-label" for="input_6_phone" id="sublabel_6_phone" style="min-height:13px">Phone Number</label></span>
-              </div>
-        </div>
-      </li> -->
+     
       <li class="form-line" data-type="control_button" id="id_2">
         <div id="cid_2" class="form-input-wide" data-layout="full">
           <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField">
@@ -1437,20 +953,5 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
       <li style="display:none">Should be Empty: <input type="text" name="website" value="" type="hidden" /></li>
     </ul>
   </div>
- <!--  <script>
-    JotForm.showJotFormPowered = "new_footer";
-  </script>
-  <script>
-    JotForm.poweredByText = "Powered by Jotform";
-  </script><input type="hidden" class="simple_spc" id="simple_spc" name="simple_spc" value="251012049024441" />
-  <script type="text/javascript">
-    var all_spc = document.querySelectorAll("form[id='251012049024441'] .si" + "mple" + "_spc");
-    for (var i = 0; i < all_spc.length; i++)
-    {
-      all_spc[i].value = "251012049024441-251012049024441";
-    }
-  </script> -->
 </form>
 @endsection
-
-<!-- </html><script type="text/javascript">JotForm.isNewSACL=true;</script> -->

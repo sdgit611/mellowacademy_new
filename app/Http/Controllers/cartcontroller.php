@@ -11,6 +11,9 @@ use Session;
 use DB;
 use Mail;
 use App\Models\Evalution;
+use App\Models\EvalutionAnswer;
+use App\Models\EvalutionQuestion;
+
 
 
 class cartcontroller extends Controller
@@ -649,9 +652,19 @@ class cartcontroller extends Controller
 	        						     ->Where('dev_id',$devId)->first();
 
 	        $show['evalution'] = DB::table('evalutions')->Where(['dev_id'=>$devId,'user_id'=>Session::get('user_login_id')])->first();
+
+	        $show['evalution_question'] = EvalutionQuestion::with(['getEvalutionanswer' => function($query) use ($devId, $u_id) {
+			    $query->where(['dev_id' => $devId, 'user_id' => $u_id]);				
+			}])->get();
+
+
 	     }else
 	     {
-	     	// dd($req->all());
+
+	     try {
+	     	
+	     	DB::beginTransaction();
+
 	     	$evalution=Evalution::Where(['dev_id'=>$devId,'user_id'=>Session::get('user_login_id')])->first();
 	     	if(empty($evalution))
 	     	{
@@ -664,27 +677,36 @@ class cartcontroller extends Controller
 
 	     	$evalution->dev_id=$devId;
 	     	$evalution->user_id=Session::get('user_login_id');
-	     	$evalution->feedback1=$req->q23_overallHow23;
-	     	$evalution->feedback2=$req->q25_afterThe25;
-	     	$evalution->feedback3=$req->q24_doYou;
-	     	$evalution->feedback4=$req->q30_whatWas;
-	     	$evalution->feedback5=$req->q26_wouldYou;
-	     	$evalution->feedback6=$req->q36_overallWere36;
-	     	// $evalution->feedback7=$req->q34_presenter2[0];
-	     	// $evalution->feedback8=$req->q33_presenter3[0];
-	     	// $evalution->feedback9=$req->q32_presenter4[0];
-	     	// $evalution->feedback10=$req->q32_presenter4[0];
-	     	$evalution->feedback11=$req->q17_howWas17;
-	     	$evalution->feedback12=$req->q50_wasThere;
 	     	$evalution->problems=$req->q37_whatProblems;
 	     	$evalution->suggestion_future_topics=$req->q45_anySuggestions45;
 	     	$evalution->final_comments=$req->q38_anyFinal38;
 	     	$evalution->save();
 
+	     	EvalutionAnswer::Where(['evalution_id'=>$evalution->id,'dev_id'=>$devId,'user_id'=>Session::get('user_login_id')])->delete();
+
+	     	foreach ($req->feedback as $key => $value)
+	     	{
+	     		$eva_ans = new EvalutionAnswer;
+	     		$eva_ans->dev_id=$devId;
+	     		$eva_ans->user_id=Session::get('user_login_id');
+	     		$eva_ans->evalution_id=$evalution->id;
+	     		$eva_ans->question_id=$key;
+	     		$eva_ans->answer=$value;
+	     		$eva_ans->save();
+	     	}
+
+	     	DB::commit();
 	     	session(['message' =>'success', 'schedule_errmsg' =>$msg]);
 
 	     	return redirect('resource');
-	     }
+
+	     } catch (\Exception $e) {
+	        DB::rollback(); 
+	        session(['message' =>'errmsg', 'schedule_errmsg' =>"Something went wrong"]);
+	        return redirect('resource');
+	    }
+
+	   }
 
     	return view('front/evalution/index')->with($show);
     }
