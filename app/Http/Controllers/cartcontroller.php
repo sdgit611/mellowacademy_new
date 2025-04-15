@@ -644,6 +644,10 @@ class cartcontroller extends Controller
 	        ->get();
 	        $show['dev_id']=$devId;
 
+	        $show['developer_details'] = DB::table('developer_details_tb')
+	        							 ->selectRaw("*, CONCAT(name, ' ', last_name) as full_name")
+	        						     ->Where('dev_id',$devId)->first();
+
 	        $show['evalution'] = DB::table('evalutions')->Where(['dev_id'=>$devId,'user_id'=>Session::get('user_login_id')])->first();
 	     }else
 	     {
@@ -652,6 +656,10 @@ class cartcontroller extends Controller
 	     	if(empty($evalution))
 	     	{
 	     		$evalution=new Evalution;
+	     		$msg='Evalution Added Successfully..';
+	     	}else
+	     	{
+	     		$msg='Evalution Updated Successfully..';
 	     	}
 
 	     	$evalution->dev_id=$devId;
@@ -661,7 +669,7 @@ class cartcontroller extends Controller
 	     	$evalution->feedback3=$req->q24_doYou;
 	     	$evalution->feedback4=$req->q30_whatWas;
 	     	$evalution->feedback5=$req->q26_wouldYou;
-	     	// $evalution->feedback6=$req->q31_presenter1[0];
+	     	$evalution->feedback6=$req->q36_overallWere36;
 	     	// $evalution->feedback7=$req->q34_presenter2[0];
 	     	// $evalution->feedback8=$req->q33_presenter3[0];
 	     	// $evalution->feedback9=$req->q32_presenter4[0];
@@ -673,9 +681,9 @@ class cartcontroller extends Controller
 	     	$evalution->final_comments=$req->q38_anyFinal38;
 	     	$evalution->save();
 
-	     	session(['message' =>'success', 'schedule_errmsg' =>'Evalution Added Successfully..']);
+	     	session(['message' =>'success', 'schedule_errmsg' =>$msg]);
 
-	     	return back();
+	     	return redirect('resource');
 	     }
 
     	return view('front/evalution/index')->with($show);

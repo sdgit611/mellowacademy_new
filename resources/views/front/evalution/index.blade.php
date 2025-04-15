@@ -779,7 +779,7 @@ div.form-header-group.hasImage {
 <script src="https://cdn02.jotfor.ms/static/prototype.forms.js?v=3.3.62236" type="text/javascript"></script>
 <script src="https://cdn03.jotfor.ms/static/jotform.forms.js?v=3.3.62236" type="text/javascript"></script>
 <script src="https://cdn01.jotfor.ms/js/punycode-1.4.1.min.js?v=3.3.62236" type="text/javascript" defer></script>
-<script src="https://cdn01.jotfor.ms/s/umd/6accf2598e8/for-form-branding-footer.js?v=3.3.62236" type="text/javascript" defer></script>
+<!-- <script src="https://cdn01.jotfor.ms/s/umd/6accf2598e8/for-form-branding-footer.js?v=3.3.62236" type="text/javascript" defer></script> -->
 <script type="text/javascript"> 
   JotForm.newDefaultTheme = true;
   JotForm.extendsNewTheme = false;
@@ -808,7 +808,7 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
 </script>
 </head>
 <!-- <body> -->
-<form class="jotform-form" onsubmit="return typeof testSubmitFunction !== 'undefined' && testSubmitFunction();" action="{{route('evalution',$dev_id)}}" method="post" name="form_251012049024441" id="251012049024441" accept-charset="utf-8" autocomplete="on">
+<form class="jotform-form" onsubmit="return typeof testSubmitFunction !== 'undefined' && testSubmitFunction();" action="{{route('evalution',@$dev_id)}}" method="post" name="form_251012049024441" id="251012049024441" accept-charset="utf-8" autocomplete="on">
   <!-- <input type="hidden" name="formID" value="251012049024441" /> -->
   @csrf
 <!--   <input type="hidden" id="JWTContainer" value="" />
@@ -820,14 +820,15 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
   <input type="hidden" name="eventObserver" value="1" /> -->
   <div role="main" class="form-all">
     <ul class="form-section page-section" role="presentation">
-      <!-- <li id="cid_1" class="form-input-wide" data-type="control_head">
+      <li id="cid_1" class="form-input-wide" data-type="control_head">
         <div class="form-header-group  header-large">
           <div class="header-text httal htvam">
-            <h1 id="header_1" class="form-header" data-component="header">Event Feedback</h1>
-            <div id="subHeader_1" class="form-subHeader">Please share your feedback regarding the event</div>
+            <h1 id="header_1" class="form-header" data-component="header">Full Name</h1>
+            <div id="subHeader_1" class="form-subHeader">{{@$developer_details->full_name}}</div><br>
+            <img src="<?php echo URL::asset('public/upload/developer/'.$developer_details->image.'') ?>" alt="" class="profile-img img-responsive center-block" style="height: 100px;">
           </div>
         </div>
-      </li> -->
+      </li>
      <!--  <li class="form-line jf-required" data-type="control_dropdown" id="id_9"><label class="form-label form-label-top form-label-auto" id="label_9" for="input_9" aria-hidden="false"> Which event did you attend?<span class="form-required">*</span> </label>
         <div id="cid_9" class="form-input-wide jf-required" data-layout="half"> <select class="form-dropdown validate[required]" id="input_9" name="q9_whichEvent9" style="width:150px" data-component="dropdown" required="" aria-label="Which  event did you attend?">
             <option value="">Please Select</option>
@@ -847,54 +848,54 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
                   <span class="rating-item-title for-from">
                     <label for="input_23_worst" aria-hidden="true">Boring</label>
                   </span>
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="1" id="input_23_1" required="" value="1" @if($evalution->feedback1 == 1) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="1" id="input_23_1" required="" value="1" @if(@$evalution->feedback1 == 1) checked @endif />
                   <label for="input_23_1">1</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="2" id="input_23_2" required="" value="2" @if($evalution->feedback1 == 2) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="2" id="input_23_2" required="" value="2" @if(@$evalution->feedback1 == 2) checked @endif />
                   <label for="input_23_2">2</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="3" id="input_23_3" required="" value="3" @if($evalution->feedback1 == 3) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="3" id="input_23_3" required="" value="3" @if(@$evalution->feedback1 == 3) checked @endif />
                   <label for="input_23_3">3</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="4" id="input_23_4" required="" value="4" @if($evalution->feedback1 == 4) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="4" id="input_23_4" required="" value="4" @if(@$evalution->feedback1 == 4) checked @endif />
                   <label for="input_23_4">4</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="5" id="input_23_5" required="" value="5" @if($evalution->feedback1 == 5) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="5" id="input_23_5" required="" value="5" @if(@$evalution->feedback1 == 5) checked @endif />
                   <label for="input_23_5">5</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="6" id="input_23_6" required="" value="6" @if($evalution->feedback1 == 6) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="6" id="input_23_6" required="" value="6" @if(@$evalution->feedback1 == 6) checked @endif />
                   <label for="input_23_6">6</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="7" id="input_23_7" required="" value="7" @if($evalution->feedback1 == 7) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="7" id="input_23_7" required="" value="7" @if(@$evalution->feedback1 == 7) checked @endif />
                   <label for="input_23_7">7</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="8" id="input_23_8" required="" value="8" @if($evalution->feedback1 == 8) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="8" id="input_23_8" required="" value="8" @if(@$evalution->feedback1 == 8) checked @endif />
                   <label for="input_23_8">8</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="9" id="input_23_9" required="" value="9" @if($evalution->feedback1 == 9) checked @endif />
+                  <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="9" id="input_23_9" required="" value="9" @if(@$evalution->feedback1 == 9) checked @endif />
                   <label for="input_23_9">9</label>
                 </div>
 
                 <div class="rating-item">
                   <span class="rating-item-title for-to">
                     <label for="input_23_best" aria-hidden="true">Fantastic</label></span>
-                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="10" id="input_23_10" required="" value="10" @if($evalution->feedback1 == 10) checked @endif />
+                    <input aria-labelledby="label_input_23" class="form-radio validate[required]" type="radio" name="q23_overallHow23" title="10" id="input_23_10" required="" value="10" @if(@$evalution->feedback1 == 10) checked @endif />
                     <label for="input_23_10">10</label>
                   </div>
               </div>
@@ -913,54 +914,54 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
                 <div class="rating-item">
                   <span class="rating-item-title for-from">
                     <label for="input_25_worst" aria-hidden="true">None</label></span>
-                    <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="1" id="input_25_1" required="" value="1" @if($evalution->feedback2 == 1) checked @endif/>
+                    <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="1" id="input_25_1" required="" value="1" @if(@$evalution->feedback2 == 1) checked @endif/>
                     <label for="input_25_1">1</label>
                   </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="2" id="input_25_2" required="" value="2" @if($evalution->feedback2 == 2) checked @endif/>
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="2" id="input_25_2" required="" value="2" @if(@$evalution->feedback2 == 2) checked @endif/>
                   <label for="input_25_2">2</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="3" id="input_25_3" required="" value="3" @if($evalution->feedback2 == 3) checked @endif/>
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="3" id="input_25_3" required="" value="3" @if(@$evalution->feedback2 == 3) checked @endif/>
                   <label for="input_25_3">3</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="4" id="input_25_4" required="" value="4" @if($evalution->feedback2 == 4) checked @endif />
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="4" id="input_25_4" required="" value="4" @if(@$evalution->feedback2 == 4) checked @endif />
                   <label for="input_25_4">4</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="5" id="input_25_5" required="" value="5"  @if($evalution->feedback2 == 5) checked @endif/>
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="5" id="input_25_5" required="" value="5"  @if(@$evalution->feedback2 == 5) checked @endif/>
                   <label for="input_25_5">5</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="6" id="input_25_6" required="" value="6" @if($evalution->feedback2 == 6) checked @endif />
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="6" id="input_25_6" required="" value="6" @if(@$evalution->feedback2 == 6) checked @endif />
                   <label for="input_25_6">6</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="7" id="input_25_7" required="" value="7" @if($evalution->feedback2 == 7) checked @endif />
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="7" id="input_25_7" required="" value="7" @if(@$evalution->feedback2 == 7) checked @endif />
                   <label for="input_25_7">7</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="8" id="input_25_8" required="" value="8" @if($evalution->feedback2 == 8) checked @endif />
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="8" id="input_25_8" required="" value="8" @if(@$evalution->feedback2 == 8) checked @endif />
                   <label for="input_25_8">8</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="9" id="input_25_9" required="" value="9" @if($evalution->feedback2 == 9) checked @endif />
+                  <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="9" id="input_25_9" required="" value="9" @if(@$evalution->feedback2 == 9) checked @endif />
                   <label for="input_25_9">9</label>
                 </div>
 
                 <div class="rating-item">
                   <span class="rating-item-title for-to">
                     <label for="input_25_best" aria-hidden="true">Fired up!</label></span>
-                    <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="10" id="input_25_10" required="" value="10" @if($evalution->feedback2 == 10) checked @endif />
+                    <input aria-labelledby="label_input_25" class="form-radio validate[required]" type="radio" name="q25_afterThe25" title="10" id="input_25_10" required="" value="10" @if(@$evalution->feedback2 == 10) checked @endif />
                     <label for="input_25_10">10</label>
                   </div>
               </div>
@@ -972,45 +973,45 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
             <div role="radiogroup" aria-labelledby="label_24 sublabel_input_24_description" cellPadding="4" cellSpacing="0" class="form-scale-table" data-component="scale">
               <div class="rating-item-group">
                 <div class="rating-item"><span class="rating-item-title for-from"><label for="input_24_worst" aria-hidden="true">Not at all</label></span>
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="1" id="input_24_1" required="" value="1" @if($evalution->feedback3 == 1) checked @endif />
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="1" id="input_24_1" required="" value="1" @if(@$evalution->feedback3 == 1) checked @endif />
                   <label for="input_24_1">1</label></div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="2" id="input_24_2" required="" value="2" @if($evalution->feedback3 == 2) checked @endif />
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="2" id="input_24_2" required="" value="2" @if(@$evalution->feedback3 == 2) checked @endif />
                   <label for="input_24_2">2</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="3" id="input_24_3" required="" value="3" @if($evalution->feedback3 == 3) checked @endif />
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="3" id="input_24_3" required="" value="3" @if(@$evalution->feedback3 == 3) checked @endif />
                   <label for="input_24_3">3</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="4" id="input_24_4" required="" value="4" @if($evalution->feedback3 == 4) checked @endif />
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="4" id="input_24_4" required="" value="4" @if(@$evalution->feedback3 == 4) checked @endif />
                   <label for="input_24_4">4</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="5" id="input_24_5" required="" value="5" @if($evalution->feedback3 == 5) checked @endif /><label for="input_24_5">5</label>
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="5" id="input_24_5" required="" value="5" @if(@$evalution->feedback3 == 5) checked @endif /><label for="input_24_5">5</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="6" id="input_24_6" required="" value="6" @if($evalution->feedback3 == 6) checked @endif/>
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="6" id="input_24_6" required="" value="6" @if(@$evalution->feedback3 == 6) checked @endif/>
                   <label for="input_24_6">6</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="7" id="input_24_7" required="" value="7" @if($evalution->feedback3 == 7) checked @endif/>
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="7" id="input_24_7" required="" value="7" @if(@$evalution->feedback3 == 7) checked @endif/>
                   <label for="input_24_7">7</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="8" id="input_24_8" required="" value="8" @if($evalution->feedback3 == 8) checked @endif/>
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="8" id="input_24_8" required="" value="8" @if(@$evalution->feedback3 == 8) checked @endif/>
                   <label for="input_24_8">8</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="9" id="input_24_9" required="" value="9" @if($evalution->feedback3 == 9) checked @endif/>
+                  <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="9" id="input_24_9" required="" value="9" @if(@$evalution->feedback3 == 9) checked @endif/>
                   <label for="input_24_9">9</label>
                 </div>
 
@@ -1018,7 +1019,7 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
                   <span class="rating-item-title for-to">
                     <label for="input_24_best" aria-hidden="true">Definitely</label></span>
                     <input aria-labelledby="label_input_24" class="form-radio validate[required]" type="radio" name="q24_doYou" title="10" id="input_24_10" required="" value="10" 
-                    @if($evalution->feedback3 == 10) checked @endif />
+                    @if(@$evalution->feedback3 == 10) checked @endif />
                     <label for="input_24_10">10</label>
                   </div>
               </div>
@@ -1031,24 +1032,24 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
         <div id="cid_30" class="form-input-wide jf-required" data-layout="full">
           <div class="form-single-column" role="group" aria-labelledby="label_30" data-component="radio">
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_0" name="q30_whatWas" required="" value="Option 1" @if($evalution->feedback4 == "Option 1") checked @endif/>
+            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_0" name="q30_whatWas" required="" value="Option 1" @if(@$evalution->feedback4 == "Option 1") checked @endif/>
             <label id="label_input_30_0" for="input_30_0">Option 1</label></span>
 
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_1" name="q30_whatWas" required="" value="Option 2" @if($evalution->feedback4 == "Option 2") checked @endif />
+            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_1" name="q30_whatWas" required="" value="Option 2" @if(@$evalution->feedback4 == "Option 2") checked @endif />
             <label id="label_input_30_1" for="input_30_1">Option 2</label>
           </span>
 
-            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_2" name="q30_whatWas" required="" value="Option 3" @if($evalution->feedback4 == "Option 3") checked @endif /><label id="label_input_30_2" for="input_30_2">Option 3</label></span>
+            <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_2" name="q30_whatWas" required="" value="Option 3" @if(@$evalution->feedback4 == "Option 3") checked @endif /><label id="label_input_30_2" for="input_30_2">Option 3</label></span>
 
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_3" name="q30_whatWas" required="" value="Option 4" @if($evalution->feedback4 == "Option 4") checked @endif /><label id="label_input_30_3" for="input_30_3">Option 4</label></span>
+            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_3" name="q30_whatWas" required="" value="Option 4" @if(@$evalution->feedback4 == "Option 4") checked @endif /><label id="label_input_30_3" for="input_30_3">Option 4</label></span>
 
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_4" name="q30_whatWas" required="" value="Option 5" @if($evalution->feedback4 == "Option 5") checked @endif /><label id="label_input_30_4" for="input_30_4">Option 5</label></span>
+            <input aria-describedby="label_30" type="radio" class="form-radio validate[required]" id="input_30_4" name="q30_whatWas" required="" value="Option 5" @if(@$evalution->feedback4 == "Option 5") checked @endif /><label id="label_input_30_4" for="input_30_4">Option 5</label></span>
 
             <span class="form-radio-item formRadioOther" style="clear:left">
-              <input type="radio" class="form-radio-other form-radio validate[required]" name="q30_whatWas" id="other_30" tabindex="0" aria-label="Other" value="other" @if($evalution->feedback4 == "other") checked @endif />
+              <input type="radio" class="form-radio-other form-radio validate[required]" name="q30_whatWas" id="other_30" tabindex="0" aria-label="Other" value="other" @if(@$evalution->feedback4 == "other") checked @endif />
               <label id="label_other_30" style="text-indent:0" for="other_30">Other</label>
 
               <span id="other_30_input" class="other-input-container" style="display:none">
@@ -1061,25 +1062,25 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
           <div class="form-single-column" role="group" aria-labelledby="label_26" data-component="radio">
             <span class="form-radio-item" style="clear:left">
               <span class="dragger-item"></span>
-              <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_0" name="q26_wouldYou" required="" value="Yes, definitely" @if($evalution->feedback5 == "Yes, definitely") checked @endif />
+              <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_0" name="q26_wouldYou" required="" value="Yes, definitely" @if(@$evalution->feedback5 == "Yes, definitely") checked @endif />
               <label id="label_input_26_0" for="input_26_0">Yes, definitely</label>
             </span>
 
               <span class="form-radio-item" style="clear:left">
                 <span class="dragger-item"></span>
-                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_1" name="q26_wouldYou" required="" value="Maybe, if the content was changed"  @if($evalution->feedback5 == "Maybe, if the content was changed") checked @endif />
+                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_1" name="q26_wouldYou" required="" value="Maybe, if the content was changed"  @if(@$evalution->feedback5 == "Maybe, if the content was changed") checked @endif />
                 <label id="label_input_26_1" for="input_26_1">Maybe, if the content was changed</label>
               </span>
 
               <span class="form-radio-item" style="clear:left">
                 <span class="dragger-item"></span>
-                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_2" name="q26_wouldYou" required="" value="Maybe, if it was cheaper" @if($evalution->feedback5 == "Maybe, if it was cheaper") checked @endif />
+                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_2" name="q26_wouldYou" required="" value="Maybe, if it was cheaper" @if(@$evalution->feedback5 == "Maybe, if it was cheaper") checked @endif />
                 <label id="label_input_26_2" for="input_26_2">Maybe, if it was cheaper</label>
               </span>
 
               <span class="form-radio-item" style="clear:left">
                 <span class="dragger-item"></span>
-                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_3" name="q26_wouldYou" required="" value="No, never" @if($evalution->feedback5 == "No, never") checked @endif />
+                <input aria-describedby="label_26" type="radio" class="form-radio validate[required]" id="input_26_3" name="q26_wouldYou" required="" value="No, never" @if(@$evalution->feedback5 == "No, never") checked @endif />
                 <label id="label_input_26_3" for="input_26_3">No, never</label>
               </span>
 
@@ -1260,11 +1261,11 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
           <div class="form-single-column" role="group" aria-labelledby="label_36" data-component="radio">
 
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_36" type="radio" class="form-radio validate[required]" id="input_36_0" name="q36_overallWere36" required="" value="Yes" @if($evalution->feedback6 == "Yes") checked @endif />
+            <input aria-describedby="label_36" type="radio" class="form-radio validate[required]" id="input_36_0" name="q36_overallWere36" required="" value="Yes" @if(@$evalution->feedback6 == "Yes") checked @endif />
             <label id="label_input_36_0" for="input_36_0">Yes</label></span>
 
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_36" type="radio" class="form-radio validate[required]" id="input_36_1" name="q36_overallWere36" required="" value="No" @if($evalution->feedback6 == "No") checked @endif />
+            <input aria-describedby="label_36" type="radio" class="form-radio validate[required]" id="input_36_1" name="q36_overallWere36" required="" value="No" @if(@$evalution->feedback6 == "No") checked @endif />
             <label id="label_input_36_1" for="input_36_1">No</label></span>
           </div>
         </div>
@@ -1282,54 +1283,54 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
                 <div class="rating-item">
                   <span class="rating-item-title for-from">
                     <label for="input_17_worst" aria-hidden="true">Terrible</label></span>
-                    <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="1" id="input_17_1" value="1" @if($evalution->feedback11 == 1) checked @endif />
+                    <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="1" id="input_17_1" value="1" @if(@$evalution->feedback11 == 1) checked @endif />
                     <label for="input_17_1">1</label>
                   </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="2" id="input_17_2" value="2" @if($evalution->feedback11 == 2) checked @endif />
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="2" id="input_17_2" value="2" @if(@$evalution->feedback11 == 2) checked @endif />
                   <label for="input_17_2">2</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="3" id="input_17_3" value="3" @if($evalution->feedback11 == 3) checked @endif/>
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="3" id="input_17_3" value="3" @if(@$evalution->feedback11 == 3) checked @endif/>
                   <label for="input_17_3">3</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="4" id="input_17_4" value="4" @if($evalution->feedback11 == 4) checked @endif />
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="4" id="input_17_4" value="4" @if(@$evalution->feedback11 == 4) checked @endif />
                   <label for="input_17_4">4</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="5" id="input_17_5" value="5"  @if($evalution->feedback11==5) checked @endif/>
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="5" id="input_17_5" value="5"  @if(@$evalution->feedback11==5) checked @endif/>
                   <label for="input_17_5">5</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="6" id="input_17_6" value="6" @if($evalution->feedback11 == 6) checked @endif/>
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="6" id="input_17_6" value="6" @if(@$evalution->feedback11 == 6) checked @endif/>
                   <label for="input_17_6">6</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="7" id="input_17_7" value="7" @if($evalution->feedback11 == 7) checked @endif />
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="7" id="input_17_7" value="7" @if(@$evalution->feedback11 == 7) checked @endif />
                   <label for="input_17_7">7</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="8" id="input_17_8" value="8" @if($evalution->feedback11 == 8) checked @endif />
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="8" id="input_17_8" value="8" @if(@$evalution->feedback11 == 8) checked @endif />
                   <label for="input_17_8">8</label>
                 </div>
 
                 <div class="rating-item">
-                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="9" id="input_17_9" value="9" @if($evalution->feedback11 == 9) checked @endif />
+                  <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="9" id="input_17_9" value="9" @if(@$evalution->feedback11 == 9) checked @endif />
                   <label for="input_17_9">9</label>
                 </div>
 
                 <div class="rating-item">
                   <span class="rating-item-title for-to">
                     <label for="input_17_best" aria-hidden="true">Great</label></span>
-                    <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="10" id="input_17_10" value="10" @if($evalution->feedback11 == 10) checked @endif />
+                    <input aria-labelledby="label_input_17" class="form-radio" type="radio" name="q17_howWas17" title="10" id="input_17_10" value="10" @if(@$evalution->feedback11 == 10) checked @endif />
                     <label for="input_17_10">10</label>
                   </div>
               </div>
@@ -1342,20 +1343,20 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
 
             <span class="form-radio-item" style="clear:left">
               <span class="dragger-item"></span>
-              <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_0" name="q50_wasThere" value="Heaps of choice" @if($evalution->feedback12 == "Heaps of choice") checked @endif />
+              <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_0" name="q50_wasThere" value="Heaps of choice" @if(@$evalution->feedback12 == "Heaps of choice") checked @endif />
 
               <label id="label_input_50_0" for="input_50_0">Heaps of choice</label>
             </span><span class="form-radio-item" style="clear:left">
               <span class="dragger-item"></span>
-              <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_1" name="q50_wasThere" value="An adequate range" @if($evalution->feedback12 == "An adequate range") checked @endif />
+              <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_1" name="q50_wasThere" value="An adequate range" @if(@$evalution->feedback12 == "An adequate range") checked @endif />
 
               <label id="label_input_50_1" for="input_50_1">An adequate range</label>
             </span>
             <span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_2" name="q50_wasThere" value="Some choice, but not what I wanted" @if($evalution->feedback12 == "Some choice, but not what I wanted") checked @endif />
+            <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_2" name="q50_wasThere" value="Some choice, but not what I wanted" @if(@$evalution->feedback12 == "Some choice, but not what I wanted") checked @endif />
 
             <label id="label_input_50_2" for="input_50_2">Some choice, but not what I wanted</label></span><span class="form-radio-item" style="clear:left"><span class="dragger-item"></span>
-            <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_3" name="q50_wasThere" value="Not enough" @if($evalution->feedback12 == "Not enough") checked @endif />
+            <input aria-describedby="label_50" type="radio" class="form-radio" id="input_50_3" name="q50_wasThere" value="Not enough" @if(@$evalution->feedback12 == "Not enough") checked @endif />
             <label id="label_input_50_3" for="input_50_3">Not enough</label></span></div>
         </div>
       </li>
@@ -1376,16 +1377,16 @@ JotForm.paymentExtrasOnTheFly([null,{"name":"clickTo","qid":"1","text":"Event Fe
 
      <!--  <li class="form-line" data-type="control_textarea" id="id_28"><label class="form-label form-label-top form-label-auto" id="label_28" for="input_28" aria-hidden="false"> If you were running the event, what would you have done differently? </label>
         <div id="cid_28" class="form-input-wide" data-layout="full">
-          <textarea id="input_28" class="form-textarea" name="q28_ifYou" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_28">{{$evalution->final_comments}}</textarea></div>
+          <textarea id="input_28" class="form-textarea" name="q28_ifYou" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_28">{{@$evalution->final_comments}}</textarea></div>
       </li> -->
 
       <li class="form-line" data-type="control_textarea" id="id_45"><label class="form-label form-label-top form-label-auto" id="label_45" for="input_45" aria-hidden="false"> Any suggestions for future event topics? </label>
-        <div id="cid_45" class="form-input-wide" data-layout="full"> <textarea id="input_45" class="form-textarea" name="q45_anySuggestions45" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_45">{{$evalution->suggestion_future_topics}}</textarea> </div>
+        <div id="cid_45" class="form-input-wide" data-layout="full"> <textarea id="input_45" class="form-textarea" name="q45_anySuggestions45" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_45">{{@$evalution->suggestion_future_topics}}</textarea> </div>
       </li>
 
       <li class="form-line" data-type="control_textarea" id="id_38"><label class="form-label form-label-top form-label-auto" id="label_38" for="input_38" aria-hidden="false"> Any final comments? </label>
         <div id="cid_38" class="form-input-wide" data-layout="full">
-          <textarea id="input_38" class="form-textarea" name="q38_anyFinal38" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_38">{{$evalution->final_comments}}</textarea>
+          <textarea id="input_38" class="form-textarea" name="q38_anyFinal38" style="width:40px;height:6px" data-component="textarea" aria-labelledby="label_38">{{@$evalution->final_comments}}</textarea>
         </div>
       </li>
       <!-- <li id="cid_3" class="form-input-wide" data-type="control_head">
