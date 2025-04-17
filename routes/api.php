@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\API\DeveloperProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,3 +17,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+// Route::middleware('auth:sanctum')->get('/developer-profile', [DeveloperProfileController::class, 'developerProfileAPI']);
+// Route::get('/developer-profile', [DeveloperProfileController::class, 'developerProfileAPI']);
+// Route::middleware(['web'])->group(function () {
+    Route::get('/developer-profile', [DeveloperProfileController::class, 'developerProfile']);
+// });
+
+Route::post('/developer-login', [DeveloperProfileController::class, 'developerLogin']);
+

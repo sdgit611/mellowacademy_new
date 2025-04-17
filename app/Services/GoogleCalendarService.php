@@ -48,6 +48,7 @@ class GoogleCalendarService
 
     public function createInterviewEvent($name, $email, $dateTime)
     {
+        
         $start = Carbon::parse($dateTime);
         $end = (clone $start)->addMinutes(30); // default 30 minutes
 
@@ -69,6 +70,7 @@ class GoogleCalendarService
                 ]
             ],
         ]);
+
 
         $event = $this->service->events->insert('primary', $event, [
             'conferenceDataVersion' => 1,
