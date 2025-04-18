@@ -19,11 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-// Route::middleware('auth:sanctum')->get('/developer-profile', [DeveloperProfileController::class, 'developerProfileAPI']);
-// Route::get('/developer-profile', [DeveloperProfileController::class, 'developerProfileAPI']);
-// Route::middleware(['web'])->group(function () {
-    Route::get('/developer-profile', [DeveloperProfileController::class, 'developerProfile']);
-// });
+
+Route::get('/developer-profile', [DeveloperProfileController::class, 'developerProfile']);
+Route::get('/developer-kyc', [DeveloperProfileController::class, 'developerKyc']);
+Route::get('/developer-wallet-details', [DeveloperProfileController::class, 'developerWalletDetails']);
+Route::post('/developer-change-password', [DeveloperProfileController::class, 'updatePassword']);
 
 Route::post('/developer-login', [DeveloperProfileController::class, 'developerLogin']);
 

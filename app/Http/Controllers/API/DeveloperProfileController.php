@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use App\Models\Developer;
 
 class DeveloperProfileController extends Controller
 {
@@ -41,16 +43,14 @@ class DeveloperProfileController extends Controller
         ], 401);
     }
 
-    public function developer_data()
+    public function developerData($developerId)
     {
-        $developer_id = Session::get('developer_login_id');
-
         $developer_details = DB::table('developer_details_tb')
-            ->where('dev_id', $developer_id)
+            ->where('dev_id', $developerId)
             ->get();
 
         $developer_project_details = DB::table('developer_project_details_tb')
-            ->where('developer_id', $developer_id)
+            ->where('developer_id', $developerId)
             ->get();
 
         return [
@@ -124,5 +124,71 @@ class DeveloperProfileController extends Controller
             'premium_profile_count' => $premium_profile_details,
             'joined_details' => $joined_details,
         ]);
+    }
+
+    public function developerKyc(Request $request)
+    {   $developerId = $request->developerId;
+        $kyc = $this->developerData($developerId);
+        return response()->json([
+            'status' => true,
+            'kyc' => $kyc,
+        ]);
+    }
+    
+    public function developerWalletDetails(Request $request)
+    {   $developerId = $request->developerId;
+        $developerWalletMilestone = DB::table('milestone_tb')
+        ->select('developer_details_tb.dev_id','developer_details_tb.perhr','developer_details_tb.pro_id','milestone_tb.milestone_name','milestone_tb.days','milestone_tb.dev_id','milestone_tb.dev_id','milestone_tb.id')
+        ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'milestone_tb.dev_id')
+        ->where('developer_details_tb.dev_id',$developerId)
+        ->get();
+
+        $commissionDetails = DB::table('commission_tb')->get();
+        return response()->json([
+            'status' => true,
+            'developerWalletMilestone' => $developerWalletMilestone,
+            'commissionDetails' => $commissionDetails,
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'developerId' => 'required|exists:developer_details_tb,dev_id',
+                'old_password' => 'required',
+                'new_password' => 'required|min:6',
+                'confirm_password' => 'required|same:new_password',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'errors' => $e->errors()
+            ], 422);
+        }
+
+        $developer = Developer::find($request->developerId);
+
+        if (!$developer) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Developer not found.'
+            ], 404);
+        }
+
+        if (!Hash::check($request->old_password, $developer->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Old password does not match.'
+            ], 401);
+        }
+
+        $developer->password = Hash::make($request->new_password);
+        $developer->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password updated successfully.'
+        ], 200);
     }
 }
