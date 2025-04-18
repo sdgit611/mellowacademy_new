@@ -32,4 +32,9 @@ class Developer extends Model implements CanResetPassword
     {
         return $this->hasMany(DeveloperProjectDetail::class, 'developer_id');
     }
+
+    public function developerOrders()
+    {
+        return $this->hasMany(DeveloperOrder::class, 'dev_id', 'dev_id');
+    }
 }
