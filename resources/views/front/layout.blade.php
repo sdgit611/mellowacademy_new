@@ -260,6 +260,12 @@
 
                         </li>
 
+                        <li class="left-side">
+
+                                <a href="https://demo-saas.worksuite.biz/account/jobs" style="font-size: 16px;margin-left: -27px;" target="_blank">JOBS</a>
+
+                        </li>
+
                        <?php
 
                         if(empty(Session::get('user_login_id'))) { ?>
@@ -296,7 +302,7 @@
 
                             <li>
 
-                                <a href="javascript:void(0);" class="open-login open" style="font-size: 19px;"><span><i class="icon icon-user"></i></span></a>
+                                <a href="javascript:void(0);" class="open-login" style="font-size: 19px;"><span><i class="icon icon-user"></i></span></a>
 
                             </li>
 
@@ -572,7 +578,7 @@
 
                     if(empty(Session::get('user_login_id'))) { ?>
 
-                        <div class="login-wrapper open">
+                        <div class="login-wrapper">
 
                             <div class="row">
 
