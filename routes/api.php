@@ -34,6 +34,7 @@ Route::get('/employer-resources', [EmployerController::class, 'employerResource'
 Route::get('/employer-on-going-resources', [EmployerController::class, 'employerOngoingResource']);
 Route::get('/employer-completed-resources', [EmployerController::class, 'employerCompletedResource']);
 Route::post('/employer-reset-password', [EmployerController::class, 'employerUpdatePassword']);
+Route::post('/employer-profile-update', [EmployerController::class, 'employerProfileUpdate']);
 
 Route::post('/developer-login', [DeveloperProfileController::class, 'developerLogin']);
 

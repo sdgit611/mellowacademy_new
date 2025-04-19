@@ -8,6 +8,7 @@ use App\Models\Employer;
 use App\Models\User;
 use App\Models\DeveloperOrder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class EmployerController extends Controller
 {
@@ -219,6 +220,64 @@ class EmployerController extends Controller
             'message' => 'Password changed successfully.'
         ]);
     }
+
+  
+
+    public function employerProfileUpdate(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required|exists:user_login,id',
+                'fname' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'email' => 'required|email',
+                'phone' => 'required|digits:10',
+                'user_name' => 'required|min:5|max:255',
+                'company_name' => 'nullable|string|max:255',
+                'user_purpose' => 'nullable|string|max:255',
+            ]);
+
+            $user = User::find($request->id);
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User not found.',
+                ], 404);
+            }
+
+            $user->fname = $request->fname;
+            $user->lname = $request->lname;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->user_name = $request->user_name;
+            $user->company_name = $request->company_name;
+            $user->purpose = $request->user_purpose;
+            $user->date = now();
+
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Profile updated successfully.',
+                'data' => $user
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Edit profile error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong. Please try again later.'
+            ], 500);
+        }
+    }
+
 
 
 }
