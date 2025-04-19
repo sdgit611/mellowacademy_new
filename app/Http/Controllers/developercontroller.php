@@ -12,6 +12,10 @@ use DB;
 use Illuminate\Validation\Rule;
 use Image;
 use Mail;
+use Illuminate\Support\Facades\Hash;
+use App\Models\DeveloperProjectDetail;
+use App\Models\Developer;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Premium;
 use App\Models\developerPayments;
 use App\Models\developerPremiumPrice;
@@ -56,7 +60,7 @@ class developercontroller extends Controller
                     'last_name'=>$request->post('last_name'),
                     'phone'=>$request->post('phone'),
                     'email'=>$request->post('email'),
-                    'password'=>md5($request->post('password')),
+                    'password'=>Hash::make($request->post('password')),
                     'show_password'=>$request->post('password'),
                     'profile_complete'=>30,
                     'date'=>date('y/m/d')
@@ -109,39 +113,77 @@ class developercontroller extends Controller
         return view('developer/index');
     }
 
+    // old funntion with usign md5 
+    // public function login_verification(Request $request)
+    // {
+    //     request()->validate(['email' => 'required|email','password' => 'required']);
+        
+    //     $email=$request->post('email');
+    //     $password=$request->post('password');
+        
+    //     $uses = DB::table('developer_details_tb')->where('email','=',$email)->where('password','=',md5($password))->count();
+    //     dd($email,$password,$request->all(),$uses);
+    //     if($uses > 0)
+    //     {
+    //         // $dev_login = DB::table('developer_details_tb')->where('email','=',$email)->first();
+
+    //         // if($dev_login->login_status == 1){
+    //             $deta= DB::table('developer_details_tb')->where('email','=',$email)->get();
+    //             foreach($deta as $dd)
+    //             {
+    //                 $id=$dd->dev_id;
+    //                 $email=$dd->email;
+    //                 $name=$dd->name;
+    //             }
+    //             session(['developer_login_id' => $id,'developer_email_login' => $email,'developer_name_login' => $name]);
+    //             session(['message' =>'success', 'errmsg' =>'Login Successfully.']);
+    //             return redirect('developer_dashboard');
+    //         // }else{
+    //         //     session(['message' =>'danger','errmsg' =>'Your Account Is Not Activate Right Now.']);
+    //         //     return redirect()->back();
+    //         // } 
+    //     }
+    //     else
+    //     {
+    //         session(['message' =>'danger','errmsg' =>'Login Failed ? Username and Password Wrong....']);
+    //         return redirect()->back();
+    //     }                  
+    // }
+
+    // old funntion with usign Hash
     public function login_verification(Request $request)
     {
-        request()->validate(['email' => 'required|email','password' => 'required']);
-        
-        $email=$request->post('email');
-        $password=$request->post('password');
-       
-        $uses = DB::table('developer_details_tb')->where('email','=',$email)->where('password','=',md5($password))->count();
-        if($uses > 0)
-        {
-            // $dev_login = DB::table('developer_details_tb')->where('email','=',$email)->first();
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-            // if($dev_login->login_status == 1){
-                $deta= DB::table('developer_details_tb')->where('email','=',$email)->get();
-                foreach($deta as $dd)
-                {
-                    $id=$dd->dev_id;
-                    $email=$dd->email;
-                    $name=$dd->name;
-                }
-                session(['developer_login_id' => $id,'developer_email_login' => $email,'developer_name_login' => $name]);
-                session(['message' =>'success', 'errmsg' =>'Login Successfully.']);
-                return redirect('developer_dashboard');
-            // }else{
-            //     session(['message' =>'danger','errmsg' =>'Your Account Is Not Activate Right Now.']);
-            //     return redirect()->back();
-            // } 
-        }
-        else
-        {
-            session(['message' =>'danger','errmsg' =>'Login Failed ? Username and Password Wrong....']);
+        $email = $request->post('email');
+        $password = $request->post('password');
+
+        // Get developer record by email
+        $developer = DB::table('developer_details_tb')->where('email', $email)->first();
+
+        if ($developer && Hash::check($password, $developer->password)) {
+            // Successful login
+            session([
+                'developer_login_id' => $developer->dev_id,
+                'developer_email_login' => $developer->email,
+                'developer_name_login' => $developer->name,
+                'message' => 'success',
+                'errmsg' => 'Login Successfully.',
+            ]);
+
+            return redirect('developer_dashboard');
+        } else {
+            // Login failed
+            session([
+                'message' => 'danger',
+                'errmsg' => 'Login Failed. Username or password is incorrect.',
+            ]);
+
             return redirect()->back();
-        }                  
+        }
     }
 
     public function developer_log()
@@ -493,13 +535,20 @@ class developercontroller extends Controller
     {
         $developer_id=Session::get('developer_login_id'); 
        $data = DB::table('developer_details_tb')->where('dev_id',$developer_id)->get();
-
         foreach ($data as $d) {
-          $total = $d->profile_complete;
+            $total = $d->profile_complete;
+            $profile_complete = $total;
+        
+            if (empty($d->job)||empty($d->total_hours) && $total < 90) {
+                $profile_complete = $total + 10;
+        
+                // Cap to 100
+                if ($profile_complete > 100) {
+                    $profile_complete = 100;
+                }
+            }
         }
-
-        $profile_complete = $total + 10;
-
+    
         request()->validate(
         [
             'name' => 'required',
@@ -513,7 +562,6 @@ class developercontroller extends Controller
             'rating' => 'required',
             'address' => 'required',
             'language' => 'required',
-            
             'skills' => 'required',
             'completed_job' => 'required',
             'portfolio_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
@@ -563,18 +611,12 @@ class developercontroller extends Controller
             'resume'=>$getresume,
             'profile_complete'=>$profile_complete,
         );
-        $dev_id=$request->post('update');       
+        $dev_id=$request->post('update');   
         $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Profile Details Update Successfully...']);
-            return redirect()->route('developer_profile');
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Profile Details Update Failed.']); 
-            return redirect()->back();
-        }
+            return response()->json([
+                'status' => 200,
+                'message' => 'Developer profile updated successfully!'
+            ]);
     }
 
     public function developer_resource()
@@ -1177,113 +1219,85 @@ class developercontroller extends Controller
         return view('developer/developer_project')->with($show);
     }
 
-    public function submit_project_details(Request $request)
-    {   
-        $dev_id=Session::get('developer_login_id'); 
-        $data = DB::table('developer_details_tb')->where('dev_id',$dev_id)->get();
-
-        foreach ($data as $d) {
-          $total = $d->profile_complete;
-        }
-
-        $profile_complete = $total + 10;
-
-        
-        request()->validate(
-        [
-            'project_link' => 'required',
-            'screenshot_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);
-
-        $getscreenshotimage = time().'.'.$request->screenshot_image->getClientOriginalExtension();       
-        $path = public_path('upload/screenshot/'.$getscreenshotimage);
-        $img = Image::make($request->file('screenshot_image')->getRealPath())->save($path);
-
-        $data=array(
-            'developer_id'=>$dev_id,
-            'project_link'=>$request->post('project_link'),
-            'screenshot_image'=>$getscreenshotimage,
-            
-        );
-
-        $result=DB::table('developer_project_details_tb')->insert($data);
-
-        $count = DB::table('developer_project_details_tb')->where('developer_id',$dev_id)->count();
-
-        if($count < 2){
-            $datass=array(
-                
-                'profile_complete'=>$profile_complete,
-            );
-            $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($datass);
-        }
-
-        if($result==true)
-        {
-            session(['message' =>'success', 'devProjecterrmsg' =>'Developer Project Details Added Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'devProjecterrmsg'=>'Developer Project Details Added Failed.']); 
-            return redirect()->back();
-        }
-    }
-
-    public function update_project_details(Request $request)
+    // by shankar 
+    public function storeOrUpdateProjectDetails(Request $request)
     {
-        $dev_id=Session::get('developer_login_id');    
-        request()->validate(
-        [
-            'project_link' => 'required',            
-            'screenshot_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);  
+        $dev_id = Session::get('developer_login_id');
 
-        if(!empty($files=$request->file('screenshot_image')))
-        {
-            $getscreenshotimage = time().'.'.$request->screenshot_image->getClientOriginalExtension();       
-            $path = public_path('upload/screenshot/'.$getscreenshotimage);
-            $img = Image::make($request->file('screenshot_image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getscreenshotimage=$request->post('old_screenshot_image');
+        // Validation rules
+        $rules = [
+            'project_link' => 'required|url',
+            'screenshot_image' => $request->hasFile('screenshot_image') ? 'image|mimes:jpg,png,jpeg,gif|max:5120' : '',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data=array(
-            
-            'developer_id'=>$dev_id,
-            'project_link'=>$request->post('project_link'),
-            'screenshot_image'=>$getscreenshotimage,
+        // Handle Image Upload
+        $getscreenshotimage = $request->old_screenshot_image ?? null;
+
+        if ($request->hasFile('screenshot_image')) {
+            $getscreenshotimage = time() . '.' . $request->file('screenshot_image')->getClientOriginalExtension();
+            $path = public_path('upload/screenshot/' . $getscreenshotimage);
+            Image::make($request->file('screenshot_image')->getRealPath())->save($path);
+        }
+
+        // Save or Update
+        $isUpdate = $request->has('update');
+
+        $devProject = DeveloperProjectDetail::updateOrCreate(
+            ['id' => $request->update ?? null],
+            [
+                'developer_id' => $dev_id,
+                'project_link' => $request->project_link,
+                'screenshot_image' => $getscreenshotimage,
+            ]
         );
-       $id=$request->post('update');       
-       $result=DB::table('developer_project_details_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'devProjecterrmsg' =>'Developer Project Details Update Successfully...']);
-            return redirect()->back();
+
+        // Profile completion logic (only for new insert)
+        if (!$isUpdate) {
+            $developer = Developer::find($dev_id);
+            if ($developer) {
+                $projectCount = $developer->projects()->count();
+                if ($projectCount < 2) {
+                    $developer->profile_complete += 10;
+                    $developer->save();
+                }
+            }
         }
-        else
-        {
-            session(['message' =>'danger', 'devProjecterrmsg'=>'Developer Project Details Update Failed.']); 
-            return redirect()->back();
-        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $isUpdate 
+                ? 'Developer Project Details Updated Successfully...' 
+                : 'Developer Project Details Added Successfully...'
+        ]);
     }
 
     public function delete_project_details($developer_id)
-    {       
-        $info_delete=DB::table('developer_project_details_tb')->where('id', $developer_id)->delete();
-        if($info_delete==true)
-        {
-            session(['message' =>'success', 'devProjecterrmsg'=>'Developer Project Details Delete Successfully. ']); 
-            return redirect()->back();
+    {
+        $project = DeveloperProjectDetail::find($developer_id);
+
+        if ($project) {
+            // Optional: delete the image file too
+            if ($project->screenshot_image && file_exists(public_path('upload/screenshot/' . $project->screenshot_image))) {
+                @unlink(public_path('upload/screenshot/' . $project->screenshot_image));
+            }
+
+            $project->delete();
+
+            session()->flash('message', 'success');
+            session()->flash('devProjecterrmsg', 'Developer Project Details Delete Successfully.');
+        } else {
+            session()->flash('message', 'danger');
+            session()->flash('devProjecterrmsg', 'Developer Project Not Found.');
         }
-        else
-        {
-            session(['message' =>'danger', 'devProjecterrmsg'=>'Developer Project Details Delete Failed.']); 
-            return redirect()->back();
-        }
-    } 
+
+        return redirect()->back();
+    }
 
     public function developer_kyc()
     {
@@ -1368,94 +1382,73 @@ class developercontroller extends Controller
 
     public function update_developer_kyc(Request $request)
     {
-        $dev_id=Session::get('developer_login_id'); 
+        $dev_id = Session::get('developer_login_id');
+
+        $request->validate([
+            'national_id_name' => 'required|string',
         
-        request()->validate(
-        [
-            'national_id_name' => 'required',
-            
-        ]);  
+            'national_id_image' => $request->hasFile('national_id_image') || !$request->old_national_id_image
+                ? 'required|mimes:jpeg,png,jpg,pdf|max:2048'
+                : 'nullable',
+        
+            'image' => $request->hasFile('image') || !$request->old_image
+                ? 'required|mimes:jpeg,png,jpg,pdf|max:2048'
+                : 'nullable',
+        
+            'signature' => $request->hasFile('signature') || !$request->old_signature
+                ? 'required|mimes:jpeg,png,jpg,pdf|max:2048'
+                : 'nullable',
+        
+            'adharcard' => $request->hasFile('adharcard') || !$request->old_adharcard
+                ? 'required|mimes:jpeg,png,jpg,pdf|max:2048'
+                : 'nullable',
+        
+            'pancard' => $request->hasFile('pancard') || !$request->old_pancard
+                ? 'required|mimes:jpeg,png,jpg,pdf|max:2048'
+                : 'nullable',
+        ]);
+        
 
-        if(!empty($files=$request->file('image')))
-        {
-            $getimage = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/developer/'.$getimage);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getimage=$request->post('old_image');
-        }
+        $getimage = $request->file('image') 
+            ? uploadFile($request->file('image'), 'developer', 'image') 
+            : $request->post('old_image');
 
-        if(!empty($files=$request->file('national_id_image')))
-        {
-            $getnationalidimage = time().'.'.$request->national_id_image->getClientOriginalExtension();       
-            $path = public_path('upload/national_image/'.$getnationalidimage);
-            $img = Image::make($request->file('national_id_image')->getRealPath())->save($path);
+        $getnationalidimage = $request->file('national_id_image') 
+            ? uploadFile($request->file('national_id_image'), 'national_image', 'nationalid') 
+            : $request->post('old_national_id_image');
 
-        }
-        else
-        {
-            $getnationalidimage=$request->post('old_national_id_image');
-        }
+        $getsignature = $request->file('signature') 
+            ? uploadFile($request->file('signature'), 'signature', 'signature') 
+            : $request->post('old_signature');
 
-        if(!empty($files=$request->file('signature')))
-        {
-            $getsignature = time().'.'.$request->signature->getClientOriginalExtension();       
-            $path = public_path('upload/signature/'.$getsignature);
-            $img = Image::make($request->file('signature')->getRealPath())->save($path);
+        $getadharcard = $request->file('adharcard') 
+            ? uploadFile($request->file('adharcard'), 'adhar_card', 'adharcard') 
+            : $request->post('old_adharcard');
 
-        }
-        else
-        {
-            $getsignature=$request->post('old_signature');
-        }
+        $getpancard = $request->file('pancard') 
+            ? uploadFile($request->file('pancard'), 'pan_card', 'pancard') 
+            : $request->post('old_pancard');
 
-        if(!empty($files=$request->file('adharcard')))
-        {
-            $getadharcard = time().'.'.$request->adharcard->getClientOriginalExtension();       
-            $path = public_path('upload/adhar_card/'.$getadharcard);
-            $img = Image::make($request->file('adharcard')->getRealPath())->save($path);
+        $data = [
+            'national_id_name'   => $request->post('national_id_name'),
+            'national_id_image'  => $getnationalidimage,
+            'image'              => $getimage,
+            'signature'          => $getsignature,
+            'adharcard'          => $getadharcard,
+            'pancard'            => $getpancard,
+        ];
 
-        }
-        else
-        {
-            $getadharcard=$request->post('old_adharcard');
-        }
+        $result = DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($data);
 
-        if(!empty($files=$request->file('pancard')))
-        {
-            $getpancard = time().'.'.$request->pancard->getClientOriginalExtension();       
-            $path = public_path('upload/pan_card/'.$getpancard);
-            $img = Image::make($request->file('pancard')->getRealPath())->save($path);
-
-        }
-        else
-        {
-            $getpancard=$request->post('old_pancard');
-        }
-
-        $data=array(
-            'national_id_name'=>$request->post('national_id_name'),
-            'national_id_image'=>$getnationalidimage,
-            'image'=>$getimage,
-            'signature'=>$getsignature,
-            'adharcard'=>$getadharcard,
-            'pancard'=>$getpancard,
-        );
-       
-       $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'devkycerrmsg' =>'KYC Details Update Successfully...']);
+        if ($result) {
+            session(['message' => 'success', 'devkycerrmsg' => 'KYC Details Update Successfully...']);
             return redirect()->route('developer_kyc');
-        }
-        else
-        {
-            session(['message' =>'danger', 'devkycerrmsg'=>'KYC Details Update Failed.']); 
+        } else {
+            session(['message' => 'danger', 'devkycerrmsg' => 'KYC Details Update Failed.']);
             return redirect()->back();
         }
     }
+
 
 
     public function bank_details()
@@ -2085,6 +2078,5 @@ class developercontroller extends Controller
             return false;
         }
     }
-
     
 }

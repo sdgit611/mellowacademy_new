@@ -7,12 +7,12 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Auth;
 use Razorpay\Api\Api;
 use Illuminate\Support\Str;
-use Session;
-use DB;
 use PDF;
 use Image;
 use Mail;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class userController extends Controller
 {
@@ -167,95 +167,205 @@ class userController extends Controller
 			}
 	}
 
-	public function verify_login(Request $request)
-    {
-    	$show['developer_order_details']=$this->developer_order_data();
-    	$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
-    	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
-        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
-        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+	//old function with only login md5 but in new function hash || md5 
+	// public function verify_login(Request $request)
+    // {
+    // 	$show['developer_order_details']=$this->developer_order_data();
+    // 	$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+    // 	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+    //     $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+    //     $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+    //     $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
 
-        $show['web_details'] = DB::table('web_setting')->get();
+    //     $show['web_details'] = DB::table('web_setting')->get();
 
-       	$show['cart_details'] = DB::table('cart_tb')
-        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
-        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
-        ->whereNull('status')
-        ->get();
+    //    	$show['cart_details'] = DB::table('cart_tb')
+    //     ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+    //     ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+    //     ->whereNull('status')
+    //     ->get();
 
-         $u_id=Session::get('user_login_id'); 
+    //      $u_id=Session::get('user_login_id'); 
 
-        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+    //     $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+    //     $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+    //     $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+    //     $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
 
-		request()->validate(['phone' => 'required','password' => 'required']);		
+	// 	request()->validate(['phone' => 'required','password' => 'required']);		
 		
-		$phone=$request->post('phone');
-		$pass=$request->post('password');
-		$password=md5($pass);
+	// 	$phone=$request->post('phone');
+	// 	$pass=$request->post('password');
+	// 	$password=md5($pass);
 
-		$use = DB::table('user_login')->where('email','=',$phone)->where('password','=',$password)->orwhere('phone','=',$phone)->count();
-       	if($use > 0)
-        {
-			$details= DB::table('user_login')->where('email','=',$phone)->where('password','=',$password)->orwhere('phone','=',$phone)->get();
-			foreach($details as $dd)
-			{
-				$id=$dd->id;
-				$email=$dd->email;
-                $fname=$dd->fname;
-			}
-				session(['client_login_id' => $id,'client_email_login' => $email,'client_name_login' => $fname]);
-				session(['user_login_id' => $id]);
-           	    $cart = Session::get('cart');
-           		$developer_cart = Session::get('developer_cart');
+	// 	$use = DB::table('user_login')->where('email','=',$phone)->where('password','=',$password)->orwhere('phone','=',$phone)->count();
+    //    	if($use > 0)
+    //     {
+	// 		$details= DB::table('user_login')->where('email','=',$phone)->where('password','=',$password)->orwhere('phone','=',$phone)->get();
+	// 		foreach($details as $dd)
+	// 		{
+	// 			$id=$dd->id;
+	// 			$email=$dd->email;
+    //             $fname=$dd->fname;
+	// 		}
+	// 			session(['client_login_id' => $id,'client_email_login' => $email,'client_name_login' => $fname]);
+	// 			session(['user_login_id' => $id]);
+    //        	    $cart = Session::get('cart');
+    //        		$developer_cart = Session::get('developer_cart');
 
 
-           		if(!empty($cart))
-				{
-					$u_id=$id;
-           			foreach ($cart as $id => $val) 
-					{					
-						$p_id=$cart[$id]['p_id'];
-						$count=DB::table('cart_tb')->whereNull('status')->where('p_id','=',$p_id)->where('u_id','=',$u_id)->count();
-						if($count == 0)
-						{
-							$data = array('u_id'=>$u_id,'p_id'=>$p_id,'status'=>null);
-							DB::table('cart_tb')->insert($data);
+    //        		if(!empty($cart))
+	// 			{
+	// 				$u_id=$id;
+    //        			foreach ($cart as $id => $val) 
+	// 				{					
+	// 					$p_id=$cart[$id]['p_id'];
+	// 					$count=DB::table('cart_tb')->whereNull('status')->where('p_id','=',$p_id)->where('u_id','=',$u_id)->count();
+	// 					if($count == 0)
+	// 					{
+	// 						$data = array('u_id'=>$u_id,'p_id'=>$p_id,'status'=>null);
+	// 						DB::table('cart_tb')->insert($data);
+	// 					}
+	// 				}
+	// 				Session::forget('cart');
+	// 			}
+	// 		if(!empty($developer_cart))
+	// 		{
+	// 			$u_id=$id;
+
+	// 			foreach ($developer_cart as $id => $val) 
+	// 			{					
+	// 				$dev_id=$developer_cart[$id]['dev_id'];
+	// 				$count=DB::table('developer_cart_tb')->whereNull('status')->where('dev_id','=',$dev_id)->where('u_id','=',$u_id)->count();
+	// 				if($count == 0)
+	// 				{
+	// 					$data = array('u_id'=>$u_id,'dev_id'=>$dev_id,'status'=>null);
+	// 					DB::table('developer_cart_tb')->insert($data);
+	// 				}
+	// 			}
+					
+	// 			Session::forget('developer_cart');
+	// 		}
+           
+	// 		return redirect()->route('index')->with($show);
+	// 	}
+    //     else
+    //     {
+    //         //session(['message' =>'danger','loginerrmsgs' =>'Login Failed ? Mobile Number / Email & Password Wrong....']);
+    //         //return redirect()->route('index')->with($show);
+
+    //         return view('front/wrong_login')->with($show);
+    //     }
+	// }
+
+	//new login function with hash || md5 password 
+	public function verify_login(Request $request)
+	{
+		// Validate input
+		$request->validate([
+			'phone' => 'required',
+			'password' => 'required'
+		]);
+
+		$show['developer_order_details'] = $this->developer_order_data();
+		$show['user_details'] = DB::table('user_login')->orderBy('id', 'desc')->get(); 
+		$show['category'] = DB::table('category_tb')->orderBy('id', 'desc')->get();
+		$show['banner'] = DB::table('banner_tb')->orderBy('id', 'desc')->get();
+		$show['subcategorys'] = DB::table('subcategory_tb')->orderBy('id', 'asc')->get();
+		$show['higher_professional'] = DB::table('higher_professional_tb')->orderBy('id', 'desc')->get();
+		$show['web_details'] = DB::table('web_setting')->get();
+
+		$u_id = Session::get('user_login_id');
+		$show['cart_value'] = DB::table('cart_tb')->whereNull('status')->where('u_id', $u_id)->count();
+		$show['cart_empty'] = DB::table('cart_tb')->whereNull('status')->where('u_id', $u_id)->count();
+		$show['developer_cart_empty'] = DB::table('developer_cart_tb')->whereNull('status')->where('u_id', $u_id)->count();
+		$show['developer_cart_value'] = DB::table('developer_cart_tb')->whereNull('status')->where('u_id', $u_id)->count();
+
+		$phone = $request->post('phone');
+		$pass = $request->post('password');
+
+		// Find user by email or phone
+		$loginUser = DB::table('user_login')
+			->where(function ($query) use ($phone) {
+				$query->where('email', $phone)->orWhere('phone', $phone);
+			})
+			->first();
+
+		if ($loginUser) {
+			$storedPassword = $loginUser->password;
+
+			// Check both Hash::check() and md5() match
+			if (Hash::check($pass, $storedPassword) || $storedPassword === md5($pass)) {
+
+				// Auto-upgrade md5 to hashed password
+				if ($storedPassword === md5($pass)) {
+					DB::table('user_login')->where('id', $loginUser->id)->update([
+						'password' => Hash::make($pass)
+					]);
+				}
+
+				// Set session
+				session([
+					'client_login_id' => $loginUser->id,
+					'client_email_login' => $loginUser->email,
+					'client_name_login' => $loginUser->fname,
+					'user_login_id' => $loginUser->id
+				]);
+
+				// Merge cart items if any
+				$cart = Session::get('cart');
+				if (!empty($cart)) {
+					foreach ($cart as $item) {
+						$count = DB::table('cart_tb')
+							->whereNull('status')
+							->where('p_id', $item['p_id'])
+							->where('u_id', $loginUser->id)
+							->count();
+
+						if ($count === 0) {
+							DB::table('cart_tb')->insert([
+								'u_id' => $loginUser->id,
+								'p_id' => $item['p_id'],
+								'status' => null
+							]);
 						}
 					}
 					Session::forget('cart');
 				}
-			if(!empty($developer_cart))
-			{
-				$u_id=$id;
 
-				foreach ($developer_cart as $id => $val) 
-				{					
-					$dev_id=$developer_cart[$id]['dev_id'];
-					$count=DB::table('developer_cart_tb')->whereNull('status')->where('dev_id','=',$dev_id)->where('u_id','=',$u_id)->count();
-					if($count == 0)
-					{
-						$data = array('u_id'=>$u_id,'dev_id'=>$dev_id,'status'=>null);
-						DB::table('developer_cart_tb')->insert($data);
+				// Merge developer cart
+				$developer_cart = Session::get('developer_cart');
+				if (!empty($developer_cart)) {
+					foreach ($developer_cart as $item) {
+						$count = DB::table('developer_cart_tb')
+							->whereNull('status')
+							->where('dev_id', $item['dev_id'])
+							->where('u_id', $loginUser->id)
+							->count();
+
+						if ($count === 0) {
+							DB::table('developer_cart_tb')->insert([
+								'u_id' => $loginUser->id,
+								'dev_id' => $item['dev_id'],
+								'status' => null
+							]);
+						}
 					}
+					Session::forget('developer_cart');
 				}
-					
-				Session::forget('developer_cart');
-			}
-           
-			return redirect()->route('index')->with($show);
-		}
-        else
-        {
-            //session(['message' =>'danger','loginerrmsgs' =>'Login Failed ? Mobile Number / Email & Password Wrong....']);
-            //return redirect()->route('index')->with($show);
 
-            return view('front/wrong_login')->with($show);
-        }
+				// Redirect to home
+				return redirect()->route('index')->with($show);
+			} else {
+				// Password incorrect
+				return view('front/wrong_login')->with($show);
+			}
+		} else {
+			// User not found
+			return view('front/wrong_login')->with($show);
+		}
 	}
+
 
 	public function user_logout()
 	{

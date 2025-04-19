@@ -1,119 +1,87 @@
 @extends('developer.layout')
 @section('content')
 
-
 <div class="page-content">
-    <div class="row">
-        <div class="col-lg-8 ml-auto mr-auto">
-            @if(Session::has('devkycerrmsg'))                 
-                <div class="alert alert-{{Session::get('message')}} alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
-                       <strong>{{Session::get('devkycerrmsg')}}</strong>
-                </div>
-                {{Session::forget('message')}}
-                {{Session::forget('devkycerrmsg')}}
-            @endif
-        </div>
-    </div>
-</div>
-
-<div class="page-content" style="padding-top:30px;">
-    <div class="main-wrapper container">   
+    <div class="main-wrapper container mt-4">   
         <div class="row">
             <div class="col-xl">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Update KYC Details</h5>
-                        <?php 
-                            foreach($developer_details as $dd) { ?>
-                            <form method="post" action="{{ route('update_developer_kyc') }}" enctype="multipart/form-data">
-                                @csrf
-                                <div class="row">
+                        @foreach($developer_details as $dd)
+                        <form id="kycForm" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="developer_id" value="{{ $dd->dev_id }}">
+                            <div class="row">
 
-                                    <div class="col-sm-6">
-                                        <div class="form-group bmd-form-group is-filled">
-                                            <label class="bmd-label-floating">Upload Residance Proofe/Aadhar Card</label>
-                                            <input type="file" class="form-control" name="adharcard" autocomplete="off" >
-                                            <input type="hidden" class="form-control" name="old_adharcard" value="<?php echo $dd->adharcard; ?>"  autocomplete="off">
-                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/adhar_card/'.$dd->adharcard.'') ?>" style="height:30px;width:40px;">
-                                            @if ($errors->has('adharcard'))
-                                            <strong class="text-danger">{{ $errors->first('adharcard') }}</strong>                                  
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-6">
-                                        <div class="form-group bmd-form-group is-filled">
-                                            <label class="bmd-label-floating">Upload PAN/TAX Card</label>
-                                            <input type="file" class="form-control" name="pancard" autocomplete="off" >
-                                            <input type="hidden" class="form-control" name="old_pancard" value="<?php echo $dd->pancard; ?>"  autocomplete="off">
-                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/pan_card/'.$dd->pancard.'') ?>" style="height:30px;width:40px;">
-                                            @if ($errors->has('pancard'))
-                                            <strong class="text-danger">{{ $errors->first('pancard') }}</strong>                                  
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-6">
-                                        <div class="form-group bmd-form-group">
-                                            <label class="bmd-label-floating">Nation Identification</label>
-                                            <select name="national_id_name" id="national_id_name" class="form-control" required>
-                                                <option value="">Choose</option>
-                                                <option value="Passport">Passport</option>
-                                                <option value="Driving License">Driving License</option>
-                                                <option value="Voter Card">Voter Card</option>
-                                            </select>
-                                            @if ($errors->has('national_id_name'))
-                                            <strong class="text-danger">{{ $errors->first('national_id_name') }}</strong>                                   
-                                            @endif
-                                        </div>                      
-                                    </div> 
-
-                                    <div class="col-sm-6">
-                                        <div class="form-group bmd-form-group is-filled">
-                                            <label class="bmd-label-floating">Upload National Id Image</label>
-                                            <input type="file" class="form-control" name="national_id_image" accept="image/*"  autocomplete="off" >
-                                            <input type="hidden" class="form-control" name="old_national_id_image" value="<?php echo $dd->national_id_image; ?>"  autocomplete="off">
-                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/national_image/'.$dd->national_id_image.'') ?>" style="height:30px;width:40px;">
-                                            @if ($errors->has('national_id_image'))
-                                            <strong class="text-danger">{{ $errors->first('national_id_image') }}</strong>                                  
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-6">
-                                        <div class="form-group bmd-form-group is-filled">
-                                            <label class="bmd-label-floating">Upload Profile Image</label>
-                                            <input type="file" class="form-control" name="image" accept="image/*"  autocomplete="off" >
-                                            <input type="hidden" class="form-control" name="old_image" value="<?php echo $dd->image; ?>"  autocomplete="off">
-                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/developer/'.$dd->image.'') ?>" style="height:30px;width:40px;">
-                                            @if ($errors->has('image'))
-                                            <strong class="text-danger">{{ $errors->first('image') }}</strong>                                  
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-6">
-                                        <div class="form-group bmd-form-group is-filled">
-                                            <label class="bmd-label-floating">Upload Signature</label>
-                                            <input type="file" class="form-control" name="signature" autocomplete="off" >
-                                            <input type="hidden" class="form-control" name="old_signature" value="<?php echo $dd->image; ?>"  autocomplete="off">
-                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/signature/'.$dd->signature.'') ?>" style="height:30px;width:40px;">
-                                            @if ($errors->has('signature'))
-                                            <strong class="text-danger">{{ $errors->first('signature') }}</strong>                                  
-                                            @endif
-                                        </div>
-                                    </div>                  
-                                    
-                                    <div class="col-sm-4">
-                                        <div class="form-group bmd-form-group">
-                                            <button type="submit" class="btn btn-success btn-block">Update KYC Details</button>
-                                        </div>
-                                    </div>
-
+                                <div class="col-sm-6">
+                                    <label>Residence Proof / Aadhar Card <span class="text-danger">*</span></label>
+                                    <input type="file" name="adharcard" class="form-control">
+                                    <input type="hidden" name="old_adharcard" value="{{ $dd->adharcard }}">
+                                    <!-- preview file start -->
+                                    <x-file-preview :fileName="$dd->adharcard" filePath="upload/adhar_card" />
+                                    <!-- preview file end -->
+                                    <span class="text-danger error-adharcard"></span>
                                 </div>
-                            </form>
-                        <?php } ?>
+
+                                <div class="col-sm-6">
+                                    <label>PAN / Tax Card <span class="text-danger">*</span></label>
+                                    <input type="file" name="pancard" class="form-control">
+                                    <input type="hidden" name="old_pancard" value="{{ $dd->pancard }}">
+                                   <!-- preview file start -->
+                                   <x-file-preview :fileName="$dd->pancard" filePath="upload/pan_card" />
+                                    <!-- preview file end -->
+                                    <span class="text-danger error-pancard"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label>National ID Type <span class="text-danger">*</span></label>
+                                    <select name="national_id_name" class="form-control">
+                                        <option value="">Choose</option>
+                                        <option value="Passport" {{ $dd->national_id_name == 'Passport' ? 'selected' : '' }}>Passport</option>
+                                        <option value="Driving License" {{ $dd->national_id_name == 'Driving License' ? 'selected' : '' }}>Driving License</option>
+                                        <option value="Voter Card" {{ $dd->national_id_name == 'Voter Card' ? 'selected' : '' }}>Voter Card</option>
+                                    </select>
+                                    <span class="text-danger error-national_id_name"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label>National ID Image <span class="text-danger">*</span></label>
+                                    <input type="file" name="national_id_image" class="form-control">
+                                    <input type="hidden" name="old_national_id_image" value="{{ $dd->national_id_image }}">
+                                    <!-- preview file start -->
+                                    <x-file-preview :fileName="$dd->national_id_image" filePath="upload/national_image" />
+                                    <!-- preview file end -->
+                                    <span class="text-danger error-national_id_image"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label>Profile Image <span class="text-danger">*</span></label>
+                                    <input type="file" name="image" class="form-control">
+                                    <input type="hidden" name="old_image" value="{{ $dd->image }}">
+                                    <!-- preview file start -->
+                                    <x-file-preview :fileName="$dd->image" filePath="upload/developer" />
+                                     <!-- preview file end -->
+                                    <span class="text-danger error-image"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label>Signature <span class="text-danger">*</span></label>
+                                    <input type="file" name="signature" class="form-control">
+                                    <input type="hidden" name="old_signature" value="{{ $dd->signature }}">
+                                    <!-- preview file start -->
+                                    <x-file-preview :fileName="$dd->signature" filePath="upload/signature" />
+                                     <!-- preview file end -->
+                                    <span class="text-danger error-signature"></span>
+                                </div>
+
+                                <div class="col-sm-4 mt-3">
+                                    <button type="submit" class="btn btn-success btn-block">Update KYC Details</button>
+                                </div>
+
+                            </div>
+                        </form>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -121,5 +89,52 @@
     </div>
 </div>
 
+<!-- Toastr -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+<!-- jQuery Validate -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+<script>
+$(document).ready(function() {
+
+    $('#kycForm').on('submit', function(e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+        $('.text-danger').text(''); // Clear all error messages
+
+        $.ajax({
+            url: "{{ route('update_developer_kyc') }}",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function() {
+                $('button[type="submit"]').prop('disabled', true);
+            },
+            success: function(response) {
+                toastr.success('KYC details updated successfully!');
+                $('button[type="submit"]').prop('disabled', false);
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1500);
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    $.each(errors, function(key, val) {
+                        $('.error-' + key).text(val[0]);
+                    });
+                } else {
+                    toastr.error('Something went wrong. Please try again.');
+                }
+                $('button[type="submit"]').prop('disabled', false);
+            }
+        });
+    });
+
+});
+</script>
 @endsection
