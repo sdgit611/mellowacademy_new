@@ -21,16 +21,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-
+// developer's routes 
+Route::post('/developer-login', [DeveloperProfileController::class, 'developerLogin']);
 Route::get('/developer-profile', [DeveloperProfileController::class, 'developerProfile']);
 Route::get('/developer-kyc', [DeveloperProfileController::class, 'developerKyc']);
 Route::get('/developer-wallet-details', [DeveloperProfileController::class, 'developerWalletDetails']);
+Route::post('/developer-profile-update', [DeveloperProfileController::class, 'developerProfileUpdate']);
 Route::post('/developer-change-password', [DeveloperProfileController::class, 'updatePassword']);
 Route::apiResource('developer-projects', DeveloperProjectController::class);
+Route::post('developer-projects/update/{id}', [DeveloperProjectController::class, 'updateProject']);
+Route::post('/developer/bank-details', [DeveloperProfileController::class, 'addBankDetailsApi']);
 
-
-
-
+// Empoyer's routes 
 Route::post('/employer-login', [EmployerController::class, 'employerLogin']);
 Route::get('/employer-profile', [EmployerController::class, 'employerProfile']);
 Route::get('/employer-resources', [EmployerController::class, 'employerResource']);
@@ -39,5 +41,4 @@ Route::get('/employer-completed-resources', [EmployerController::class, 'employe
 Route::post('/employer-reset-password', [EmployerController::class, 'employerUpdatePassword']);
 Route::post('/employer-profile-update', [EmployerController::class, 'employerProfileUpdate']);
 
-Route::post('/developer-login', [DeveloperProfileController::class, 'developerLogin']);
 
