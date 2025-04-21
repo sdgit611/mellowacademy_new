@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\DeveloperProfileController;
 use App\Http\Controllers\API\EmployerController;
+use App\Http\Controllers\API\DeveloperProjectController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +26,8 @@ Route::get('/developer-profile', [DeveloperProfileController::class, 'developerP
 Route::get('/developer-kyc', [DeveloperProfileController::class, 'developerKyc']);
 Route::get('/developer-wallet-details', [DeveloperProfileController::class, 'developerWalletDetails']);
 Route::post('/developer-change-password', [DeveloperProfileController::class, 'updatePassword']);
+Route::apiResource('developer-projects', DeveloperProjectController::class);
+
 
 
 
