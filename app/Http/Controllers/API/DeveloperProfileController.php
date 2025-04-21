@@ -310,6 +310,7 @@ class DeveloperProfileController extends Controller
             'message' => 'Developer profile updated successfully!'
         ]);
     }
+    
 
     public function addBankDetailsApi(Request $request)
     {
@@ -378,5 +379,6 @@ class DeveloperProfileController extends Controller
             ]
         ]);
     }
+
     
 }

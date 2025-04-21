@@ -17,33 +17,33 @@ class GoogleCalendarService
     protected $service;
 
     public function __construct()
-{
-    $this->client = new \Google_Client();
-    $this->client->setAuthConfig(storage_path('app/google-calendar-credentials.json'));
-    $this->client->addScope(\Google_Service_Calendar::CALENDAR);
-    $this->client->setAccessType('offline');
+    {
+        $this->client = new \Google_Client();
+        $this->client->setAuthConfig(storage_path('app/google-calendar-credentials.json'));
+        $this->client->addScope(\Google_Service_Calendar::CALENDAR);
+        $this->client->setAccessType('offline');
 
-    if (Session::has('google_calendar_token')) {
-        $this->client->setAccessToken(Session::get('google_calendar_token'));
+        if (Session::has('google_calendar_token')) {
+            $this->client->setAccessToken(Session::get('google_calendar_token'));
 
-        if ($this->client->isAccessTokenExpired()) {
-            if ($this->client->getRefreshToken()) {
-                $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-                Session::put('google_calendar_token', $this->client->getAccessToken());
-            } else {
-                // token expired and no refresh token, force re-login
-                $this->client = null;
-                return;
+            if ($this->client->isAccessTokenExpired()) {
+                if ($this->client->getRefreshToken()) {
+                    $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+                    Session::put('google_calendar_token', $this->client->getAccessToken());
+                } else {
+                    // token expired and no refresh token, force re-login
+                    $this->client = null;
+                    return;
+                }
             }
-        }
 
-        $this->service = new \Google_Service_Calendar($this->client);
-    } else {
-        // No token in session
-        $this->client = null;
-        $this->service = null;
+            $this->service = new \Google_Service_Calendar($this->client);
+        } else {
+            // No token in session
+            $this->client = null;
+            $this->service = null;
+        }
     }
-}
 
 
     public function createInterviewEvent($name, $email, $dateTime)

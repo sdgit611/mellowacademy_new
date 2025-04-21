@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\DeveloperProfileController;
 use App\Http\Controllers\API\EmployerController;
 use App\Http\Controllers\API\DeveloperProjectController;
+use App\Http\Controllers\API\DeveloperInterviewController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -40,5 +41,11 @@ Route::get('/employer-on-going-resources', [EmployerController::class, 'employer
 Route::get('/employer-completed-resources', [EmployerController::class, 'employerCompletedResource']);
 Route::post('/employer-reset-password', [EmployerController::class, 'employerUpdatePassword']);
 Route::post('/employer-profile-update', [EmployerController::class, 'employerProfileUpdate']);
+Route::get('/employer/resource-list', [EmployerController::class, 'resource']);
+
+
+Route::post('employer/interview/schedule', [DeveloperInterviewController::class, 'scheduleInterview']);
+
+
 
 
