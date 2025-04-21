@@ -99,4 +99,61 @@ class DeveloperInterviewController extends Controller
             'meet_link' => $meetLink,
         ]);
     }
+
+    public function InterviewFeedback(Request $request)
+    {
+        $request->validate([
+            'employer_id' => 'required|integer',
+            'developer_id' => 'required|integer',
+            'status' => 'required|string',
+            'review' => 'required|string',
+        ]);
+
+        $u_id = $request->employer_id;
+        $dev_id = $request->developer_id;
+
+        // Fetch developer order using Eloquent
+        $order = DeveloperOrder::where('dev_id', $dev_id)->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Developer order not found.',
+                'status' => false,
+            ], 404);
+        }
+
+        // Prepare data for interview schedule
+        $data = [
+            'dev_id' => $dev_id,
+            'fname' => $order->fname,
+            'lname' => $order->lname,
+            'phone' => $order->phone,
+            'email' => $order->email,
+            'perhr' => $order->perhr,
+            'code' => $order->code,
+            'address_one' => $order->address_one,
+            'status' => $request->status,
+            'review' => $request->review,
+        ];
+
+        // Update or insert in DeveloperInterviewSchedule
+        $interview = DeveloperInterviewSchedule::updateOrCreate(
+            ['dev_id' => $dev_id],
+            $data
+        );
+
+        // Update DeveloperOrder with feedback info
+        $order->update([
+            'status' => $request->status,
+            'review' => $request->review,
+        ]);
+
+        return response()->json([
+            'message' => 'Interview feedback processed successfully.',
+            'status' => true,
+            'data' => $interview,
+        ]);
+    }
+
+
 }

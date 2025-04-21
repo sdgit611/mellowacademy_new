@@ -45,6 +45,8 @@ Route::get('/employer/resource-list', [EmployerController::class, 'resource']);
 
 
 Route::post('employer/interview/schedule', [DeveloperInterviewController::class, 'scheduleInterview']);
+Route::post('employer/interview-feedback', [DeveloperInterviewController::class, 'InterviewFeedback']);
+
 
 
 

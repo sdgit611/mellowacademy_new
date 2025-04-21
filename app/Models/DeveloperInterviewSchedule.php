@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class DeveloperInterviewSchedule extends Model
 {
     use HasFactory;
-
+    public $timestamps = false;
     protected $table = 'developer_interview_schedule';
     protected $fillable = [
         'dev_id', 'u_id', 'fname', 'lname', 'phone', 'email', 'from_time', 'to_time',
