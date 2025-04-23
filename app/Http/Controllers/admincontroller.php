@@ -16,6 +16,7 @@ use Image;
 use Mail;
 use App\Models\developerPremiumPrice;
 use App\Models\Premium;
+use Illuminate\Support\Facades\Http;
 
 class admincontroller extends Controller
 {
@@ -1801,9 +1802,23 @@ class admincontroller extends Controller
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
         $devLogin = DB::table('developer_details_tb')->where('dev_id',$dev_id)->first();
-
         $Login_status = $devLogin->login_status;
-
+        
+        // call new panels api for saving active developer
+        $payload = [
+            'job_id' => 1,
+            'full_name' => $devLogin->name,
+            'email' => $devLogin->email,
+            'phone' => $devLogin->phone,
+            'source' => 1,
+            'resume' => 'Na',
+            'remark' => 'Na',
+            'recruit_job_id' => 1,
+            'location_id' => 1,
+            'application_sources' => 'addedByUser'
+        ];
+        $response = Http::withoutVerifying()->post('https://gulbug.com/staging/mellow_backend/public/api/job-applications', $payload);
+            
         $emails=array();
         
         $emails[]= $devLogin->email;
