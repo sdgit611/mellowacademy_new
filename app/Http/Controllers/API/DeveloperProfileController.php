@@ -380,5 +380,13 @@ class DeveloperProfileController extends Controller
         ]);
     }
 
+     public function developersList(){
+        $developerList = Developer::where('profile_complete', 100)->where('developer_status', 'Active')->where('login_status', 1)->orderBy('dev_id', 'DESC')->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Developers successfully fetched',
+            'data' => $developerList
+        ]);
+     }
     
 }

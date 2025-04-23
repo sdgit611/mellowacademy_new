@@ -32,6 +32,7 @@ Route::post('/developer-change-password', [DeveloperProfileController::class, 'u
 Route::apiResource('developer-projects', DeveloperProjectController::class);
 Route::post('developer-projects/update/{id}', [DeveloperProjectController::class, 'updateProject']);
 Route::post('/developer/bank-details', [DeveloperProfileController::class, 'addBankDetailsApi']);
+Route::get('/developers/list', [DeveloperProfileController::class, 'developersList']);
 
 // Empoyer's routes 
 Route::post('/employer-login', [EmployerController::class, 'employerLogin']);
