@@ -148,15 +148,13 @@ class cartcontroller extends Controller
         ->whereNull('status')
         ->get();
 
-        $u_id=Session::get('user_login_id'); 
+		 $u_id=Session::get('user_login_id'); 
 
         $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
         $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
 
 
-  		$fname = $request->post('fname');
-  		$lname = $request->post('lname');
-		$email = $request->post('email');
+  		
 		$phone = $request->post('phone');
 		$company_name = $request->post('company_name');
 		$country = $request->post('country');
@@ -174,31 +172,48 @@ class cartcontroller extends Controller
 		$dev_id=Session::get('dev_id'); 
 			
 		$order_id = rand(0,9999);				
-				
-		$order_data=array(
-					'order_id'=>$order_id,
-					'u_id'=>$u_id,
-					'fname'=>$fname,
-					'lname'=>$lname,
-					'email'=>$email,
-					'phone'=>$phone,
-					'company_name'=>$company_name,
-					'country'=>$country,
-					'state'=>$state,
-					'city'=>$city,
-					'address_one'=>$address_one,
-					'address_two'=>$address_two,
-					'code'=>$code,
-					'gst'=>$gst,
-					'purpose'=>$purpose,
-					'dev_id'=>$dev_id,
-					'perhr'=>$tperhr,
-					'status'=>'Not Approved',				
-					'payment_status'=>'SUCCESS',
-					'date' => date("Y-m-d")				
-					);				
-					DB::table('developer_order_tb')->insert($order_data);
-
+		
+		
+		if ($request->has('dev_id')) 
+		{
+			$developer = DB::table('developer_details_tb')->where('dev_id', $request->post('dev_id'))->first();
+			$userLogin = DB::table('user_login')->where('id', $u_id)->first();
+			
+			DB::table('developer_order_tb')->where('u_id', $u_id)->where('dev_id',$request->post('dev_id'))->update([
+				'payment_amount'=>$request->post('amount'),
+				'payment_status'=>'SUCCESS',
+				'status'=> 2,
+			]);
+		}
+		else
+		{
+			$developer = DB::table('developer_details_tb')->where('dev_id', $dev_id)->first();
+			$order_data=array(
+				'order_id'=>$order_id,
+				'u_id'=>$u_id,
+				'fname'=>$developer->name,
+				'lname'=>$developer->last_name,
+				'email'=>$developer->email,
+				'phone'=>$phone ?? '',
+				'company_name'=>$company_name,
+				'country'=>$country ?? '',
+				'state'=>$state ?? '',
+				'city'=>$city ?? '',
+				'address_one'=>$address_one ?? '',
+				'address_two'=>$address_two ?? '',
+				'code'=>$code ?? '',
+				'gst'=>$gst ?? '',
+				'purpose'=>$purpose ?? '',
+				'dev_id'=>$dev_id,
+				'perhr'=>$developer->perhr,
+				'status'=> 1,	
+				'payment_amount'=>$request->post('amount'),
+				'payment_status'=>'SUCCESS',
+				'date' => date("Y-m-d")				
+				);				
+				DB::table('developer_order_tb')->insert($order_data);
+			}
+			$email = $developer->email;
 					$details = DB::table('developer_order_tb')->where('email',$email)->get();
 		            $emails=array();
 		            foreach ($details as $key) 
@@ -219,19 +234,28 @@ class cartcontroller extends Controller
 		                'link'=>$url
 		            );
 
-					Mail::send('developer_payment_mail', $datas, function($message) use ($emails) {
-			            $message->to($emails)->subject('Mellow Elements');
-			            $message->from('dev@mellowelements.in', 'The Mellow Elements');   
-			        });
+					// Mail::send('developer_payment_mail', $datas, function($message) use ($emails) {
+			        //     $message->to($emails)->subject('Mellow Elements');
+			        //     $message->from('dev@mellowelements.in', 'The Mellow Elements');   
+			        // });
 				
 					
 					$status=array(
-					'developer_status'=>'Book Now',
+						'developer_status'=>'Book Now',
 					);
 
 					DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($status);	
-					
+				if ($request->has('dev_id')) 
+				{	
+					return response()->json([
+						'status' => 'success',
+						'redirect' => route('developer_thank_you')
+					]);
+				}
+				else
+				{
 					return redirect()->route('developer_thank_you')->with($show);
+				}
 				
     }
 
@@ -572,7 +596,7 @@ class cartcontroller extends Controller
     	->get();
     	//  dd($show['developer_resources']);
     	 
-    	 $show['developer_resource'] = DB::table('developer_order_tb')
+    	$show['developer_resource'] = DB::table('developer_order_tb')
     	->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_order_tb.status','developer_order_tb.u_id','developer_order_tb.dev_id')
         ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
         ->where('developer_order_tb.u_id' ,'=', $u_id )
@@ -621,6 +645,8 @@ class cartcontroller extends Controller
     	// $show['developer_data_details'] = DB::table('sow_tb')->count();
 
     	// $show['developer_data'] = DB::table('sow_tb')->where('sow_status' ,'=', '')->count();
+
+		// return $show;
 
 		return view('front/resource')->with($show);
     }
@@ -1208,7 +1234,7 @@ public function success(){
         ->whereNull('status')
         ->get();
 
-        $u_id=Session::get('user_login_id'); 
+		$u_id=Session::get('user_login_id'); 
 
         $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
         $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count(); 
@@ -1235,6 +1261,28 @@ public function success(){
         $show['developer_order_details']=$this->developer_order_data();
         return view('front/why_qualified_advance')->with($show);
     }
+
+	public function pay($id)
+	{
+		$u_id=Session::get('user_login_id');
+		$show['web_details'] = DB::table('web_setting')->get();
+		$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+		$show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+		$show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count(); 
+		$show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+		$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+		$show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+		$show['developer_order_details']=$this->developer_order_data();
+		$show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+		$show['developer_details'] = DB::table('developer_details_tb')->where('dev_id', $id)->where('login_status', 1)->first(); 
+
+		return view('front/pay')->with($show);
+	}
     
     public function devq_payment_initiate(Request $request, $dev_id)
     {   
@@ -1309,12 +1357,7 @@ public function success(){
         $api = new Api($this->razorpayId, $this->razorpayKey);
         // In razorpay you have to convert rupees into paise we multiply by 100
         // Creating order
-        $order = $api->order->create(array(
-			'receipt' => $receiptId,
-			'amount' => $final * 100,
-			'currency' => 'INR'
-			)
-        );
+       
 
         request()->validate([
 					'phone' => 'required|digits:10',

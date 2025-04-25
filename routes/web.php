@@ -17,6 +17,9 @@ use App\Http\Controllers\GoogleCalendarController;
 |
 */
 
+
+
+
 Route::get('/','App\Http\Controllers\frontController@index');
 Route::get('index','App\Http\Controllers\frontController@index')->name('index');
 Route::get('aboutus','App\Http\Controllers\frontController@aboutus')->name('aboutus');
@@ -173,6 +176,7 @@ Route::get('dev_qualified_checkout/{dev_id}','App\Http\Controllers\cartcontrolle
 Route::post('devq_payment_initiate/{dev_id}','App\Http\Controllers\cartcontroller@devq_payment_initiate')->name('devq_payment_initiate');
 Route::post('dev_qcheckout/{dev_id}','App\Http\Controllers\cartcontroller@dev_qcheckout')->name('dev_qcheckout');
 Route::get('dev_thank_you','App\Http\Controllers\cartcontroller@dev_thank_you')->name('dev_thank_you');
+Route::get('/dev/pay/{dev_id}', 'App\Http\Controllers\cartcontroller@pay')->name('dev.pay');
 
 /*
 ---------------------------------------------------------------------------------------------------------

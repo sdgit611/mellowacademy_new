@@ -110,6 +110,7 @@
                                         <li><a href="{{route('client_ongoing_resource')}}"><i class="material-icons">accessible</i> Ongoing Resource</a></li>
                                         <li><a href="{{route('client_completed_resource')}}"><i class="material-icons">all_out</i> Completed Resource</a></li>
                                         <li><a href="{{route('client_change_password')}}"><i class="material-icons">settings</i> Setting</a></li>
+                                      
                                     </ul>
                                 </div>
                             </div>
