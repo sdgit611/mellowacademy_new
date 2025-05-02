@@ -36,6 +36,7 @@ Route::get('/developers/list', [DeveloperProfileController::class, 'developersLi
 
 // Empoyer's routes 
 Route::post('/employer-login', [EmployerController::class, 'employerLogin']);
+Route::get('/employer-register', [EmployerController::class, 'employerRegister']);
 Route::get('/employer-profile', [EmployerController::class, 'employerProfile']);
 Route::get('/employer-resources', [EmployerController::class, 'employerResource']);
 Route::get('/employer-on-going-resources', [EmployerController::class, 'employerOngoingResource']);

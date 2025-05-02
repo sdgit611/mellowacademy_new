@@ -13,6 +13,17 @@ use DB;
 
 class EmployerController extends Controller
 {
+    public function employerRegister(Request $request)
+    {
+        $latestEmployer = Employer::latest('id')->first();
+        return response()->json([
+            'status' => true,
+            'message' => 'Latest employer retrieved successfully.',
+            'data' => $latestEmployer
+        ], 200);
+
+    }
+    
     public function employerLogin(Request $request)
     {
         $request->validate([

@@ -13,6 +13,7 @@ use Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use URL;
 
 class userController extends Controller
 {
@@ -86,6 +87,7 @@ class userController extends Controller
 		request()->validate([
 		'fname' => 'required',
 		'lname' => 'required',
+		'location' => 'required',
 		'email' => 'required|email',
 		'phone' => 'required|digits:10',
 		'password' => 'required|min:5',
@@ -104,6 +106,8 @@ class userController extends Controller
 					'lname'=>$request->post('lname'),
 					'email'=>$request->post('email'),
 					'phone'=>$request->post('phone'),
+					'location'=>$request->post('location'),
+					'address'=>$request->post('address'),
 					'password'=>md5($request->post('password')),
 					'show_password'=>$request->post('password'),
 					'user_name'=>$request->post('user_name'),
@@ -135,7 +139,7 @@ class userController extends Controller
 	            
 	            $files = [
                     public_path('front/assets/images/Logo-01.png'),
-                    url::$link,
+                    URL::$link,
                 ];
                 
 
@@ -1365,16 +1369,16 @@ class userController extends Controller
         [
             'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);  
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/profile_image/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->resize(400,400)->save($path);
-        }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+        if ($request->hasFile('image')) {
+			$file = $request->file('image');
+			$getimageName = time() . '.' . $file->getClientOriginalExtension();
+			
+			// Move the uploaded file to the public path
+			$file->move(public_path('upload/profile_image'), $getimageName);
+		} else {
+			$getimageName = $request->post('old_image');
+		}
+		
 
         $data=array(
             'image'=>$getimageName,

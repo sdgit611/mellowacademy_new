@@ -2,7 +2,7 @@
 @section('content')
 
 <br><br><br><br><br><br><br>
-<?php 
+<?php
     foreach ($developer_resourcequl as $k) {
 ?>
 <div class="container header-padding1">

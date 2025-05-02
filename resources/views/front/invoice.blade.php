@@ -1,5 +1,11 @@
 @extends('front.layout')
 @section('content')
+<style>
+      body {
+    font-family: 'Roboto', sans-serif;
+    color: #000000;
+  }
+</style>
 
         <section class="checkout">
            
@@ -158,7 +164,7 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="h2">INR {{$price}}</div>
+                                    <div class="h2">INR {{$price ?? 0}}</div>
                                 </div>
                             </div>
                         </div>

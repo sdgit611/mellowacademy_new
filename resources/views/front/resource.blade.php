@@ -255,68 +255,6 @@
     </div>
     @endforeach
 </div>
-
-<?php }elseif( $resource->status == "Qualified" ){ ?>
-<div class="container bootstrap snippets bootdeys pt-0">
-    <div class="row">
-        <div class="col-lg-8 ml-auto mr-auto">
-            @if(Session::has('schedule_errmsg'))
-            <div class="alert alert-{{Session::get('message')}} alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-                <center><strong>{{Session::get('schedule_errmsg')}}</strong></center>
-            </div>
-            {{Session::forget('message')}}
-            {{Session::forget('schedule_errmsg')}}
-            @endif
-        </div>
-    </div>
-    <?php 
-                foreach ($developer_resourcequl as $resource) {
-                 
-              ?>
-    <div class="row" id="user-profile">
-        <div class="col-lg-3 col-md-4 col-sm-4">
-            <div class="main-box clearfix">
-                <h2><?php echo $resource->name; ?> <?php echo $resource->last_name; ?></h2>
-                <div class="profile-status">
-                    <i class="fa fa-star"></i> <span> <?php echo $resource->rating; ?>/5</span>
-                </div>
-
-                <img src="<?php echo URL::asset('public/upload/developer/'.$resource->image.'') ?>" alt=""
-                    class="profile-img img-responsive center-block">
-                <div class="profile-label">
-                    <span class="label btn-success"> <?php echo $resource->perhr; ?> INR / Month.</span>
-                </div>
-
-                <div class="profile-details">
-                    <ul class="fa-ul">
-                        <li><i class="fa-li fa fa-language"></i> Language:
-                            <span><?php echo $resource->language; ?></span>
-                        </li>
-                        <li><i class="fa-li fa fa-edit"></i>Education: <span><?php echo $resource->degree; ?></span>
-                        </li>
-                        <li><i class="fa-li fa fa-tasks"></i>Total Jobs: <span><?php echo $resource->job; ?></span>
-                        </li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-lg-9 col-md-8 col-sm-8">
-            <div class="main-box clearfix">
-                <div class="profile-header">
-                    <h3><span>You are successfully submitted your request!</span></h3>
-                    <!--<a class="btn btn-success btn-sm" href="{{ url('why_qualified_advance',['dev_id'=>''.$resource->dev_id.'']) }}" >Pay Now <i class="fa fa-edit"></i></a>-->
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <?php } ?>
-</div>
 <?php }elseif( $resource->status == "1" ){ ?>
 <div class="container bootstrap snippets bootdeys pt-0">
     <div class="row">
@@ -810,8 +748,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let today = new Date().toISOString().split("T")[0];
 
     // Compare today's date with developer's available_start_date
-    let minDate = "{{ $resource->available_start_date }}";
-    let maxDate = "{{ $resource->available_end_date }}";
+    let minDate = "{{ $resource->available_start_date ?? '' }}";
+    let maxDate = "{{ $resource->available_end_date ?? '' }}";
 
     // Ensure minDate is not in the past
     if (minDate < today) {
