@@ -9,7 +9,8 @@ use Illuminate\Support\Str;
 use Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-
+use App\Models\DeveloperOrder;
+use App\Models\Employer;
 use DB;
 use Illuminate\Validation\Rule;
 use Image;
@@ -93,16 +94,13 @@ class clientcontroller extends Controller
         ]);  
 
 
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/profile_image/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $getimageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move(public_path('upload/profile_image'), $getimageName);
+        } else {
+            $getimageName = $request->post('old_image');
         }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+        
 
         $data=array(
             
@@ -222,11 +220,21 @@ class clientcontroller extends Controller
         ->where('developer_order_tb.u_id',$login_id)
         ->where('developer_order_tb.payment_status','SUCCESS')
         ->get();
-
-        
-
         return view('client/client_completed_resource')->with($show);
     }
+
+    public function hiredDevelopersList()
+    {
+        $login_id = session('client_login_id');
+        $employer = Employer::find($login_id);
+        $hiredDevelopersData = DeveloperOrder::with('developer')
+            ->where('u_id', $login_id)
+            ->get()
+            ->pluck('developer')
+            ->unique('dev_id');
+        return view('client.hired_developers_list', compact('hiredDevelopersData'));
+    }
+
 
     public function client_require_docs($ids,$u_id)
     {   

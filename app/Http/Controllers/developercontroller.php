@@ -543,24 +543,31 @@ class developercontroller extends Controller
 
     public function developer_profile_update(Request $request)
     {
-        $developer_id=Session::get('developer_login_id'); 
-       $data = DB::table('developer_details_tb')->where('dev_id',$developer_id)->get();
+        $developer_id = Session::get('developer_login_id'); 
+
+        $data = DB::table('developer_details_tb')->where('dev_id', $developer_id)->get();
+        
         foreach ($data as $d) {
             $total = $d->profile_complete;
             $profile_complete = $total;
+<<<<<<< HEAD
            // if (empty($d->job)||empty($d->total_hours) && $total < 90) {
             if ($total <= 90) {
+=======
+
+            if ((empty($d->job) || empty($d->total_hours)) && $total < 90) {
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
                 $profile_complete = $total + 10;
-        
+
                 // Cap to 100
                 if ($profile_complete > 100) {
                     $profile_complete = 100;
                 }
             }
         }
-    
-        request()->validate(
-        [
+
+        // Validate inputs
+        $request->validate([
             'name' => 'required',
             'last_name' => 'required',
             'phone' => 'required',
@@ -576,60 +583,71 @@ class developercontroller extends Controller
             'completed_job' => 'required',
             'portfolio_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
             // 'resume' => 'mimes:pdf|max:1000mb'
-        ]);  
+        ]);
 
-        if(!empty($files=$request->file('portfolio_image')))
-        {
-            $getportfolioimage = time().'.'.$request->portfolio_image->getClientOriginalExtension();       
-            $path = public_path('upload/portfolio/'.$getportfolioimage);
-            $img = Image::make($request->file('portfolio_image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getportfolioimage=$request->post('old_portfolio_image');
-        }
+        // Handle portfolio image upload
+        if ($request->hasFile('portfolio_image')) {
+            $portfolioPath = public_path('upload/portfolio/');
+            if (!file_exists($portfolioPath)) {
+                mkdir($portfolioPath, 0755, true);
+            }
 
-
-        if(!empty($files=$request->file('resume')))
-        {
-            $new_name = rand().'.'.$request->resume->getClientOriginalExtension();
-            $getresume = $request->resume->move(public_path('upload/resume/'),$new_name);             
-        }
-        else
-        {
-            $getresume=$request->post('old_resume');
+            $getportfolioimage = time().'_portfolio.'.$request->portfolio_image->getClientOriginalExtension();
+            $request->portfolio_image->move($portfolioPath, $getportfolioimage);
+        } else {
+            $getportfolioimage = $request->post('old_portfolio_image');
         }
 
+        // Handle resume upload
+        if ($request->hasFile('resume')) {
+            $resumePath = public_path('upload/resume/');
+            if (!file_exists($resumePath)) {
+                mkdir($resumePath, 0755, true);
+            }
 
-        $data=array(
-            
-            'name'=>$request->post('name'),
-            'last_name'=>$request->post('last_name'),
-            'phone'=>$request->post('phone'),
-            'email'=>$request->post('email'),
-            'description'=>$request->post('description'),
-            'job'=>$request->post('job'),
-            'total_hours'=>$request->post('total_hours'),
-            'perhr'=>$request->post('perhr'),
-            'rating'=>$request->post('rating'),
-            'address'=>$request->post('address'),
-            'language'=>$request->post('language'),
-            
-            'skills'=>$request->post('skills'),
-            'completed_job'=>$request->post('completed_job'),
-            'portfolio_image'=>$getportfolioimage,
-            'resume'=>$getresume,
-            'profile_complete'=>$profile_complete,
-        );
-        $dev_id=$request->post('update');   
-        $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
-            return response()->json([
-                'status' => 200,
-                'message' => 'Developer profile updated successfully!'
-            ]);
+            $new_name = rand().'_resume.'.$request->resume->getClientOriginalExtension();
+            $request->resume->move($resumePath, $new_name);
+            $getresume = $new_name;
+        } else {
+            $getresume = $request->post('old_resume');
+        }
+
+        // Prepare update data
+        $data = [
+            'name' => $request->post('name'),
+            'last_name' => $request->post('last_name'),
+            'phone' => $request->post('phone'),
+            'email' => $request->post('email'),
+            'description' => $request->post('description'),
+            'job' => $request->post('job'),
+            'total_hours' => $request->post('total_hours'),
+            'perhr' => $request->post('perhr'),
+            'rating' => $request->post('rating'),
+            'address' => $request->post('address'),
+            'language' => $request->post('language'),
+            'skills' => $request->post('skills'),
+            'completed_job' => $request->post('completed_job'),
+            'portfolio_image' => $getportfolioimage,
+            'resume' => $getresume,
+            'profile_complete' => $profile_complete,
+        ];
+
+        $dev_id = $request->post('update');
+
+        $result = DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($data);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Developer profile updated successfully!'
+        ]);
     }
 
+<<<<<<< HEAD
    public function developer_resource()
+=======
+
+    public function developer_resource()
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
     {   
         $developer_id=Session::get('developer_login_id'); 
 
@@ -1258,10 +1276,18 @@ class developercontroller extends Controller
         $getscreenshotimage = $request->old_screenshot_image ?? null;
 
         if ($request->hasFile('screenshot_image')) {
-            $getscreenshotimage = time() . '.' . $request->file('screenshot_image')->getClientOriginalExtension();
-            $path = public_path('upload/screenshot/' . $getscreenshotimage);
-            Image::make($request->file('screenshot_image')->getRealPath())->save($path);
+            $file = $request->file('screenshot_image');
+            $getscreenshotimage = time() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = public_path('upload/screenshot/');
+            
+            // Make sure directory exists
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+        
+            $file->move($destinationPath, $getscreenshotimage);
         }
+        
 
         // Save or Update
         $isUpdate = $request->has('update');
@@ -1324,9 +1350,10 @@ class developercontroller extends Controller
     }
 
     public function add_developer_kyc(Request $request)
-    {
-        $dev_id=Session::get('developer_login_id');   
+{
+    $dev_id = Session::get('developer_login_id');   
 
+<<<<<<< HEAD
         $data = DB::table('developer_details_tb')->where('dev_id',$dev_id)->get();
 
         foreach ($data as $d) {
@@ -1400,8 +1427,79 @@ class developercontroller extends Controller
             session(['message' =>'danger', 'devkycerrmsg'=>'KYC Details Add Failed.']); 
             return redirect()->back();
         }
+=======
+    $data = DB::table('developer_details_tb')->where('dev_id', $dev_id)->get();
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
 
+    foreach ($data as $d) {
+        $total = $d->profile_complete;
     }
+
+    $profile_complete = $total + 30;
+
+    // Validate inputs
+    $request->validate([
+        'national_id_name' => 'required',
+        'national_id_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        'adharcard' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        'pancard' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+        'signature' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);  
+
+    // Create destination directories if they don't exist
+    $paths = [
+        'upload/developer/',
+        'upload/national_image/',
+        'upload/signature/',
+        'upload/adhar_card/',
+        'upload/pan_card/'
+    ];
+
+    foreach ($paths as $path) {
+        if (!file_exists(public_path($path))) {
+            mkdir(public_path($path), 0755, true);
+        }
+    }
+
+    // Upload each file normally
+    $getimage = time().'_image.'.$request->image->getClientOriginalExtension();       
+    $request->image->move(public_path('upload/developer/'), $getimage);
+
+    $getnationalidimage = time().'_national.'.$request->national_id_image->getClientOriginalExtension();       
+    $request->national_id_image->move(public_path('upload/national_image/'), $getnationalidimage);
+
+    $getsignature = time().'_sign.'.$request->signature->getClientOriginalExtension();       
+    $request->signature->move(public_path('upload/signature/'), $getsignature);
+
+    $getadharcard = time().'_adhar.'.$request->adharcard->getClientOriginalExtension();       
+    $request->adharcard->move(public_path('upload/adhar_card/'), $getadharcard);
+
+    $getpancard = time().'_pan.'.$request->pancard->getClientOriginalExtension();       
+    $request->pancard->move(public_path('upload/pan_card/'), $getpancard);
+
+    // Prepare data to update
+    $data = [
+        'national_id_name' => $request->post('national_id_name'),
+        'national_id_image' => $getnationalidimage,
+        'image' => $getimage,
+        'signature' => $getsignature,
+        'profile_complete' => $profile_complete,
+        'adharcard' => $getadharcard,
+        'pancard' => $getpancard,
+    ];
+
+    $result = DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($data);
+
+    if ($result) {
+        session(['message' => 'success', 'devkycerrmsg' => 'KYC Details Added Successfully...']);
+    } else {
+        session(['message' => 'danger', 'devkycerrmsg' => 'KYC Details Add Failed.']);
+    }
+
+    return redirect()->back();
+}
+
 
     public function update_developer_kyc_details()
     {
@@ -1501,60 +1599,63 @@ class developercontroller extends Controller
     }
 
     public function add_bank_details(Request $request)
-    {
-        $dev_id=Session::get('developer_login_id');   
+{
+    $dev_id = Session::get('developer_login_id');   
 
-        $data = DB::table('developer_details_tb')->where('dev_id',$dev_id)->get();
+    $data = DB::table('developer_details_tb')->where('dev_id', $dev_id)->get();
 
-        foreach ($data as $d) {
-          $total = $d->profile_complete;
-        }
-
-        $profile_complete = $total + 10;
-
-        request()->validate(
-        [
-            'bank_name' => 'required',
-            'branch_name' => 'required',
-            'acct_name' => 'required',
-            'account_number' => 'required',
-            'ifc_code' => 'required',
-            'micr_number' => 'required',
-            'account_Type' => 'required',
-            'passbook' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-           
-        ]);  
-
-        
-        $getpassbook = time().'.'.$request->passbook->getClientOriginalExtension();       
-        $path = public_path('upload/passbook/'.$getpassbook);
-        $img = Image::make($request->file('passbook')->getRealPath())->save($path);
-        
-        $data=array(
-            'bank_name'=>$request->post('bank_name'),
-            'branch_name'=>$request->post('branch_name'),
-            'acct_name'=>$request->post('acct_name'),
-            'account_number'=>$request->post('account_number'),
-            'ifc_code'=>$request->post('ifc_code'),
-            'micr_number'=>$request->post('micr_number'),
-            'account_Type'=>$request->post('account_Type'),
-            'profile_complete'=>$profile_complete,
-            'passbook'=>$getpassbook,
-        );
-       
-       $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'bankerrmsg' =>'Bank Details Add Successfully...']);
-            return redirect()->back();            
-        }
-        else
-        {
-            session(['message' =>'danger', 'bankerrmsg'=>'Bank Details Add Failed.']); 
-            return redirect()->back();
-        }
-
+    foreach ($data as $d) {
+        $total = $d->profile_complete;
     }
+
+    $profile_complete = $total + 10;
+
+    // Validate inputs
+    $request->validate([
+        'bank_name' => 'required',
+        'branch_name' => 'required',
+        'acct_name' => 'required',
+        'account_number' => 'required',
+        'ifc_code' => 'required',
+        'micr_number' => 'required',
+        'account_Type' => 'required',
+        'passbook' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);  
+
+    // Create folder if not exists
+    $uploadPath = public_path('upload/passbook/');
+    if (!file_exists($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
+    }
+
+    // Upload passbook image
+    $getpassbook = time().'_passbook.'.$request->passbook->getClientOriginalExtension();       
+    $request->passbook->move($uploadPath, $getpassbook);
+
+    // Prepare data to update
+    $data = [
+        'bank_name' => $request->post('bank_name'),
+        'branch_name' => $request->post('branch_name'),
+        'acct_name' => $request->post('acct_name'),
+        'account_number' => $request->post('account_number'),
+        'ifc_code' => $request->post('ifc_code'),
+        'micr_number' => $request->post('micr_number'),
+        'account_Type' => $request->post('account_Type'),
+        'profile_complete' => $profile_complete,
+        'passbook' => $getpassbook,
+    ];
+
+    $result = DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($data);
+
+    if ($result) {
+        session(['message' => 'success', 'bankerrmsg' => 'Bank Details Added Successfully...']);
+    } else {
+        session(['message' => 'danger', 'bankerrmsg' => 'Bank Details Add Failed.']);
+    }
+
+    return redirect()->back();
+}
+
 
     public function update_developer_bank_details()
     {
@@ -1969,7 +2070,7 @@ class developercontroller extends Controller
             'milestone_name' => 'required',
             'work' => 'required',
             'days' => 'required',
-            'milestone_pdf' => ['required', 'mimes:pdf','max:1000mb']
+            'milestone_pdf' => ['required', 'mimes:pdf']
         ]);
 
         if($files=$request->file('milestone_pdf'))

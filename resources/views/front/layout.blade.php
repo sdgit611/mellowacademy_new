@@ -689,7 +689,7 @@
 
                         <?php } }?>
 
-                            <li><a href="{{route('user_profile_details')}}"><i class="fa fa-user" aria-hidden="true"></i>   My Profile</a></li>
+                            <li><a href="{{route('user_profile')}}"><i class="fa fa-user" aria-hidden="true"></i>   My Profile</a></li>
 
                             <!-- <li><a href="{{route('user_profile')}}"><i class="fa fa-user" aria-hidden="true"></i>   My Profile</a></li> -->
 

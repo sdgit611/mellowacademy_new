@@ -3,6 +3,8 @@
 
 <!-- ========================  Checkout ======================== -->
 <br><br>
+<br><br>
+<br><br>
 <?php
 
  foreach($developer_resourcequl as $user) {  ?>

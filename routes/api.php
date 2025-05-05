@@ -35,8 +35,12 @@ Route::post('/developer/bank-details', [DeveloperProfileController::class, 'addB
 Route::get('/developers/list', [DeveloperProfileController::class, 'developersList']);
 
 // Empoyer's routes 
+<<<<<<< HEAD
 Route::get('/employer-register', [EmployerController::class, 'employerRegister']);
+=======
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
 Route::post('/employer-login', [EmployerController::class, 'employerLogin']);
+Route::get('/employer-register', [EmployerController::class, 'employerRegister']);
 Route::get('/employer-profile', [EmployerController::class, 'employerProfile']);
 Route::get('/employer-resources', [EmployerController::class, 'employerResource']);
 Route::get('/employer-on-going-resources', [EmployerController::class, 'employerOngoingResource']);

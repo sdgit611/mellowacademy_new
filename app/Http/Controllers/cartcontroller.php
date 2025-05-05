@@ -914,6 +914,7 @@ class cartcontroller extends Controller
 // 			});
 // 		}
 
+<<<<<<< HEAD
 // 		return response()->json([
 // 			'success' => true,
 // 			'message' => 'Interview scheduled successfully and emails sent.',
@@ -925,6 +926,114 @@ class cartcontroller extends Controller
     public function schedule_interview_resource(Request $request)
     {
         $dev_id = Session::get('dev_id');
+=======
+		// Update developer_order_tb with new interview info
+		DB::table('developer_order_tb')->where('dev_id', $dev_id)->update([
+			'interviewdateone' => $request->interviewdateone,
+			'interviewdatetwo' => $request->from_time,
+			'interviewdatethree' => $request->to_time,
+			'interviewlink' => $meetLink,
+			'status' => "Scheduled",
+		]);
+
+		// Prepare email HTML content
+		$htmlContent = "
+			<h2>Interview Scheduled</h2>
+			<p><strong>Candidate:</strong> {$request->name}</p>
+			<p><strong>Email:</strong> {$request->email}</p>
+			<p><strong>Date:</strong> {$request->interviewdateone}</p>
+			<p><strong>Time:</strong> {$request->from_time} - {$request->to_time}</p>
+			<p><strong>Google Meet Link:</strong> <a href='{$meetLink}'>{$meetLink}</a></p>
+			<br><p>Thanks,</p>
+		";
+
+		// Recipients list (admin, employer, candidate)
+		$recipients = [
+			'admin@email.com',
+			$doc->email,
+			$request->email,
+		];
+
+		foreach ($recipients as $to) {
+			if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+				\Log::warning("Invalid email skipped: " . json_encode($to));
+				continue;
+			}
+
+			Mail::html($htmlContent, function ($message) use ($to) {
+				$message->to($to)->subject('Interview Scheduled');
+			});
+		}
+
+		return response()->json([
+			'success' => true,
+			'message' => 'Interview scheduled successfully and emails sent.',
+			'meet_link' => $meetLink,
+		]);
+	}
+
+	public function schedule_interview_qualified (Request $request)
+    {  
+
+    	    $u_id=Session::get('user_login_id');
+    	    $dev_id= Session::get('dev_id');
+    	    //echo $dev_id; exit();
+    	    
+	       	request()->validate(
+	        [
+	            'status' => ['required'],
+	            'review' => ['required'],
+	        ]);
+	        
+	        $dev_id= Session::get('dev_id');
+	        //$fname = $request->post('fname');
+  	    	//$lname = $request->post('lname');
+	        
+       		$docs = DB::table('developer_order_tb')->where('dev_id',$dev_id)->get();
+
+			foreach($docs as $c)
+			{
+		        $data=array(
+
+		            'dev_id'=>$dev_id,
+		            'fname'=>$c->fname,
+		            'lname'=>$c->lname,
+		            'phone'=>$c->phone,
+		            'email'=>$c->email,
+		            'perhr'=>$c->perhr,
+		            'code'=>$c->code,
+		            'address_one'=>$c->address_one,
+		            'status'=>1,
+		            'review'=>$request->post('review'),
+		        );
+		        
+		    }
+
+	       // $result=DB::table('developer_interview_schedule')->insert($data);
+	        $result=DB::table('developer_interview_schedule')->where('dev_id',$dev_id)->update($data);
+	        
+	        $result=DB::table('developer_order_tb')->where('dev_id',$dev_id)->update($data);
+	        
+
+	        if($result==true)
+	        {
+	            session(['message' =>'success', 'schedule_errmsg' =>'Interview Feedback Sent Successfully.']);
+	           
+	            return redirect()->back();
+	        }
+	        else
+	        {
+	            session(['message' =>'danger', 'schedule_errmsg'=>'Interview Feedback Not Sent Successfully.']); 
+	            return redirect()->back();
+	        }
+	    
+    }
+
+
+public function success(){
+	return "successfully meeting schedule.";
+}
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
     
         // Validate developer existence
         $doc = DB::table('developer_order_tb')->where('dev_id', $dev_id)->first();
@@ -1456,13 +1565,13 @@ class cartcontroller extends Controller
         $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count(); 
         
         $show['developer_resourcequl'] = DB::table('developer_order_tb')
-    	->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_order_tb.status','developer_order_tb.u_id','developer_order_tb.dev_id','developer_order_tb.interviewdateone','developer_order_tb.interviewdatetwo','developer_order_tb.interviewdatethree')
-        ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
+    	// ->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_order_tb.status','developer_order_tb.u_id','developer_order_tb.dev_id','developer_order_tb.interviewdateone','developer_order_tb.interviewdatetwo','developer_order_tb.interviewdatethree')
+        // ->join('developer_details_tb','developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
         ->where('developer_order_tb.u_id' ,'=', $u_id )
         ->where('developer_order_tb.dev_id' ,'=', $devs_id )
         ->where('developer_order_tb.status' ,'=', '1' )
     	->get();
-    	//dd($show['developer_resourcequl']);
+    	// dd($show['developer_resourcequl']);
     	
     	$show['developer_resources'] = DB::table('developer_order_tb')
     	->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_order_tb.status','developer_order_tb.u_id','developer_order_tb.dev_id')
@@ -1475,6 +1584,7 @@ class cartcontroller extends Controller
         
         $show['developer_details']=$this->developer_data();
         $show['developer_order_details']=$this->developer_order_data();
+		
         return view('front/why_qualified_advance')->with($show);
     }
     

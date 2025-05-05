@@ -492,6 +492,7 @@ Route::post('client_update_password','App\Http\Controllers\clientcontroller@clie
 Route::get('client_resource','App\Http\Controllers\clientcontroller@client_resource')->name('client_resource');
 Route::get('client_ongoing_resource','App\Http\Controllers\clientcontroller@client_ongoing_resource')->name('client_ongoing_resource');
 Route::get('client_completed_resource','App\Http\Controllers\clientcontroller@client_completed_resource')->name('client_completed_resource');
+Route::get('hire-developers-list','App\Http\Controllers\clientcontroller@hiredDevelopersList')->name('hiredDevelopersList');
 
 Route::get('client_require_docs/{id}/{u_id}','App\Http\Controllers\clientcontroller@client_require_docs')->name('client_require_docs');
 Route::get('client_require_download/{id}','App\Http\Controllers\clientcontroller@client_require_download')->name('client_require_download');
