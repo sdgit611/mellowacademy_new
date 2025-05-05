@@ -180,7 +180,7 @@
                                                     <div class="modal-body">
                                                         <div class="card">
                                                           <div class="card-body">
-                                                            <h5 class="card-title">Schedule Interview Date&Time</h5>
+                                                            <h5 class="card-title text-dark">Schedule Interview Date&Time</h5>
                                                             <input type="radio" name="schinterviewdatetime" value="<?php echo $pp->interviewdateone; ?>">
                                                             <label for="Interview Date&Time"><?php echo $pp->interviewdateone; ?></label><br>
                                                             <input type="radio" name="schinterviewdatetime" value="<?php echo $pp->interviewdatetwo; ?>">

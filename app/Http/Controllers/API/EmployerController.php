@@ -9,9 +9,22 @@ use App\Models\User;
 use App\Models\DeveloperOrder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use DB;
 
 class EmployerController extends Controller
 {
+    
+    public function employerRegister(Request $request)
+    {
+        $latestEmployer = Employer::latest('id')->first();
+        return response()->json([
+            'status' => true,
+            'message' => 'Latest employer retrieved successfully.',
+            'data' => $latestEmployer
+        ], 200);
+
+    }
+    
     public function employerLogin(Request $request)
     {
         $request->validate([
@@ -278,6 +291,101 @@ class EmployerController extends Controller
         }
     }
 
+    public function developerOrderData($employerId)
+    { 
+        return  $developer_order_details = DB::table('developer_order_tb')->where('payment_status' ,'=', 'SUCCESS')->where('u_id' ,'=', $employerId )->count();
+    }
 
+    public function resource(Request $request)
+    {
+        $employerId = $request->input('employerId');
+        $developerId = $request->input('developerId');
+
+        if (!$employerId || !$developerId) {
+            return response()->json(['error' => 'Missing u_id or dev_id'], 422);
+        }
+
+        $show = [];
+
+        $show['premium_profile_details'] = DB::table('developer_order_tb')
+            ->select(
+                'qualified_order_tb.p_code',
+                'qualified_order_tb.dev_id',
+                'qualified_order_tb.payment_status',
+                'developer_order_tb.u_id',
+                'developer_order_tb.dev_id',
+                'developer_order_tb.status',
+                'developer_order_tb.payment_status'
+            )
+            ->join('qualified_order_tb', 'qualified_order_tb.dev_id', '=', 'developer_order_tb.dev_id')
+            ->where('qualified_order_tb.payment_status', 'SUCCESS')
+            ->get();
+
+        $show['developer_order_resource'] = DB::table('developer_order_tb')->where('u_id', $employerId)->get();
+
+        $show['developer_payment_resource'] = DB::table('qualified_order_tb')->where('dev_id', $developerId)->where('payment_status', 'SUCCESS')->get();
+
+        $show['developerid'] = DB::table('qualified_order_tb')->where('dev_id', $developerId)->count();
+
+        $show['developer_interview_resource'] = DB::table('developer_interview_schedule')->where('dev_id', $developerId)->get();
+
+        $show['developer_order_details'] = $this->developerOrderData($employerId);
+
+        $show['allproduct'] = DB::table('product_tb')->orderBy('id', 'desc')->limit(3)->get();
+        $show['user_details'] = DB::table('user_login')->orderBy('id', 'desc')->get();
+        $show['about'] = DB::table('about_tb')->orderBy('id', 'desc')->get();
+        $show['category'] = DB::table('category_tb')->orderBy('id', 'desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderBy('id', 'asc')->get();
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderBy('id', 'desc')->get();
+        $show['web_details'] = DB::table('web_setting')->get();
+
+        $show['cart_details'] = DB::table('cart_tb')
+            ->select(
+                'product_tb.name',
+                'product_tb.image',
+                'product_tb.tax',
+                'product_tb.video',
+                'product_tb.price',
+                'product_tb.pro_size',
+                'product_tb.id',
+                'cart_tb.u_id',
+                'cart_tb.id',
+                'cart_tb.status'
+            )
+            ->join('product_tb', 'product_tb.id', '=', 'cart_tb.p_id')
+            ->whereNull('status')
+            ->get();
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status', NULL)->where('u_id', $employerId)->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status', NULL)->where('u_id', $employerId)->count();
+
+        $show['dev_order_details_empty'] = DB::table('developer_order_tb')
+            ->join('developer_details_tb', 'developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
+            ->where('u_id', $employerId)
+            ->where('developer_order_tb.payment_status', 'SUCCESS')
+            ->where('developer_order_tb.status', '1')
+            ->count();
+
+        // Continue fetching developer resources as in your original code...
+
+        $show['developer_resources'] = DB::table('developer_order_tb')
+            ->join('developer_details_tb', 'developer_details_tb.dev_id', '=', 'developer_order_tb.dev_id')
+            ->where('developer_order_tb.u_id', $employerId)
+            ->where('developer_order_tb.payment_status', 'SUCCESS')
+            ->select(
+                'developer_details_tb.*',
+                'developer_order_tb.interviewlink',
+                'developer_order_tb.date',
+                'developer_order_tb.interviewdateone',
+                'developer_order_tb.interviewdatetwo',
+                'developer_order_tb.status',
+                'developer_order_tb.qdate'
+            )
+            ->get();
+
+        // You can continue copying the remaining $show[...] values similarly...
+
+        return response()->json($show);
+    }
 
 }

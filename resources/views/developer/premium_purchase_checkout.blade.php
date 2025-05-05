@@ -9,7 +9,7 @@
     <div class="container">
         <div class="cart-wrapper">
             <div class="note-block">
-                <form name="myForm" id="payment_form" class="payment_com" method="post" action="{{route('premium_payment_initiate')}}">
+                <form name="myForm" id="payment_form" class="payment_com">
                 @csrf
                     <?php 
                     $id= Session::get('developer_login_id');
@@ -235,7 +235,7 @@
                                                 
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <textarea class="form-control" id="purpose" name="purpose" placeholder="Your Purpose" rows="10"></textarea>
+                                                        <textarea class="form-control" placeholder="Your Purpose" rows="10"></textarea>
                                                         
                                                         @if ($errors->has('purpose'))
                                                             <strong class="text-danger">{{ $errors->first('purpose') }}</strong>                                  
@@ -288,7 +288,7 @@
 
                                         </div>
                                         <div style="padding-top:20px">
-                                            <button type="submit" class="btn btn-primary">Continue <i class="fa fa-long-arrow-right" aria-hidden="true"></i></button>
+                                        <button type="button" id="paymentButton" class="btn btn-primary">Continue <i class="fa fa-long-arrow-right" aria-hidden="true"></i></button>
                                             <!--<a href="" type="button" class="btn btn-primary">Continue <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>-->
                                             <!--<button type="submit" class="btn btn-primary">Continue <i class="fa fa-long-arrow-right" aria-hidden="true"></i></button>-->
                                         </div>
@@ -309,8 +309,73 @@
 
 <?php session(['total_price' => $total_price]); } ?>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('paymentButton').addEventListener('click', function() {
+    // Get the total price from PHP session
+    const totalPrice = <?php echo $total_price * 100; ?>; // Convert to paise
+    
+    const options = {
+        key: "{{ env('RAZORPAY_KEY') }}", // Your Razorpay Key ID
+        amount: totalPrice, // Use the calculated amount
+        currency: "INR",
+        name: "mellow",
+        description: "Premium Subscription",
+        handler: function(response) {
+            // Create a new FormData object
+            const form = document.getElementById('payment_form');
+            const formData = new FormData(form);
+            
+            // Add Razorpay response data to the form
+            formData.append('razorpay_payment_id', response.razorpay_payment_id);
+            formData.append('razorpay_order_id', response.razorpay_order_id);
+            formData.append('razorpay_signature', response.razorpay_signature);
+            formData.append('amount', totalPrice);
+            
+            // Convert FormData to URL-encoded string
+            const urlEncodedData = new URLSearchParams(formData).toString();
+            
+            fetch("{{route('premium_payment_initiate')}}", {
+                method: 'POST',
+                body: urlEncodedData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response:', data);
+                if (data.success && data.redirect_url) {
+                    alert('Payment successful! Thank you.');
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert(data.message || 'Payment verification failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred. Please try again.");
+            });
+        },
+        prefill: {
+            name: document.getElementById('fname').value + ' ' + document.getElementById('lname').value,
+            email: document.getElementById('email').value,
+            contact: document.getElementById('phone').value
+        },
+        theme: {
+            color: "#3646C9"
+        }
+    };
 
-
-
+    const rzp = new Razorpay(options);
+    rzp.open();
+});
+</script>
 
 @endsection

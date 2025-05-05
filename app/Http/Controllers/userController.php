@@ -13,6 +13,7 @@ use Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Http;
 
 class userController extends Controller
 {
@@ -81,6 +82,18 @@ class userController extends Controller
 
     public function submit_registeration(Request $request)
     {
+        $response = Http::withoutVerifying()->post('https://gulbug.com/staging/mellow_backend/public/api/employer-register', [
+            'company_name' => $request->input('company_name'),
+            'email' => $request->input('email'),
+            'phone' => $request->input('phone'),
+            'fname' => $request->input('fname'),
+            'lname' => $request->input('lname'),
+            'show_password' => $request->input('password'),
+            'location' => $request->input('location'),
+        ]);
+        
+        $response->body();
+		
         $email=$request->post('email');
        // echo $email; exit();
 		request()->validate([
@@ -135,7 +148,7 @@ class userController extends Controller
 	            
 	            $files = [
                     public_path('front/assets/images/Logo-01.png'),
-                    url::$link,
+                    // url::$link,
                 ];
                 
 
@@ -151,6 +164,28 @@ class userController extends Controller
                         }
                 		$message->from('welcome@mellowvault.com', 'Mellow Vault');
             		});
+            		
+            		$show['developer_order_details']=$this->developer_order_data();
+                	$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+                    $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+                    $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+                    $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+                    $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+            
+                    $show['web_details'] = DB::table('web_setting')->get();
+            
+                    $show['cart_details'] = DB::table('cart_tb')
+                    ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+                    ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+                    ->whereNull('status')
+                    ->get();
+            
+                     $u_id=Session::get('user_login_id'); 
+            
+                    $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+                    $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+                    $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+                    $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
 
 					return view('front/registration_completed')->with($show);
 				}

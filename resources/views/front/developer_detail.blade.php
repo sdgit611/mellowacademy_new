@@ -28,15 +28,15 @@
                     <div class="col-md-5">
                         <h5 class="card-title">
                             <div class="mb-2 mb-sm-0 ">
-                                <div class="entry developerDetails" style="padding:5px;">
+                                <div class="entry developerDetails text-dark" style="padding:5px;">
                                     <i class="icon icon-user"></i>
                                     <span style=""><?php echo $d->name; ?></span>
                                 </div>
-                                <div class="entry developerDetails" style="padding:5px;">
+                                <div class="entry developerDetails text-dark" style="padding:5px;">
                                     <i class="icon icon-map-marker"></i>
                                     <span style=""><?php echo $d->address; ?></span>
                                 </div>
-                                <div class="entry developerDetails" style="padding:5px;">
+                                <div class="entry developerDetails text-dark" style="padding:5px;">
                                     <i class="icon icon-star"></i>
                                     <span style=""><?php echo $d->rating; ?>/5</span>
                                 </div>
@@ -79,11 +79,11 @@
                         <?php }  elseif($ddd->developer_status == 'Booked') {
                         ?>
                             <ul style="display: inline-flex;width: 100%;margin-top: 24px;">
-                                <li><span><a href="javascript:void(0);" class="btn btn-danger" style="margin-left: 10px;border: 2px solid #77c24b;border-radius: 25px;font-size:14px">Not Available </a></span>
+                                <li><span><a href="javascript:void(0);" class="btn btn-danger text-dark" style="margin-left: 10px;border: 2px solid #77c24b;border-radius: 25px;font-size:14px">Not Available </a></span>
                                     <?php if($ddd->available_start_date == ''){ ?>
                                        
                                     <?php }else{ ?>
-                                        <p style="color:red;font-size:10px;"> Available By <?php $middle = strtotime($ddd->available_end_date); echo $new_date = date('F jS\, Y ', $middle);  ?> </p>
+                                        <p class="text-dark" style="color:red;font-size:10px;"> Available By <?php $middle = strtotime($ddd->available_end_date); echo $new_date = date('F jS\, Y ', $middle);  ?> </p>
                                     <?php } ?>
                                 </li>
                                 <li><span><a href="{{ route('developer_rating_details',['dev_id'=>''.$d->dev_id.''] ) }}" style="margin-left: 10px;border: 2px solid #77c24b;border-radius: 25px;font-size:14px" class="btn btn-danger">View More</a></span></li>
@@ -91,7 +91,7 @@
                        <?php } } else{ ?>
                             <ol class="breadcrumb">
                                 
-                                <li class="entry" style="padding: 28px;"><span><a href="" class="btn btn-warning" style="width:104px;">Deactivate</a></span></li>
+                                <li class="entry text-dark" style="padding: 28px;"><span><a href="" class="btn btn-warning" style="width:104px;">Deactivate</a></span></li>
 
                                        
                             </ol>
@@ -112,13 +112,13 @@
                             <div class="blog-post-title">
                                 
                                 <div class="blog-info">
-                                    <div class="entry">
+                                    <div class="entry text-dark">
                                         <span>Lagnuage : <?php echo $d->language; ?></span>
                                     </div>
-                                    <div class="entry">
+                                    <div class="entry text-dark">
                                         <span>Rate : <?php echo $d->perhr; ?>INR/Month</span>
                                     </div>
-                                    <div class="entry">
+                                    <div class="entry text-dark">
                                         <span>Education : <?php echo $d->degree; ?></span>
                                     </div>
                                 </div>
@@ -149,7 +149,7 @@
                                     <div class="col-md-8 offset-md-2">
                                       
                                         <div class="row">
-                                            <div class="col-12">
+                                            <div class="col-12 text-dark">
                                                <p><?php echo $d->description; ?></p>
                                             </div>
                                         </div> 
@@ -160,7 +160,7 @@
                                     <div class="col-md-8 offset-md-2">
                                         
                                         <div class="row">
-                                            <div class="col-12">
+                                            <div class="col-12 text-dark">
                                                <p><?php echo $d->skills; ?></p>
                                             </div>
                                         </div> 
@@ -171,7 +171,7 @@
                                     <div class="col-md-8 offset-md-2">
                                        
                                         <div class="row">
-                                            <div class="col-12">
+                                            <div class="col-12 text-dark">
                                                <p><?php echo $d->completed_job; ?></p>
                                             </div>
                                         </div> 
@@ -195,11 +195,11 @@
                                 
                                 <div class="col-md-6">
                                     <h5 class="title">Total Jobs</h5>
-                                    <p><?php echo $d->job; ?></p>
+                                    <p class="text-dark"><?php echo $d->job; ?></p>
                                 </div>
                                 <div class="col-md-6">
                                     <h5 class="title">Total Hours</h5>
-                                    <p><?php echo $d->total_hours; ?></p>
+                                    <p class="text-dark"><?php echo $d->total_hours; ?></p>
                                 </div>
                                 
                             </div>

@@ -117,6 +117,24 @@
                                     @endif
                                 </div>
                             </div> 
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" value="" class="form-control" name="location" placeholder="Location: *">
+                                    @if ($errors->has('location'))
+                                        <strong class="text-danger">{{ $errors->first('location') }}</strong>                                   
+                                    @endif
+                                </div>
+                            </div>  
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" value="" class="form-control" name="address" placeholder="Company Address">
+                                    @if ($errors->has('address'))
+                                        <strong class="text-danger">{{ $errors->first('address') }}</strong>                                   
+                                    @endif
+                                </div>
+                            </div>   
                                                         
                            
                         </div>

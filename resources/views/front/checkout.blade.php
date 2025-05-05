@@ -5,8 +5,8 @@
         
             <header>
                 <div class="container">
-                    <h2 class="title">Hire Now!</h2>
-                    <div class="text">
+                    <h2 class="title text-dark">Hire Now!</h2>
+                    <div class="text text-dark">
                         <p>Proceed To Hiring!</p>
                     </div>
                 </div>
@@ -38,11 +38,11 @@
                                 <a href="#"><img src="<?php echo URL::asset('public/upload/developer/'.$dcart->image);?>" alt="" /></a>
                             </div>
                             <div class="title">
-                              <div class="h6 text-center"><a href=""><?php echo $dcart->name; ?></a></div>
+                              <div class="h6 text-center text-dark"><a href=""><?php echo $dcart->name; ?></a></div>
                             </div>
 
                            <div class="title">
-                                <div class="text-center"><?php foreach($developer_cart_deatls as $p) {
+                                <div class="text-center text-dark"><?php foreach($developer_cart_deatls as $p) {
                                         if($dcart->pro_id === $p->id ) { ?>
                                            <?php echo $p->heading; ?>
 
@@ -63,7 +63,7 @@
 
                             <div class="price">
                                 <span class="final"></span>
-                                <span class="text-center">
+                                <span class="text-center text-dark">
                                   INR <?php echo ($dcart->perhr)*10/100+$dcart->perhr; ?>
                                 </span> 
                             </div>
@@ -94,7 +94,7 @@
                                 
                             </div>
                             <div class="col-8 text-right">
-                                <a href="{{route('developer_proceed_checkout')}}" class="btn btn-outline-warning"><span class="icon icon-cart"></span> Proceed to Hire</a>
+                                <a href="{{route('developer_proceed_checkout')}}" class="btn btn-outline-warning text-dark"><span class="icon icon-cart"></span> Proceed to Hire</a>
                             </div>
                         </div>
                         

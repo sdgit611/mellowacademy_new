@@ -17,24 +17,24 @@ class DeveloperPremiumPriceSeeder extends Seeder
         DeveloperPremiumPrice::create([
             'name' => 'one time',
             'price' => 20000,
-            'status' => 0,
+            'status' => 1,
         ]);
         DeveloperPremiumPrice::create([
             'name' => 'monthly',
             'price' => 100,
-            'status' => 0,
+            'status' => 1,
         ]);
 
         DeveloperPremiumPrice::create([
             'name' => 'quarterly',
             'price' => 500,
-            'status' => 0,
+            'status' => 1,
         ]);
 
         DeveloperPremiumPrice::create([
             'name' => 'yearly',
             'price' => 800,
-            'status' => 0,
+            'status' => 1,
         ]);
     }
 }
