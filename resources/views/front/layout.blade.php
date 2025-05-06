@@ -249,6 +249,9 @@
                            
 
                         </li>
+                        <li class="left-side">
+                            <a href="{{env('URL').'/account/jobs'}}" style="font-size: 16px;">Advance filter</a>
+                        </li>
 
                        <?php
 

@@ -1874,6 +1874,37 @@ class admincontroller extends Controller
         }
     } 
     
+    // this function is working for insert developer in jop_applications table but not need now 
+    //  public function developer_login_status($dev_id)
+    // {
+    //     $email = Session::get('admin_login_role');
+    //     $data['rolesdetails'] = DB::table('admin_tb')->where('role', $email)->get();
+    //     $devLogin = DB::table('developer_details_tb')->where('dev_id', $dev_id)->first();
+    
+    //     $payload = [
+    //         'job_id' => 1,
+    //         'full_name' => $devLogin->name,
+    //         'email' => $devLogin->email,
+    //         'phone' => $devLogin->phone,
+    //         'source' => 1,
+    //         'resume' => 'Na',
+    //         'remark' => 'Na',
+    //         'recruit_job_id' => 1,
+    //         'location_id' => 1,
+    //         'application_sources' => 'addedByUser'
+    //     ];
+    
+    //     $response = Http::withoutVerifying()->post('https://gulbug.com/staging/mellow_backend/public/api/job-applications', $payload);
+    
+    //     if ($response->successful()) {
+    //         session(['message' => 'success', 'errmsg' => 'Developer submitted to job application API successfully.']);
+    //     } else {
+    //         session(['message' => 'danger', 'errmsg' => 'API call failed: ' . $response->body()]);
+    //     }
+    
+    //     return redirect()->back();
+    // }
+    
     public function developer_approve_status($dev_id)
     {
         

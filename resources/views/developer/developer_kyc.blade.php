@@ -43,18 +43,37 @@
                                         @endif
                                     </div>
                                 </div>
+                                
+                                
+                                <div class="col-sm-6">
+                                    <label>Aadhar Card Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="adhar_number" class="form-control">
+                                    <span class="text-danger error-adhar_number"></span>
+                                    @if ($errors->has('adhar_number'))
+                                        <strong class="text-danger">{{ $errors->first('adhar_number') }}</strong>                                  
+                                    @endif
+                                </div>
+
 
                                 <div class="col-sm-6">
                                     <div class="form-group bmd-form-group is-filled">
                                         <label class="bmd-label-floating">Upload PAN/TAX Card</label>
                                         <input type="file" class="form-control" name="pancard"  autocomplete="off" required>
-                                        
                                         @if ($errors->has('pancard'))
-                                        <strong class="text-danger">{{ $errors->first('pancard') }}</strong>                                  
+                                            <strong class="text-danger">{{ $errors->first('pancard') }}</strong>                                  
                                         @endif
                                     </div>
                                 </div>
 
+                                <div class="col-sm-6">
+                                    <label>PAN Card Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="pan_number" class="form-control">
+                                    <span class="text-danger error-pan_number"></span>
+                                    @if ($errors->has('pan_number'))
+                                        <strong class="text-danger">{{ $errors->first('pan_number') }}</strong>                                  
+                                    @endif
+                                </div>
+                                
                                 <div class="col-sm-6">
                                     <div class="form-group bmd-form-group">
                                         <label class="bmd-label-floating">National Identification</label>

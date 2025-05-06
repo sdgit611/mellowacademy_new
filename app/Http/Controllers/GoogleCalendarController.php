@@ -3,42 +3,55 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\Controller; // ✅ Add this line
 use Google\Client as Google_Client;
 use Google\Service\Calendar as Google_Service_Calendar;
-
-
+use App\Services\GoogleCalendarService;
 
 class GoogleCalendarController extends Controller
 {
+    protected $googleCalendarService;
+
+    public function __construct(GoogleCalendarService $googleCalendarService)
+    {
+        $this->googleCalendarService = $googleCalendarService;
+    }
+
+    // Redirect to Google OAuth for authentication
     public function redirectToGoogle()
     {
         $client = new Google_Client();
-        $client->setAuthConfig(storage_path('app/google-calendar-credentials.json'));
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
         $client->addScope(Google_Service_Calendar::CALENDAR);
         $client->setAccessType('offline');
         $client->setPrompt('consent');
-        $client->setRedirectUri(route('google.callback'));
 
         $authUrl = $client->createAuthUrl();
         return redirect($authUrl);
     }
 
+    // Handle the Google OAuth callback and save the access token
     public function handleGoogleCallback(Request $request)
     {
-        $client = new Google_Client();
-        $client->setAuthConfig(storage_path('app/google-calendar-credentials.json'));
-        $client->setRedirectUri(route('google.callback'));
-        $client->addScope(Google_Service_Calendar::CALENDAR);
-
-        if ($request->has('code')) {
-            $token = $client->fetchAccessTokenWithAuthCode($request->code);
-            Session::put('google_calendar_token', $token);
-
-            return redirect()->route('success')->with('success', 'Google Calendar connected!');
+        $client = new \Google_Client();
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $client->addScope(\Google_Service_Calendar::CALENDAR);
+    
+        // Fetch the access token using the code
+        $token = $client->fetchAccessTokenWithAuthCode($request->code);
+    
+        if (isset($token['error'])) {
+            return redirect('/')->with('error', 'Google Calendar authentication failed.');
         }
-
-        return redirect()->route('success')->with('error', 'Failed to connect to Google Calendar.');
+    
+        // Save token using the service
+        $calendarService = new GoogleCalendarService();
+        $calendarService->saveAccessToken($token);
+    
+        return redirect('resource')->with('success', 'Google Calendar connected successfully');
     }
+
 }

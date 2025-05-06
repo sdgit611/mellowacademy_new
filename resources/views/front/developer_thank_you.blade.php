@@ -31,10 +31,10 @@
             
             <div class="col-8 col-lg-8 col-sm-8 col-md-8" style=" background-color: #d9d0d02e;border-radius: 20px;padding: 20px 20px 20px 20px;left: 20%;">
                 
-                <h3 class="">Now you are one step closer!</h3>
-                <h5 class=""><img src="public/front/assets/images/checkmark-clipart-right-sign-15.png" width="120px" height="120px"></h5>
-                <h5 class="">Thank You!</h5>
-                <p class="">Please Go To Resource Tab and Complete SOW Work and Proceed!</p>
+                <h3 class="text-dark">Now you are one step closer!</h3>
+                <h5 class="text-dark"><img src="public/front/assets/images/checkmark-clipart-right-sign-15.png" width="120px" height="120px"></h5>
+                <h5 class="text-dark">Thank You!</h5>
+                <p class="text-dark">Please Go To Resource Tab and Complete SOW Work and Proceed!</p>
                 <hr style="width:97%">
                 <a class="btn  btn-primary btn-lg" href="{{route('resource')}}" role="button">CONTINUE <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
                  

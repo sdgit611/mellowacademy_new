@@ -12,6 +12,10 @@ use DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Services\GoogleCalendarService;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+
 
 class cartcontroller extends Controller
 {
@@ -64,6 +68,28 @@ class cartcontroller extends Controller
 			echo $count=DB::table('developer_cart_tb')->whereNull('status')->where('u_id','=',$u_id)->count();
 		}	
 	}*/
+	
+	public function pay($id)
+    {
+        $u_id=Session::get('user_login_id');
+        $show['web_details'] = DB::table('web_setting')->get();
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count(); 
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $show['developer_order_details']=$this->developer_order_data();
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
+        ->get();
+
+        $show['developer_details'] = DB::table('developer_details_tb')->where('dev_id', $id)->where('login_status', 1)->first(); 
+
+        return view('front/pay')->with($show);
+    }
 
 	public function developer_checkout($id)
     {   
@@ -136,9 +162,9 @@ class cartcontroller extends Controller
 
      public function developer_payment_initiate(Request $request)
     {
-    	$show['developer_order_details']=$this->developer_order_data();
-		$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
-    	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['developer_order_details']=$this->developer_order_data();
+        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
         $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
         $show['web_details'] = DB::table('web_setting')->get();
         $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
@@ -148,93 +174,277 @@ class cartcontroller extends Controller
         ->whereNull('status')
         ->get();
 
-        $u_id=Session::get('user_login_id'); 
+         $u_id=Session::get('user_login_id'); 
 
         $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
         $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
 
 
-  		$fname = $request->post('fname');
-  		$lname = $request->post('lname');
-		$email = $request->post('email');
-		$phone = $request->post('phone');
-		$company_name = $request->post('company_name');
-		$country = $request->post('country');
-		$state = $request->post('state');
-		$city = $request->post('city');
-		$address_one = $request->post('address_one');
-		$address_two = $request->post('address_two');
-		$code = $request->post('code');
-		$gst = $request->post('gst');
-		$purpose = $request->post('purpose');
+        
+        $phone = $request->post('phone');
+        $company_name = $request->post('company_name');
+        $country = $request->post('country');
+        $state = $request->post('state');
+        $city = $request->post('city');
+        $address_one = $request->post('address_one');
+        $address_two = $request->post('address_two');
+        $code = $request->post('code');
+        $gst = $request->post('gst');
+        $purpose = $request->post('purpose');
 
-		$tperhr= Session::get('tperhr');
+        $tperhr= Session::get('tperhr');
 
-		$u_id=Session::get('user_login_id'); 
-		$dev_id=Session::get('dev_id'); 
-			
-		$order_id = rand(0,9999);				
-				
-		$order_data=array(
-					'order_id'=>$order_id,
-					'u_id'=>$u_id,
-					'fname'=>$fname,
-					'lname'=>$lname,
-					'email'=>$email,
-					'phone'=>$phone,
-					'company_name'=>$company_name,
-					'country'=>$country,
-					'state'=>$state,
-					'city'=>$city,
-					'address_one'=>$address_one,
-					'address_two'=>$address_two,
-					'code'=>$code,
-					'gst'=>$gst,
-					'purpose'=>$purpose,
-					'dev_id'=>$dev_id,
-					'perhr'=>$tperhr,
-					'status'=>'Not Approved',				
-					'payment_status'=>'SUCCESS',
-					'date' => date("Y-m-d")				
-					);				
-					DB::table('developer_order_tb')->insert($order_data);
+        $u_id=Session::get('user_login_id'); 
+        $dev_id=Session::get('dev_id'); 
+            
+        $order_id = rand(0,9999);  
+        
+        // by shankar start 
+        // Get user email
+        $user = DB::table('user_login')->where('id', $u_id)->first();
+        $user_email = $user->email ?? null;
+        
+        // Default fallback values
+        $company_id = 1;
+        $role_id = null;
+        
+        if ($user_email) {
+            $companyApiUrl = 'https://gulbug.com/staging/mellow_backend/public/api/get-employer-company';
+        
+            $companyApiResponse = Http::withoutVerifying()->get($companyApiUrl, [
+                'email' => $user_email,
+            ]);
+        
+            if ($companyApiResponse->successful()) {
+                $apiData = $companyApiResponse->json();
+        
+                // Check if 'employer_data' and 'company_id' exist
+                if (isset($apiData['employer_data']['company_id'])) {
+                    $company_id = $apiData['employer_data']['company_id'];
+                }
+        
+                // Check if role_id exists at root level
+                if (isset($apiData['role_id'])) {
+                    $role_id = $apiData['role_id'];
+                }
+        
+            } else {
+                \Log::error('Company API failed: ' . $companyApiResponse->body());
+            }
+        }
 
-					$details = DB::table('developer_order_tb')->where('email',$email)->get();
-		            $emails=array();
-		            foreach ($details as $key) 
-		            {
-		                $emails[]= $key->email;
-		            }
+        
+        
+        if ($request->has('dev_id')) 
+        {
+            $developer = DB::table('developer_details_tb')->where('dev_id', $request->post('dev_id'))->first();
+            
 
-					$data = DB::table('developer_order_tb')->where('email',$email)->get();
-		            foreach ($data as $k) 
-		            {
-		                $fname = $k->fname;
-		                $order_id = $k->order_id;
-		                $url = route('contact');
-		            }
-		           $datas=array(
-		                'fname'=>$fname,
-		                'order_id'=>$order_id,
-		                'link'=>$url
-		            );
+            $employeeData = [
+                "salutation" => "mr",
+                "name" => $developer->name ?? 'Unknown',
+                "email" => $developer->email,
+                // "password" => $developer->password, 
+                "password" =>"12345678",
+                "designation" => "1",
+                "department" => "1",
+                "company_id" => $company_id,
+                "country" => "99",
+                "country_phonecode" => "91",
+                "mobile" => $phone ?? null,
+                "gender" => "male",
+                "joining_date" => now()->format('d-m-Y'), // or $joining_date if defined
+                "date_of_birth" => null,
+                "reporting_to" => null,
+                "locale" => "en",
+                "role" => $role_id,
+                "address" => $address_one ?? null,
+                "about_me" => null,
+                "login" => "enable",
+                "email_notifications" => "yes",
+                "hourly_rate" => $developer->perhr ?? null,
+                "slack_username" => null,
+                "tags" => null,
+                "probation_end_date" => null,
+                "notice_period_start_date" => null,
+                "notice_period_end_date" => null,
+                "employment_type" => null,
+                "internship_end_date" => null,
+                "contract_end_date" => null,
+                "marital_status" => "single",
+                "company_address" => $company_name ?? '1',
+                "marriage_anniversary_date" => null,
+                "add_more" => "false"
+            ];
+            
+            $response = Http::withoutVerifying()
+                ->post('https://gulbug.com/staging/mellow_backend/public/api/employees', $employeeData);
+                
+                if ($response->successful()) {
+                // Send email to developer after account setup
+                $email = $developer->email;
+                $dev_name = $developer->name ?? 'Developer';
+            
+                $emailData = [
+                    'name' => $dev_name,
+                    'login_url' => 'https://gulbug.com/staging/mellow_backend/public/login',
+                    'reset_url' => 'https://gulbug.com/staging/mellow_backend/public/forgot-password'
+                ];
+            
+                Mail::send([], [], function ($message) use ($email, $emailData) {
+                    $message->to($email)
+                        ->from('dev@mellowelements.in', 'The Mellow Elements')
+                        ->subject('Your Account is Ready - Mellow Elements')
+                        ->setBody(
+                        '<p>Hello ' . $emailData['name'] . ',</p>' .
+                        '<p>Your account has been successfully set up on Mellow Elements.</p>' .
+                        '<p>You can log in using the link below:</p>' .
+                        '<p><a href="' . $emailData['login_url'] . '">' . $emailData['login_url'] . '</a></p>' .
+                        '<p>If you are not able to log in, you can reset your password using the link below:</p>' .
+                        '<p><a href="' . $emailData['reset_url'] . '">' . $emailData['reset_url'] . '</a></p>' .
+                        '<p>Welcome aboard!</p>' .
+                        '<p>- The Mellow Elements Team</p>',
+                        'text/html'
+                    );
+                });
 
-					Mail::send('developer_payment_mail', $datas, function($message) use ($emails) {
-			            $message->to($emails)->subject('Mellow Elements');
-			            $message->from('dev@mellowelements.in', 'The Mellow Elements');   
-			        });
-				
-					
-					$status=array(
-					'developer_status'=>'Book Now',
-					);
+            }
 
-					DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($status);	
-					
-					return redirect()->route('developer_thank_you')->with($show);
-				
+            
+            // Optional: log if request fails
+            if (!$response->successful()) {
+                \Log::error('API Error - Employee Sync Failed: ' . $response->body());
+            }
+
+            // by shankar end
+            $userLogin = DB::table('user_login')->where('id', $u_id)->first();
+            
+            DB::table('developer_order_tb')->where('u_id', $u_id)->where('dev_id',$request->post('dev_id'))->update([
+                'payment_amount'=>$request->post('amount'),
+                'payment_status'=>'SUCCESS',
+                'status'=> 2,
+            ]);
+        }
+        else
+        {
+            $developer = DB::table('developer_details_tb')->where('dev_id', $dev_id)->first();
+            $order_data=array(
+                'order_id'=>$order_id,
+                'u_id'=>$u_id,
+                'fname'=>$developer->name,
+                'lname'=>$developer->last_name,
+                'email'=>$developer->email,
+                'phone'=>$phone ?? '',
+                'company_name'=>$company_name,
+                'country'=>$country ?? '',
+                'state'=>$state ?? '',
+                'city'=>$city ?? '',
+                'address_one'=>$address_one ?? '',
+                'address_two'=>$address_two ?? '',
+                'code'=>$code ?? '',
+                'gst'=>$gst ?? '',
+                'purpose'=>$purpose ?? '',
+                'dev_id'=>$dev_id,
+                'perhr'=>$developer->perhr,
+                'status'=> "Not Approved",	
+                'payment_amount'=>$request->post('amount'),
+                'payment_status'=>'SUCCESS',
+                'date' => date("Y-m-d")             
+                );              
+                DB::table('developer_order_tb')->insert($order_data);
+            }
+            // Fetch the developer's order data
+            $email = $developer->email;
+            $data = DB::table('developer_order_tb')->where('email', $email)->first();  // Use first() to get a single record
+            $fname = $data->fname ?? 'Developer';
+            $order_id = $data->order_id ?? 'N/A';
+            $url = route('contact');
+        
+            $datas = [
+                'fname' => $fname,
+                'order_id' => $order_id,
+                'link' => $url
+            ];
+        
+            Mail::send('developer_payment_mail', $datas, function($message) use ($email) {
+                $message->to($email)->subject('Mellow Elements');
+                $message->from('dev@mellowelements.in', 'The Mellow Elements');   
+            });
+        
+            $status = [
+                'developer_status' => 'Book Now',
+            ];
+        
+            DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($status);    
+        
+            if ($request->has('dev_id')) {   
+                return response()->json([
+                    'status' => 'success',
+                    'redirect' => route('developer_thank_you')
+                ]);
+            }
+            else
+            {
+                return redirect()->route('developer_thank_you')->with($show);
+            }
+                
     }
 
+    public function schedule_interview_qualified (Request $request)
+     {  
+ 
+		  $u_id=Session::get('user_login_id');
+			//  $dev_id= Session::get('dev_id');
+     	    //echo $dev_id; exit();
+ 
+ 	       	request()->validate(
+ 	        [
+ 	            'status' => ['required'],
+ 	            'review' => ['required'],
+ 	        ]);
+			 $dev_id = $request->dev_id;
+ 	        // $dev_id= Session::get('dev_id');
+ 	        //$fname = $request->post('fname');
+   	    	//$lname = $request->post('lname');
+ 
+        		$docs = DB::table('developer_order_tb')->where('dev_id',$dev_id)->get();
+ 
+ 			foreach($docs as $c)
+ 			{
+ 		        $data=array(
+ 
+ 		            'dev_id'=>$dev_id,
+ 		            'fname'=>$c->fname,
+ 		            'lname'=>$c->lname,
+ 		            'phone'=>$c->phone,
+ 		            'email'=>$c->email,
+ 		            'perhr'=>$c->perhr,
+ 		            'code'=>$c->code,
+ 		            'address_one'=>$c->address_one,
+ 		            'status'=>$request->post('status'),
+ 		            'review'=>$request->post('review'),
+ 		        );
+ 
+ 		    }
+ 
+ 	       // $result=DB::table('developer_interview_schedule')->insert($data);
+ 	        $result=DB::table('developer_interview_schedule')->where('dev_id',$dev_id)->update($data);
+ 
+ 	        $result=DB::table('developer_order_tb')->where('dev_id',$dev_id)->update($data);
+ 
+ 	        if($result==true)
+ 	        {
+ 	            session(['message' =>'success', 'schedule_errmsg' =>'Interview Feedback Sent Successfully.']);
+ 
+ 	            return redirect()->back();
+ 	        }
+ 	        else
+ 	        {
+ 	            session(['message' =>'danger', 'schedule_errmsg'=>'Interview Feedback Not Sent Successfully.']); 
+ 	            return redirect()->back();
+ 	        }
+ 
+     }
     public function developer_thank_you()
     {  
     	$show['developer_order_details']=$this->developer_order_data();
@@ -625,102 +835,98 @@ class cartcontroller extends Controller
 		return view('front/resource')->with($show);
     }
     
-    // public function schedule_interview_resource (Request $request)
-    // {  
-	//        	request()->validate(
-	//         [
-	//             'interviewdateone' => ['required'],
-	//             'interviewdatetwo' => ['required'],
-	//             'interviewdatethree' => ['required'],
-	//         ]);
-	        
-	//         $dev_id= Session::get('dev_id');
-	       
-	//        // echo $dev_id; exit();
 
-    //    		$docs = DB::table('developer_order_tb')->where('dev_id',$dev_id)->get();
-       		
-    //    		//dd($docs);
+// its working as well but new function with life time token this short time token
+// 	public function schedule_interview_resource(Request $request)
+// 	{
+// 		$dev_id = Session::get('dev_id');
 
-	// 		foreach($docs as $c)
-	// 		{
-	// 	        $data=array(
+// 		// Get developer record
+// 		$doc = DB::table('developer_order_tb')->where('dev_id', $dev_id)->first();
+// 		if (!$doc) {
+// 			return response()->json(['message' => 'Developer not found'], 404);
+// 		}
 
-	// 	            'dev_id'=>$dev_id,
-	// 	            'u_id'=>$c->u_id,
-	// 	            'fname'=>$c->fname,
-	// 	            'lname'=>$c->lname,
-	// 	            'phone'=>$c->phone,
-	// 	            'email'=>$c->email,
-	// 	            'perhr'=>$c->perhr,
-	// 	            'code'=>$c->code,
-	// 	            'address_one'=>$c->address_one,
-	// 	            'interviewdateone'=>$request->post('interviewdateone'),
-	// 	            'interviewdatetwo'=>$request->post('interviewdatetwo'),
-	// 	            'interviewdatethree'=>$request->post('interviewdatethree'),
-	// 	            'status'=>'Interview Schedule',
-	// 	        );
-		        
-	// 	    }
+// 		// Create Google Meet link via calendar service
+// 		$calendar = new GoogleCalendarService();
+// 		$meetLink = $calendar->createInterviewEvent(
+// 			$request->name,
+// 			$request->email,
+// 			$request->interviewdateone
+// 		);
 
-	//         $result=DB::table('developer_interview_schedule')->insert($data);
-	        
-	//         $result=DB::table('developer_order_tb')->where('dev_id',$dev_id)->update($data);
-	        
+// 		// Save full interview schedule details
+// 		$data = [
+// 			'dev_id' => $dev_id,
+// 			'u_id' => $doc->u_id,
+// 			'fname' => $doc->fname,
+// 			'lname' => $doc->lname,
+// 			'phone' => $doc->phone,
+// 			'email' => $doc->email,
+// 			'perhr' => $doc->perhr,
+// 			'code' => $doc->code,
+// 			'address_one' => $doc->address_one,
+// 			'interviewdateone' => $request->interviewdateone,
+// 			'from_time' => $request->from_time,
+// 			'to_time' => $request->to_time,
+// 			'meet_link' => $meetLink,
+// 			'fname' => $request->name,
+// 			'email' => $request->email
+// 		];
 
-	//         if($result==true)
-	//         {
-	//             session(['message' =>'success', 'schedule_errmsg' =>'Interview Schedule Successfully.']);
-	           
-	//             return redirect()->back();
-	//         }
-	//         else
-	//         {
-	//             session(['message' =>'danger', 'schedule_errmsg'=>'Interview Schedule Not Successful.']); 
-	//             return redirect()->back();
-	//         }
-	    
-    // }
+// 		DB::table('developer_interview_schedule')->insert($data);
 
-	public function schedule_interview_resource(Request $request)
-	{
-		$dev_id = Session::get('dev_id');
+// 		// Update developer_order_tb with new interview info
+// 		DB::table('developer_order_tb')->where('dev_id', $dev_id)->update([
+// 			'interviewdateone' => $request->interviewdateone,
+// 			'interviewdatetwo' => $request->from_time,
+// 			'interviewdatethree' => $request->to_time,
+// 			'interviewlink' => $meetLink,
+// 			'status' => 'Scheduled',
+// 		]);
 
-		// Get developer record
-		$doc = DB::table('developer_order_tb')->where('dev_id', $dev_id)->first();
-		if (!$doc) {
-			return response()->json(['message' => 'Developer not found'], 404);
-		}
+// 		// Prepare email HTML content
+// 		$htmlContent = "
+// 			<h2>Interview Scheduled</h2>
+// 			<p><strong>Candidate:</strong> {$request->name}</p>
+// 			<p><strong>Email:</strong> {$request->email}</p>
+// 			<p><strong>Date:</strong> {$request->interviewdateone}</p>
+// 			<p><strong>Time:</strong> {$request->from_time} - {$request->to_time}</p>
+// 			<p><strong>Google Meet Link:</strong> <a href='{$meetLink}'>{$meetLink}</a></p>
+// 			<br><p>Thanks,</p>
+// 		";
 
-		// Create Google Meet link via calendar service
-		$calendar = new GoogleCalendarService();
-		$meetLink = $calendar->createInterviewEvent(
-			$request->name,
-			$request->email,
-			$request->interviewdateone
-		);
+// 		// Recipients list (admin, employer, candidate)
+// 		$recipients = [
+// 			'admin@email.com',
+// 			$doc->email,
+// 			$request->email,
+// 		];
 
-		// Save full interview schedule details
-		$data = [
-			'dev_id' => $dev_id,
-			'u_id' => $doc->u_id,
-			'fname' => $doc->fname,
-			'lname' => $doc->lname,
-			'phone' => $doc->phone,
-			'email' => $doc->email,
-			'perhr' => $doc->perhr,
-			'code' => $doc->code,
-			'address_one' => $doc->address_one,
-			'interviewdateone' => $request->interviewdateone,
-			'from_time' => $request->from_time,
-			'to_time' => $request->to_time,
-			'meet_link' => $meetLink,
-			'fname' => $request->name,
-			'email' => $request->email
-		];
+// 		foreach ($recipients as $to) {
+// 			if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+// 				\Log::warning("Invalid email skipped: " . json_encode($to));
+// 				continue;
+// 			}
 
-		DB::table('developer_interview_schedule')->insert($data);
+// 			Mail::html($htmlContent, function ($message) use ($to) {
+// 				$message->to($to)->subject('Interview Scheduled');
+// 			});
+// 		}
 
+<<<<<<< HEAD
+// 		return response()->json([
+// 			'success' => true,
+// 			'message' => 'Interview scheduled successfully and emails sent.',
+// 			'meet_link' => $meetLink,
+// 		]);
+// 	}
+
+    // with life time token
+    public function schedule_interview_resource(Request $request)
+    {
+        $dev_id = Session::get('dev_id');
+=======
 		// Update developer_order_tb with new interview info
 		DB::table('developer_order_tb')->where('dev_id', $dev_id)->update([
 			'interviewdateone' => $request->interviewdateone,
@@ -827,7 +1033,94 @@ class cartcontroller extends Controller
 public function success(){
 	return "successfully meeting schedule.";
 }
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
     
+        // Validate developer existence
+        $doc = DB::table('developer_order_tb')->where('dev_id', $dev_id)->first();
+        if (!$doc) {
+            return response()->json(['message' => 'Developer not found'], 404);
+        }
+    
+        // Create Google Meet link
+        $calendar = new GoogleCalendarService();
+        $meetLink = $calendar->createInterviewEvent(
+            $request->name,
+            $request->email,
+            $request->interviewdateone
+        );
+    
+        // Prepare interview schedule data
+        $data = [
+            'dev_id' => $dev_id,
+            'u_id' => $doc->u_id,
+            'fname' => $request->name,
+            'lname' => $doc->lname,
+            'phone' => $doc->phone,
+            'email' => $request->email,
+            'perhr' => $doc->perhr,
+            'code' => $doc->code,
+            'address_one' => $doc->address_one,
+            'interviewdateone' => $request->interviewdateone,
+            'from_time' => $request->from_time,
+            'to_time' => $request->to_time,
+            'meet_link' => $meetLink,
+            'language' => $doc->language ?? null, // Optional fields
+            'interviewdatetwo' => $request->from_time,
+            'interviewdatethree' => $request->to_time,
+            'schinterviewdatetime' => now(),
+            'interviewlink' => $meetLink,
+            'status' => 'Scheduled',
+            'approve_status' => 'Pending',
+        ];
+    
+        // Insert into developer_interview_schedule table
+        DB::table('developer_interview_schedule')->insert($data);
+    
+        // Update developer_order_tb
+        DB::table('developer_order_tb')->where('dev_id', $dev_id)->update([
+            'interviewdateone' => $request->interviewdateone,
+            'interviewdatetwo' => $request->from_time,
+            'interviewdatethree' => $request->to_time,
+            'interviewlink' => $meetLink,
+            'status' => 'Scheduled',
+        ]);
+    
+        // Prepare email content
+        $htmlContent = "
+            <h2>Interview Scheduled</h2>
+            <p><strong>Candidate:</strong> {$request->name}</p>
+            <p><strong>Email:</strong> {$request->email}</p>
+            <p><strong>Date:</strong> {$request->interviewdateone}</p>
+            <p><strong>Time:</strong> {$request->from_time} - {$request->to_time}</p>
+            <p><strong>Google Meet Link:</strong> <a href='{$meetLink}' target='_blank'>{$meetLink}</a></p>
+            <br><p>Thanks,</p>
+        ";
+    
+        // Send email to admin, employer, and candidate
+        $recipients = [
+            'admin@email.com',
+            $doc->email,           // Employer's email from developer_order_tb
+            $request->email        // Candidate's email from form
+        ];
+    
+        foreach ($recipients as $to) {
+            if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+                \Log::warning("Invalid email skipped: " . json_encode($to));
+                continue;
+            }
+    
+            Mail::html($htmlContent, function ($message) use ($to) {
+                $message->to($to)->subject('Interview Scheduled');
+            });
+        }
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Interview scheduled successfully and emails sent.',
+            'meet_link' => $meetLink,
+        ]);
+    }
+
 
     public function submit_require_docs(Request $request)
     {  

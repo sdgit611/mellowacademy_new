@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Premium;
 use App\Models\developerPayments;
 use App\Models\developerPremiumPrice;
+use Carbon\Carbon;
 
 class developercontroller extends Controller
 {
@@ -282,12 +283,13 @@ class developercontroller extends Controller
     
     public function premium_payment_initiate(Request $request)
     {    
+       
         $show['developer_premium_price_table_details'] = DB::table('developer_premium_price_table')->orderby('id','asc')->get();
     	$d_id= Session::get('developer_login_id');
 		$show['developer_details'] = DB::table('developer_details_tb')->orderby('dev_id','desc')->get();
 		//$d_id= Session::get('developer_login_id');
 		//echo $d_id; exit();
-		
+      
   		$fname = $request->post('name');
   		$lname = $request->post('last_name');
 		$email = $request->post('email');
@@ -298,7 +300,7 @@ class developercontroller extends Controller
 		$address_one = $request->post('address_one');
 		$code = $request->post('code');
 		$purpose = $request->post('purpose');
-
+       
 		session(['name' => $fname]);
 		session(['last_name' => $lname]);
 		session(['email' => $email]);
@@ -310,44 +312,52 @@ class developercontroller extends Controller
 		session(['code' => $code]);
 		session(['purpose' => $purpose]);
 		
-		$tprice= Session::get('total_price');
-		$final=$tprice;		
-		// Generate random receipt id
-        $receiptId = Str::random(20);        
-        // Create an object of razorpay
-        $api = new Api($this->razorpayId, $this->razorpayKey);
-        // In razorpay you have to convert rupees into paise we multiply by 100
-        // Creating order
-        $order = $api->order->create(array(
-			'receipt' => $receiptId,
-			'amount' => $final * 100,
-			'currency' => 'INR'
-			)
-        );
+        //  $tprice= Session::get('total_price');
+        //   $final=$tprice;		
+		// // Generate random receipt id
+        // $receiptId = Str::random(20);        
+        // // Create an object of razorpay
+        // $api = new Api($this->razorpayId, $this->razorpayKey);
+        // // In razorpay you have to convert rupees into paise we multiply by 100
+        // // Creating order
+        // $order = $api->order->create(array(
+		// 	'receipt' => $receiptId,
+		// 	'amount' => (int) round($final * 100),
+		// 	'currency' => 'INR'
+		// 	)
+        // );
 
-        request()->validate([
-					'phone' => 'required|digits:10',
-				]);
+        // request()->validate([
+		// 			'phone' => 'required|digits:10',
+		// 		]);
         // Return response on payment page
-        $response = [
-			'orderId' => $order['id'],
-			'razorpayId' => $this->razorpayId,
-			'currency' => 'INR',
-			'amount' => $final,			
-			'name' =>$fname,
-			'last_name' =>$lname,             
+      
+          $data = [
+			'order_id' =>  $request->post('razorpay_payment_id'),
+			'dev_id' => $d_id,
+            'name' =>$fname,
+            'last_name' =>$lname,             
 			'email' => $email,
 			'phone' =>$phone,
-			'country' =>$country,
+            'country' =>$country,
 			'state' =>$state,
 			'city' =>$city,
 			'address_one' =>$address_one,
-			'code' =>$code,
+            'code' =>$code,
 			'purpose' =>$purpose,
-			'description' => 'Buy Plan Payment',
+            'tprice' => ($request->post('amount')/100),
+			'status' => 'Premium Member',
+			'payment_status' => 'SUCCESS',
+			'date' => Carbon::now(),
         ];
         // Let's checkout payment page is it working	
-        return view('developer/premiumpayment',compact('response'))->with($show);
+        DB::table('premium_order_tb')->insert( $data);
+        
+        return response()->json([
+            'success' => true,
+            'redirect_url' => route('developer_profile'), // or any other route
+            'message' => 'Payment successful'
+        ]);
     }
     
     public function premium_checkout(Request $request)
@@ -497,7 +507,7 @@ class developercontroller extends Controller
     {
         $developer_id=Session::get('developer_login_id'); 
 
-        $show['developer_details_interview_schedule'] = DB::table('developer_interview_schedule')->orderby('dev_id','desc')->get();
+        $show['developer_details_interview_schedule'] = DB::table('developer_interview_schedule')->where('dev_id', $developer_id)->orderby('dev_id','desc')->get();
         
         return view('developer/developer_interview_schedule_details')->with($show);
     }
@@ -540,8 +550,13 @@ class developercontroller extends Controller
         foreach ($data as $d) {
             $total = $d->profile_complete;
             $profile_complete = $total;
+<<<<<<< HEAD
+           // if (empty($d->job)||empty($d->total_hours) && $total < 90) {
+            if ($total <= 90) {
+=======
 
             if ((empty($d->job) || empty($d->total_hours)) && $total < 90) {
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
                 $profile_complete = $total + 10;
 
                 // Cap to 100
@@ -627,12 +642,24 @@ class developercontroller extends Controller
         ]);
     }
 
+<<<<<<< HEAD
+   public function developer_resource()
+=======
 
     public function developer_resource()
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
     {   
         $developer_id=Session::get('developer_login_id'); 
 
-        $show['resource_details'] = DB::table('developer_order_tb')->where('dev_id',$developer_id)->orderby('id','desc')->get();
+        $count = DB::table('developer_order_tb')->where('dev_id',$developer_id)->where('status',2)->orderby('id','desc')->count();
+
+        if( $count != 0)
+        {
+            return redirect(env('URL'));
+        }
+
+        $show['resource_details'] = DB::table('developer_order_tb')->where('dev_id',$developer_id)->where('status',2)->orderby('id','desc')->get();
+
 
         return view('developer/developer_resource')->with($show);
     }
@@ -1326,7 +1353,83 @@ class developercontroller extends Controller
 {
     $dev_id = Session::get('developer_login_id');   
 
+<<<<<<< HEAD
+        $data = DB::table('developer_details_tb')->where('dev_id',$dev_id)->get();
+
+        foreach ($data as $d) {
+          $total = $d->profile_complete;
+        }
+
+        $profile_complete = $total + 30;
+
+        request()->validate(
+        [
+            'national_id_name' => 'required',
+            'national_id_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'adharcard' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'pancard' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'signature' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'adhar_number' => [
+                'required',
+                'digits:12',
+                Rule::unique('developer_details_tb', 'adhar_number')->ignore($request->developer_id, 'dev_id'),
+            ],
+            'pan_number' => [
+                'required',
+                'regex:/^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$/',
+                Rule::unique('developer_details_tb', 'pan_number')->ignore($request->developer_id, 'dev_id'),
+            ],
+        ]);  
+
+        
+        $getimage = time().'.'.$request->image->getClientOriginalExtension();       
+        $path = public_path('upload/developer/'.$getimage);
+        $img = Image::make($request->file('image')->getRealPath())->save($path);
+        
+        $getnationalidimage = time().'.'.$request->national_id_image->getClientOriginalExtension();       
+        $path = public_path('upload/national_image/'.$getnationalidimage);
+        $img = Image::make($request->file('national_id_image')->getRealPath())->save($path);
+
+        $getsignature = time().'.'.$request->signature->getClientOriginalExtension();       
+        $path = public_path('upload/signature/'.$getsignature);
+        $img = Image::make($request->file('signature')->getRealPath())->save($path);
+
+        $getadharcard = time().'.'.$request->adharcard->getClientOriginalExtension();       
+        $path = public_path('upload/adhar_card/'.$getadharcard);
+        $img = Image::make($request->file('adharcard')->getRealPath())->save($path);
+
+        $getpancard = time().'.'.$request->pancard->getClientOriginalExtension();       
+        $path = public_path('upload/pan_card/'.$getpancard);
+        $img = Image::make($request->file('pancard')->getRealPath())->save($path);
+
+        $data=array(
+            
+           'national_id_name'=>$request->post('national_id_name'),
+            'national_id_image'=>$getnationalidimage,
+            'image'=>$getimage,
+            'signature'=>$getsignature,
+            'profile_complete'=>$profile_complete,
+            'adharcard'=>$getadharcard,
+            'pancard'=>$getpancard,
+            'adhar_number'       => $request->post('adhar_number'),
+            'pan_number'         => $request->post('pan_number'),
+        );
+       
+       $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
+        if($result==true)
+        {
+            session(['message' =>'success', 'devkycerrmsg' =>'KYC Details Add Successfully...']);
+            return redirect()->back();            
+        }
+        else
+        {
+            session(['message' =>'danger', 'devkycerrmsg'=>'KYC Details Add Failed.']); 
+            return redirect()->back();
+        }
+=======
     $data = DB::table('developer_details_tb')->where('dev_id', $dev_id)->get();
+>>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
 
     foreach ($data as $d) {
         $total = $d->profile_complete;
@@ -1431,6 +1534,17 @@ class developercontroller extends Controller
             'pancard' => $request->hasFile('pancard') || !$request->old_pancard
                 ? 'required|mimes:jpeg,png,jpg,pdf|max:2048'
                 : 'nullable',
+
+            'adhar_number' => [
+                'required',
+                'digits:12',
+                Rule::unique('developer_details_tb', 'adhar_number')->ignore($request->developer_id, 'dev_id'),
+            ],
+            'pan_number' => [
+                'required',
+                'regex:/^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$/',
+                Rule::unique('developer_details_tb', 'pan_number')->ignore($request->developer_id, 'dev_id'),
+            ],
         ]);
         
 
@@ -1461,6 +1575,8 @@ class developercontroller extends Controller
             'signature'          => $getsignature,
             'adharcard'          => $getadharcard,
             'pancard'            => $getpancard,
+            'adhar_number'       => $request->post('adhar_number'),
+            'pan_number'         => $request->post('pan_number'),
         ];
 
         $result = DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($data);

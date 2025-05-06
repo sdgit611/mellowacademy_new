@@ -156,10 +156,12 @@ Route::post('schedule_interview_qualified','App\Http\Controllers\cartcontroller@
 
 Route::get('success','App\Http\Controllers\cartcontroller@success')->name('success');
 
-
+// google calender routes start
 Route::get('/google-calendar/connect', [GoogleCalendarController::class, 'redirectToGoogle'])->name('google.connect');
 Route::get('/google-calendar/callback', [GoogleCalendarController::class, 'handleGoogleCallback'])->name('google.callback');
-
+// new
+Route::get('/google-calendar/events', [GoogleCalendarController::class, 'useGoogleCalendar'])->name('google.use');
+// google calender routes end
 
 
 Route::get('assign_work','App\Http\Controllers\cartcontroller@assign_work')->name('assign_work');
@@ -173,6 +175,7 @@ Route::get('dev_qualified_checkout/{dev_id}','App\Http\Controllers\cartcontrolle
 Route::post('devq_payment_initiate/{dev_id}','App\Http\Controllers\cartcontroller@devq_payment_initiate')->name('devq_payment_initiate');
 Route::post('dev_qcheckout/{dev_id}','App\Http\Controllers\cartcontroller@dev_qcheckout')->name('dev_qcheckout');
 Route::get('dev_thank_you','App\Http\Controllers\cartcontroller@dev_thank_you')->name('dev_thank_you');
+Route::get('/dev/pay/{dev_id}', 'App\Http\Controllers\cartcontroller@pay')->name('dev.pay');
 
 /*
 ---------------------------------------------------------------------------------------------------------
@@ -405,6 +408,7 @@ Route::get('developer_project','App\Http\Controllers\developercontroller@develop
 Route::post('submit_project_details','App\Http\Controllers\developercontroller@storeOrUpdateProjectDetails')->name('storeOrUpdateProjectDetails');
 // Route::post('update_project_details','App\Http\Controllers\developercontroller@update_project_details')->name('update_project_details');
 Route::get('delete_project_details/{developer_id}','App\Http\Controllers\developercontroller@delete_project_details')->name('delete_project_details');
+Route::get('payment/success','App\Http\Controllers\developercontroller@paymentSuccess')->name('payment.success');
 
 
 Route::get('work_space','App\Http\Controllers\developercontroller@work_space')->name('work_space');

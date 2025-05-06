@@ -173,6 +173,12 @@ window.location.href = "developer_admin";
                                             <i class="material-icons">settings</i> Settings
                                         </a>
                                     </li>
+                                    <li>
+                                         <a href="{{ route('developer_premium') }}"
+                                             class="{{ request()->routeIs('developer_change_password') ? 'active' : '' }}">
+                                             <i class="fa fa-credit-card" aria-hidden="true"></i>  Buy premium package
+                                         </a>
+                                     </li>
                                 </ul>
 
                             </div>

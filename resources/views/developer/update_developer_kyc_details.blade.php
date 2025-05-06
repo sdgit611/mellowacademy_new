@@ -25,6 +25,12 @@
                                 </div>
 
                                 <div class="col-sm-6">
+                                    <label>Aadhar Card Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="adhar_number" value="{{ $dd->adhar_number }}" class="form-control">
+                                    <span class="text-danger error-adhar_number"></span>
+                                </div>
+
+                                <div class="col-sm-6">
                                     <label>PAN / Tax Card <span class="text-danger">*</span></label>
                                     <input type="file" name="pancard" class="form-control">
                                     <input type="hidden" name="old_pancard" value="{{ $dd->pancard }}">
@@ -32,6 +38,12 @@
                                    <x-file-preview :fileName="$dd->pancard" filePath="upload/pan_card" />
                                     <!-- preview file end -->
                                     <span class="text-danger error-pancard"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label>PAN Card Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="pan_number" value="{{ $dd->pan_number }}" class="form-control">
+                                    <span class="text-danger error-pan_number"></span>
                                 </div>
 
                                 <div class="col-sm-6">
