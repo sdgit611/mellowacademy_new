@@ -28,94 +28,197 @@
                                     <th>SOW</th>
                                 </tr>
                             </thead>
-	                         <tbody>
-                                <?php $i=1;
-                                    foreach($resoure_details as $rd) { ?>
-                                        <tr>
-                                            <td><?php echo $i; ?></td>
-                                            <td><?php echo $rd->name; ?> <?php echo $rd->last_name; ?></td>
-                                            
-                                            <td>
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#editModal<?php echo $rd->dev_id; ?>" >More Details</a>
-                                            </td>
-                                            <td><?php echo $rd->fname; ?> <?php echo $rd->lname; ?></td>
-                                            <td>
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myeditModal<?php echo $rd->u_id; ?>" >Click Here</a>
-                                            </td>
+                            <tbody>
+                                @foreach($resoure_details as $i => $rd)
+                                <tr>
+                                    <td>{{ $i + 1 }}</td>
+                                    <td>{{ $rd->name }} {{ $rd->last_name }}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal"
+                                            data-target="#editModal{{ $rd->dev_id }}">More Details</button>
+                                    </td>
+                                    <td>{{ $rd->fname }} {{ $rd->lname }}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal"
+                                            data-target="#myeditModal{{ $rd->u_id }}">Click Here</button>
+                                    </td>
+                                    <td><a class="btn btn-success"
+                                            href="{{ route('require_docs_details', ['u_id' => $rd->u_id, 'dev_id' => $rd->dev_id]) }}">Details</a>
+                                    </td>
+                                    <td><a class="btn btn-success"
+                                            href="{{ route('short_message_details', ['u_id' => $rd->u_id, 'dev_id' => $rd->dev_id]) }}">Details</a>
+                                    </td>
+                                    <td><a class="btn btn-success"
+                                            href="{{ route('sow_details', ['u_id' => $rd->u_id, 'dev_id' => $rd->dev_id]) }}">Details</a>
+                                    </td>
+                                </tr>
 
-                                            <td><a class="btn btn-success" href="<?php echo route('require_docs_details',['u_id'=>''.$rd->u_id.'','dev_id'=>''.$rd->dev_id.'']) ?>"><i class="fa fa-show"></i>Details</a></td>
-                                            <td><a class="btn btn-success" href="<?php echo route('short_message_details',['u_id'=>''.$rd->u_id.'','dev_id'=>''.$rd->dev_id.'']) ?>"><i class="fa fa-show"></i>Details</a></td>
-                                            <td><a class="btn btn-success" href="<?php echo route('sow_details',['u_id'=>''.$rd->u_id.'','dev_id'=>''.$rd->dev_id.'']) ?>"><i class="fa fa-show"></i>Details</a></td>
-                                     
-                                            
-                                            
-                                        </tr>
-                                        <div class="modal" id="editModal<?php echo $rd->dev_id; ?>">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <!-- Modal Header -->
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Developer Details</h4>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&nbsp;&times;&nbsp;</button>
+                                <!-- Developer Modal -->
+                                <div class="modal fade" id="editModal{{ $rd->dev_id }}" tabindex="-1" role="dialog"
+                                    aria-labelledby="developerModalLabel{{ $rd->dev_id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+                                        <div class="modal-content shadow-sm rounded">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title text-white"
+                                                    id="developerModalLabel{{ $rd->dev_id }}">Developer Details</h5>
+                                                <button type="button" class="close text-white" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Phone:</strong> {{ $rd->dev_phone }}
                                                     </div>
-                                                    <!-- Modal body -->
-                                                    <div class="modal-body">
-                                                        <p>  Phone : <?php echo $rd->dev_phone; ?></p>
-                                                        <p> Address : <?php echo $rd->address; ?></p>
-                                                        <p>  job : <?php echo $rd->job; ?></p>
-                                                         <p>  Total Hours : <?php echo $rd->total_hours; ?></p>
-                                                          <p>  Per Hr : <?php echo $rd->perhr; ?></p>
-                                                           <p>  Rating : <?php echo $rd->rating; ?></p>
-                        
-                                                            <p>  Language : <?php echo $rd->language; ?></p>
-                                                            <p>  Education : <?php echo $rd->education; ?></p>
-                                                            <p>  Description : <?php echo $rd->description; ?></p>
-                                                            <p>  Skills : <?php echo $rd->skills; ?></p>
-                                                            <p>  Completed Job : <?php echo $rd->completed_job; ?></p>
-                                                            <p>  Image : <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/developer/'.$rd->image.'') ?>" style="height:80px"></p>
-                                                            <p>  Portfolio Image : <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/portfolio/'.$rd->portfolio_image.'') ?>" style="height:80px"></p>
-                                                            <p>  Resume : <?php echo $rd->resume; ?></p>
-                                                            <p>  Date : <?php echo $rd->date; ?></p>
-                                                        
-                                                    </div>                                               
+                                                    <div class="col-md-6">
+                                                        <strong>Address:</strong> {{ $rd->address }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Job:</strong> {{ $rd->job }}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Total Hours:</strong> {{ $rd->total_hours }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Per Hr:</strong> {{ $rd->perhr }}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Rating:</strong> {{ $rd->rating }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Language:</strong> {{ $rd->language }}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Education:</strong> {{ $rd->education }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-12">
+                                                        <strong>Description:</strong>
+                                                        <p class="mb-0">{!! $rd->description !!}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-12">
+                                                        <strong>Skills:</strong>
+                                                        <p class="mb-0">{!! $rd->skills !!}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Completed Jobs:</strong> {!! $rd->completed_job !!}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Date:</strong> {{ $rd->date }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6 text-center">
+                                                        <strong>Image:</strong><br>
+                                                        <img src="{{ asset('public/upload/developer/' . $rd->image) }}"
+                                                            class="img-thumbnail" style="height:80px">
+                                                    </div>
+                                                    <div class="col-md-6 text-center">
+                                                        <strong>Portfolio:</strong><br>
+                                                        <img src="{{ asset('public/upload/portfolio/' . $rd->portfolio_image) }}"
+                                                            class="img-thumbnail" style="height:80px">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <strong>Resume:</strong> <span
+                                                            class="text-muted">{{ $rd->resume }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-
-                                        <div class="modal" id="myeditModal<?php echo $rd->u_id; ?>">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <!-- Modal Header -->
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Client Details</h4>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&nbsp;&times;&nbsp;</button>
-                                                    </div>
-                                                    <!-- Modal body -->
-                                                    <div class="modal-body">
-                                                        <p>  Phone : <?php echo $rd->phone; ?></p>
-                                                        <p> Address : <?php echo $rd->address_one; ?></p>
-                                                        <p>  Email : <?php echo $rd->email; ?></p>
-                                                         <p>  Country : <?php echo $rd->country; ?></p>
-                                                          <p>  State : <?php echo $rd->state; ?></p>
-                                                           <p>  City : <?php echo $rd->city; ?></p>
-                        
-                                                            <p>  Payment Status : <?php echo $rd->payment_status; ?></p>
-                                                            
-                                                        
-                                                    </div>                                               
-                                                </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
-                                        
-                                <?php $i++;
-                                } ?>
+                                    </div>
+                                </div>
+
+
+                                <!-- Client Modal -->
+<div class="modal fade" id="myeditModal{{ $rd->u_id }}" tabindex="-1" role="dialog" aria-labelledby="clientModalLabel{{ $rd->u_id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content shadow-sm rounded">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="clientModalLabel{{ $rd->u_id }}">Client Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Phone:</strong> {{ $rd->phone }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong> {{ $rd->email }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Address:</strong> {{ $rd->address_one }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Payment Status:</strong>
+                        <span class="badge {{ $rd->payment_status == 'SUCCESS' ? 'badge-success' : 'badge-warning' }}">
+                            {{ $rd->payment_status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Country:</strong> {{ $rd->country }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>State:</strong> {{ $rd->state }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>City:</strong> {{ $rd->city }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-       	</div>
+        </div>
     </div>
 </div>
+
 @endsection

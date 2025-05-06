@@ -551,74 +551,70 @@ class admincontroller extends Controller
     }
     
     public function submit_banner(Request $request)
-    {   
-        
-        request()->validate(
-        [
-            'heading' => 'required',
-            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+    {
+        $request->validate([
+            'heading' => 'required|string|max:255',
+            'image' => $request->id ? 'nullable|image' : 'required|image',
         ]);
-
-        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-        $path = public_path('upload/banner/'.$getimageName);
-        $img = Image::make($request->file('image')->getRealPath())->save($path);
-            
-
-        $data=array(
-            'heading'=>$request->post('heading'),
-            'image'=>$getimageName,
-        );
-
-        $result=DB::table('banner_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Banner Added Successfully...']);
-            return redirect()->back();
+    
+        $data = ['heading' => $request->heading];
+    
+        if ($request->hasFile('image')) {
+            $filename = Str::random(10) . '.' . $request->image->getClientOriginalExtension();
+            $request->image->move(public_path('upload/banner'), $filename);
+            $data['image'] = $filename;
+        } elseif ($request->id) {
+            $data['image'] = $request->old_image;
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Banner Added Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
+    
+        if ($request->id) {
+            DB::table('banner_tb')->where('id', $request->id)->update($data);
+            Session::flash('message', 'Banner updated!');
+        } else {
+            DB::table('banner_tb')->insert($data);
+            Session::flash('message', 'Banner added!');
         }
+    
+        return redirect()->back();
     }
     
-    public function update_banner(Request $request)
-    {
+    // public function update_banner(Request $request)
+    // {
        
-        request()->validate(
-        [
-            'heading' => 'required',
-            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);  
+    //     request()->validate(
+    //     [
+    //         'heading' => 'required',
+    //         'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+    //     ]);  
 
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/banner/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+    //     if(!empty($files=$request->file('image')))
+    //     {
+    //         $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+    //         $path = public_path('upload/banner/'.$getimageName);
+    //         $img = Image::make($request->file('image')->getRealPath())->save($path);
+    //     }
+    //     else
+    //     {
+    //         $getimageName=$request->post('old_image');
+    //     }
 
-        $data=array(
-            'heading'=>$request->post('heading'),
-            'image'=>$getimageName,
-        );
-        $id=$request->post('update');       
-        $result=DB::table('banner_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Banner Details Update Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Banner Details Update   Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
-    }
+    //     $data=array(
+    //         'heading'=>$request->post('heading'),
+    //         'image'=>$getimageName,
+    //     );
+    //     $id=$request->post('update');       
+    //     $result=DB::table('banner_tb')->where('id',$id)->update($data);
+    //     if($result==true)
+    //     {
+    //         session(['message' =>'success', 'errmsg' =>'Banner Details Update Successfully...']);
+    //         return redirect()->back();
+    //     }
+    //     else
+    //     {
+    //         session(['message' =>'danger', 'errmsg'=>'Banner Details Update   Failed. Due To Internal Server Error..']); 
+    //         return redirect()->back();
+    //     }
+    // }
     
     public function delete_banner($id)
     {
@@ -626,12 +622,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('banner_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Banner Details Delete Successfully. ']); 
+            session(['message' =>'Banner Details Delete Successfully.']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Banner Details Delete Failed ? Due To Internal Server Error...']); 
+            session(['message' =>'Banner Details Delete Failed ? Due To Internal Server Error...']); 
             return redirect()->back();
         }
     }  

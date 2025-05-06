@@ -10,33 +10,33 @@
             </ol>
         </nav>
     </div>
+
     <div class="main-wrapper container">
         <div class="row">
-            <div class="col-lg-8 ml-auto mr-auto">
-                @if(Session::has('widthdrawerrmsg'))                 
-                    <div class="alert alert-{{Session::get('message')}} alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
-                           <strong>{{Session::get('widthdrawerrmsg')}}</strong>
+            <div class="col-lg-8 mx-auto">
+                @if(Session::has('widthdrawerrmsg'))
+                    <div class="alert alert-{{ Session::get('message') }} alert-dismissible fade show" role="alert">
+                        <strong>{{ Session::get('widthdrawerrmsg') }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    {{Session::forget('message')}}
-                    {{Session::forget('widthdrawerrmsg')}}
+                    @php
+                        Session::forget(['message', 'widthdrawerrmsg']);
+                    @endphp
                 @endif
-                <br><br>
             </div>
         </div>
-        <div class="row">
+
+        <div class="row mt-4">
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <form method="POST" form action="{{ url('withdraw_status_submit') }}">
-                        @csrf
-                            <table id="complex-header" class="table table-striped table-bordered" style="width:100%">
-                                <!-- <p></p> -->
-                                <!-- <a href="">Approve All</a> -->
+                        <form method="POST" action="{{ url('withdraw_status_submit') }}">
+                            @csrf
+
+                            <table id="complex-header" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
-                                        <th><input  type="checkbox" id="checkAl" /> Select All<br/></th>
-                                       
+                                        <th><input type="checkbox" id="checkAll"> Select All</th>
                                         <th>Developer Name</th>
                                         <th>Milestone Name</th>
                                         <th>Days</th>
@@ -45,122 +45,94 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    
-                                    foreach($requested_reward_details as $rd) { ?>
+                                    @forelse($requested_reward_details as $rd)
                                         <tr>
-                                            
-                                            <td> <input type="checkbox" name="milestone_id[]" value="<?php echo $rd->id; ?>"></td>
-                                           
-                                            <?php
-                                                foreach($developer_details as $d) { 
-                                                    if( $d->dev_id == $rd->dev_id ){
-                                            ?>
-                                                    <td><?php echo $d->name; ?> <?php echo $d->last_name; ?></td>
-                                            <?php } } ?>
+                                            <td><input type="checkbox" name="milestone_id[]" value="{{ $rd->id }}"></td>
 
-                                            <td><?php echo $rd->milestone_name; ?></td>
-                                            <td><?php echo $rd->days; ?></td>
+                                            @php
+                                                $dev = $developer_details->firstWhere('dev_id', $rd->dev_id);
+                                                $price = $dev ? $dev->perhr : 0;
+                                                $total_price = $rd->days * $price;
+                                            @endphp
+
+                                            <td>{{ $dev->name ?? 'N/A' }} {{ $dev->last_name ?? '' }}</td>
+                                            <td>{{ $rd->milestone_name }}</td>
+                                            <td>{{ $rd->days }}</td>
+                                            <td>{{ $total_price }}</td>
                                             <td>
-                                                <?php
-                                                    $price = $d->perhr; 
-                                                    $days = $rd->days;
-                                                    echo $total_price = $days * $price;
-                                                ?>
+                                                <a class="btn btn-success" href="javascript:void(0);" data-toggle="modal" data-target="#rewardModal{{ $rd->id }}">Details</a>
                                             </td>
-                                            <td><a class="btn btn-success" href="javascript:void();" data-toggle="modal" data-target="#rewardModal<?php echo $rd->id; ?>">Details</a></td>
-                                            
-                                            
                                         </tr>
-                                         <div class="modal" id="rewardModal<?php echo $rd->id; ?>">
-                                            <div class="modal-dialog modal-lg">
+
+                                        <!-- Rating Modal -->
+                                        <div class="modal fade" id="rewardModal{{ $rd->id }}" tabindex="-1" role="dialog" aria-labelledby="rewardModalLabel{{ $rd->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
                                                 <div class="modal-content">
-                                                    <!-- Modal Header -->
+
                                                     <div class="modal-header">
-                                                        <h4 class="modal-title">Rating Details</h4>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&nbsp;&times;&nbsp;</button>
+                                                        <h5 class="modal-title" id="rewardModalLabel{{ $rd->id }}">Rating Details</h5>
+                                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&times;</button>
                                                     </div>
-                                                    <?php
-                                                        foreach($developer_rating as $dr) { 
-                                                            if($dr->milestone_id == $rd->id){
-                                                    ?>
-                                                        <!-- Modal body -->
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Logical Stability : <?php echo $dr->logical_stability; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div>
 
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Code Quality : <?php echo $dr->code_quality; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div>
+                                                    @foreach($developer_rating as $dr)
+                                                        @if($dr->milestone_id == $rd->id)
+                                                            @php
+                                                                $fields = [
+                                                                    'Logical Stability' => $dr->logical_stability,
+                                                                    'Code Quality' => $dr->code_quality,
+                                                                    'Understanding' => $dr->understanding,
+                                                                    'Communication' => $dr->communication,
+                                                                    'Behaviour' => $dr->behaviour,
+                                                                    'Work Performance' => $dr->work_performance,
+                                                                    'Delivery Review' => $dr->delivary_review,
+                                                                ];
+                                                            @endphp
 
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Understanding : <?php echo $dr->understanding; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div>
-
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Communication : <?php echo $dr->communication; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div>
-
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Behaviour : <?php echo $dr->behaviour; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div>
-
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Work Performance : <?php echo $dr->work_performance; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div>
-
-                                                        <div class="modal-body">
-                                                            <div class="card">
-                                                              <div class="card-body">
-                                                                Delivary Review : <?php echo $dr->delivary_review; ?> Out Of 5
-                                                              </div>
-                                                            </div>  
-                                                        </div> 
-                                                    <?php } } ?>                                              
+                                                            @foreach($fields as $label => $value)
+                                                                <div class="modal-body">
+                                                                    <div class="card">
+                                                                        <div class="card-body">
+                                                                            {{ $label }} : {{ $value }} out of 5
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
-                                    <?php 
-                                    } ?>
+
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center">No reward requests found.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
-    	                        
                             </table>
-                            <?php 
-                                if($total_requested_reward_details > 0){
-                            ?>
-                                <p align="center"><button type="submit" class="btn btn-primary">Approve</button></p>
-                            <?php }else{ ?>
-                            <?php } ?>
+
+                            @if($total_requested_reward_details > 0)
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">Approve</button>
+                                </div>
+                            @endif
                         </form>
                     </div>
                 </div>
             </div>
-       	</div>
+        </div>
     </div>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.getElementById('checkAll').addEventListener('change', function () {
+        const checkboxes = document.querySelectorAll('input[name="milestone_id[]"]');
+        for (let checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+</script>
+@endpush

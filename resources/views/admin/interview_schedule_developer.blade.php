@@ -25,7 +25,7 @@
                                     <th>Email & Phone</th>
                                     <th>Address</th>
                                     <th>Per hour charge</th>
-                                    <th>Skills</th>
+                                    <!-- <th>Skills</th> -->
                                     <th>Client</th>
                                     <th>Interview Date&Time</th>
                                     <th>Send Interview Details</th>
@@ -34,236 +34,169 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $i=1;
-                                    foreach($interview_schedule_developer_details as $pp) { ?>
-                                        <tr>
-                                            <td><?php echo $i; ?></td>
-                                            <td><?php echo $pp->name; ?> <?php echo $pp->last_name; ?></td>
-                                            <td>
-                                                <?php echo $pp->email; ?>
-                                                <br><?php echo $pp->phone; ?>
-                                            </td>
-                                            <td><?php echo $pp->address; ?></td>
-                                            <td>Rating: <?php echo $pp->rating; ?>/5 
-                                                <br>₹<?php echo $pp->perhr; ?>/-
-                                            </td>
-                                            <td><?php echo $pp->skills; ?></td>
-                                            <td><a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myClientModal<?php echo $pp->dev_id; ?>" ><i class="fa fa-show"></i>Details</a></td>
-                                            <td>
-                                                <?php 
-                                                 if( $pp->status == 'Interview Schedule' ){ 
-                                                ?>
-                                                
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myModal<?php echo $pp->dev_id; ?>" >
-                                                    <i class="fa fa-show"></i>Details
-                                                </a>
-    
-                                                <?php }else{ ?>
-                                                
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#" >
-                                                    <i class="fa fa-show"></i><?php echo $pp->schinterviewdatetime; ?>
-                                                </a>
-                                                
-                                                <?php } ?>
-                                            </td>
-                                            <td>
-                                                <?php 
-                                                 if( $pp->status == 'Interview Schedule' ){ 
-                                                ?>
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#mySendModal<?php echo $pp->dev_id; ?>" >
-                                                    <i class="fa fa-show"></i>Send
-                                                </a>
-                                                <?php }else{ ?>
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#mySendLinkModal<?php echo $pp->dev_id; ?>" >
-                                                    <i class="fa fa-show"></i>View Now
-                                                </a>
-                                                <?php } ?>
-                                            </td>
-                                            <td><a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myReviewModal<?php echo $pp->dev_id; ?>" ><i class="fa fa-show"></i>View</a></td>
-                                            <td>
-                                                <?php 
-                                                    if( $pp->status == "Qualified" ){ 
-                                                   //echo "hi"; exit();
-                                                ?>
-                                                    <a class="btn btn-danger btn-sm" href="<?php echo route('developer_approve_status',['dev_id'=>''.$pp->dev_id.'']) ?>"><i class="fa fa-show"></i>Disapprove</a>
-                                                <?php } else{ ?>
-                                                    <a class="btn btn-success btn-sm" href="<?php echo route('developer_approve_status',['dev_id'=>''.$pp->dev_id.'']) ?>"><i class="fa fa-show"></i>Approve</a>
-                                                <?php } ?>                                            
-                                            </td>
-                                        </tr>
-                                        
-                                        <div class="modal" id="myClientModal<?php echo $pp->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Client Details</h4>
+                                @php $i = 1; @endphp
+                                @foreach($interview_schedule_developer_details as $pp)
+                                <tr>
+                                    <td>{{ $i++ }}</td>
+                                    <td>{{ $pp->name }} {{ $pp->last_name }}</td>
+                                    <td>{{ $pp->email }}<br>{{ $pp->phone }}</td>
+                                    <td>{{ $pp->address }}</td>
+                                    <td>Rating: {{ $pp->rating }}/5<br>₹{{ $pp->perhr }}/-</td>
+                                    <!-- <td>{{ $pp->skills }}</td> -->
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#myClientModal{{ $pp->dev_id }}">Details</button>
+                                    </td>
+                                    <td>
+                                        @if($pp->status == 'Interview Schedule')
+                                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal{{ $pp->dev_id }}">Details</button>
+                                        @else
+                                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#mySendLinkModal{{ $pp->dev_id }}">Details</button>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($pp->status == 'Interview Schedule')
+                                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#mySendModal{{ $pp->dev_id }}">Send</button>
+                                        @else
+                                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#mySendLinkModal{{ $pp->dev_id }}">View Now</button>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#myReviewModal{{ $pp->dev_id }}">View</button>
+                                    </td>
+                                    <td>
+                                        @if($pp->status == "Qualified")
+                                            <a class="btn btn-danger btn-sm" href="{{ route('developer_approve_status', ['dev_id' => $pp->dev_id]) }}">Disapprove</a>
+                                        @else
+                                            <a class="btn btn-success btn-sm" href="{{ route('developer_approve_status', ['dev_id' => $pp->dev_id]) }}">Approve</a>
+                                        @endif
+                                    </td>
+                                </tr>
+
+                                {{-- Client Modal --}}
+                                <div class="modal fade" id="myClientModal{{ $pp->dev_id }}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header"><h4 class="modal-title">Client Details</h4></div>
+                                            <div class="modal-body">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h5>Full Name</h5>
+                                                        <p>{{ $pp->fname }} {{ $pp->lname }}</p>
+                                                        <h5>Email</h5>
+                                                        <p>{{ $pp->email }}</p>
+                                                        <h5>Phone</h5>
+                                                        <p>{{ $pp->phone }}</p>
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Full Name</h5>
-                                                            <p class="card-text"><?php echo $pp->fname; ?> <?php echo $pp->lname; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Email Address</h5>
-                                                            <p class="card-text"><?php echo $pp->email; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Phone Number</h5>
-                                                            <p class="card-text"><?php echo $pp->phone; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                
-                                                  <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="modal" id="myModal<?php echo $pp->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Interview Date&Time Details</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">1st Interview Date&Time</h5>
-                                                            <p class="card-text"><?php echo $pp->interviewdateone; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">2nd Interview Date&Time</h5>
-                                                            <p class="card-text"><?php echo $pp->interviewdatetwo; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">3rd Interview Date&Time</h5>
-                                                            <p class="card-text"><?php echo $pp->interviewdatethree; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                
-                                                  <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  </div>
-                                                </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
-                                        
-                                        <div class="modal" id="mySendModal<?php echo $pp->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Send Interview Link</h4>
+                                    </div>
+                                </div>
+
+                                {{-- Interview Date Modal --}}
+                                <div class="modal fade" id="myModal{{ $pp->dev_id }}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header"><h4 class="modal-title">Interview Date & Time</h4></div>
+                                            <div class="modal-body">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h5>1st Interview Date&Time</h5>
+                                                        <p>{{ $pp->interviewdateone }}</p>
+                                                        <h5>2nd Interview Date&Time</h5>
+                                                        <p>{{ $pp->interviewdatetwo }}</p>
+                                                        <h5>3rd Interview Date&Time</h5>
+                                                        <p>{{ $pp->interviewdatethree }}</p>
                                                     </div>
-                                                    
-                                                    <form method="POST" action="{{route('send_interview_link')}}">
-                                                    @csrf
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Schedule Interview Date&Time</h5>
-                                                            <input type="radio" name="schinterviewdatetime" value="<?php echo $pp->interviewdateone; ?>">
-                                                            <label for="Interview Date&Time"><?php echo $pp->interviewdateone; ?></label><br>
-                                                            <input type="radio" name="schinterviewdatetime" value="<?php echo $pp->interviewdatetwo; ?>">
-                                                            <label for="Interview Date&Time"><?php echo $pp->interviewdatetwo; ?></label><br>
-                                                            <input type="radio" name="schinterviewdatetime" value="<?php echo $pp->interviewdatethree; ?>">
-                                                            <label for="Interview Date&Time"><?php echo $pp->interviewdatethree; ?></label>
-                                                            
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Interview Link</h5>
-                                                            <input type="text" name="interviewlink" class="form-control" placeholder="Interview Link">
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                  
-                                                    <div class="modal-footer">
-                                                      <button type="submit" class="btn btn-primary">Send</button>
-                                                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                    </div>
-                                                    </form>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="modal" id="mySendLinkModal<?php echo $pp->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Interview Details</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Interview Date&Time</h5>
-                                                            <p class="card-text"><?php echo $pp->schinterviewdatetime; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Interview Link</h5>
-                                                            <p class="card-text"><?php echo $pp->interviewlink; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                 
-                                                  <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  </div>
-                                                </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
-                                        
-                                        <div class="modal" id="myReviewModal<?php echo $pp->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Interview Review</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Review</h5>
-                                                            <p class="card-text"><?php echo $pp->review; ?></p>
-                                                          </div>
+                                    </div>
+                                </div>
+
+                                {{-- Send Interview Modal --}}
+                                <div class="modal fade" id="mySendModal{{ $pp->dev_id }}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="POST" action="{{ route('send_interview_link') }}">
+                                                @csrf
+                                                <div class="modal-header"><h4 class="modal-title">Send Interview Link</h4></div>
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="dev_id" value="{{ $pp->dev_id }}">
+                                                    <div class="form-group">
+                                                        <label>Choose Interview Date & Time:</label><br>
+                                                        <div class="form-check">
+                                                            <input type="radio" class="form-check-input" name="schinterviewdatetime" value="{{ $pp->interviewdateone }}">
+                                                            <label class="form-check-label">{{ $pp->interviewdateone }}</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input type="radio" class="form-check-input" name="schinterviewdatetime" value="{{ $pp->interviewdatetwo }}">
+                                                            <label class="form-check-label">{{ $pp->interviewdatetwo }}</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input type="radio" class="form-check-input" name="schinterviewdatetime" value="{{ $pp->interviewdatethree }}">
+                                                            <label class="form-check-label">{{ $pp->interviewdatethree }}</label>
                                                         </div>
                                                     </div>
-                                                   
-                                                  <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  </div>
+                                                    <div class="form-group">
+                                                        <label>Interview Link:</label>
+                                                        <input type="text" name="interviewlink" class="form-control" placeholder="Paste interview link">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Send</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- View Interview Link Modal --}}
+                                <div class="modal fade" id="mySendLinkModal{{ $pp->dev_id }}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header"><h4 class="modal-title">Interview Details</h4></div>
+                                            <div class="modal-body">
+                                                <div class="card-body">
+                                                    <h5>Scheduled Interview Date & Time</h5>
+                                                    <p>{{ $pp->schinterviewdatetime }}</p>
+                                                    <h5>Interview Link</h5>
+                                                    <p>{{ $pp->interviewlink }}</p>
                                                 </div>
                                             </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
                                         </div>
-                                        
-                                        
-                                <?php $i++;
-                                } ?> 
+                                    </div>
+                                </div>
+
+                                {{-- Review Modal --}}
+                                <div class="modal fade" id="myReviewModal{{ $pp->dev_id }}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header"><h4 class="modal-title">Interview Review</h4></div>
+                                            <div class="modal-body">
+                                                <div class="card-body">
+                                                    <h5>Review</h5>
+                                                    <p>{{ $pp->review }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -271,13 +204,6 @@
             </div>
         </div>
     </div>
-
 </div>
-
-
-
-
-
-
 
 @endsection
