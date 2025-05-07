@@ -17,6 +17,7 @@ use Mail;
 use App\Models\developerPremiumPrice;
 use App\Models\Premium;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\File;
 
 class admincontroller extends Controller
 {
@@ -130,112 +131,118 @@ class admincontroller extends Controller
     
     public function submit_category(Request $request)
     {   
-       
-        request()->validate(
-        [
+        $request->validate([
             'title' => 'required',
             'name' => 'required',
             'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-            'multiple_image.*' => 'required|image|mimes:jpg,png,jpeg,gif,|max:5120',
+            'multiple_image.*' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);
-
-
-        $images=array();
-        $img=array();
-        if($files=$request->file('multiple_image'))
-        {
-            $img=array();
-            foreach($files as $file)
-            {
-                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
-                $path = public_path('upload/category/'.$getimageName);
-                Image::make($file)->save($path);   
-                $img[]=$getimageName;
-            }           
-            $multiple_image=implode(",",$img);          
-        }       
-        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-        $path = public_path('upload/category/'.$getimageName);
-        $img = Image::make($request->file('image')->getRealPath())->save($path);
-
-
-        $data=array(
-            'title'=>$request->post('title'),
-            'name'=>$request->post('name'),
-            'image'=>$getimageName,
-            'multiple_image'=>$multiple_image
-        );
-
-        $result=DB::table('category_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Category Added Successfully...']);
-            return redirect()->back();
+    
+        $multiple_image = '';
+        if ($request->hasFile('multiple_image')) {
+            $imgNames = [];
+    
+            foreach ($request->file('multiple_image') as $file) {
+                $fileName = rand(0,999999999) . '_' . $file->getClientOriginalName();
+                $file->move(public_path('upload/category/'), $fileName);
+                $imgNames[] = $fileName;
+            }
+    
+            $multiple_image = implode(",", $imgNames);
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Category Added Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
+    
+        $singleImage = '';
+        if ($request->hasFile('image')) {
+            $singleImage = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->file('image')->move(public_path('upload/category/'), $singleImage);
         }
+    
+        $data = [
+            'title' => $request->post('title'),
+            'name' => $request->post('name'),
+            'image' => $singleImage,
+            'multiple_image' => $multiple_image,
+        ];
+    
+        $result = DB::table('category_tb')->insert($data);
+    
+        if ($result) {
+            session(['message' => 'Category Added Successfully...']);
+        } else {
+            session(['message' => 'Category Added Failed. Due To Internal Server Error..']);
+        }
+    
+        return redirect()->back();
     }
+
     
     public function update_category(Request $request)
     {
-        
-        request()->validate(
-        [
+        $request->validate([
             'title' => 'required',
             'name' => 'required',
             'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-            'multiple_image.*' => 'image|mimes:jpg,png,jpeg,gif,|max:5120',
-        ]);  
-
-        if(!empty($files=$request->file('multiple_image')))
-        {
-            $img=array();
-            foreach($files as $file)
-            {
-                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
-                $path = public_path('upload/category/'.$getimageName);
-                Image::make($file)->save($path);   
-                $img[]=$getimageName;
-            }           
-            $multiple_image=implode(",",$img);          
+            'multiple_image.*' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);
+    
+        $uploadPath = public_path('upload/category/');
+    
+        // === Handle multiple images ===
+        if ($request->hasFile('multiple_image')) {
+            $imgNames = [];
+            foreach ($request->file('multiple_image') as $file) {
+                $fileName = rand(0, 999999999) . '_' . $file->getClientOriginalName();
+                $file->move($uploadPath, $fileName);
+                $imgNames[] = $fileName;
+            }
+            $multiple_image = implode(",", $imgNames);
+    
+            // Delete old multiple images AFTER new ones are uploaded
+            $oldMultiple = explode(',', $request->post('old_multiple_image'));
+            foreach ($oldMultiple as $oldFile) {
+                if ($oldFile && File::exists($uploadPath . $oldFile)) {
+                    File::delete($uploadPath . $oldFile);
+                }
+            }
+        } else {
+            $multiple_image = $request->post('old_multiple_image');
         }
-        else
-        {
-            $multiple_image=$request->post('old_multiple_image');
+    
+        // === Handle single image ===
+        if ($request->hasFile('image')) {
+            $singleImage = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->file('image')->move($uploadPath, $singleImage);
+    
+            // Delete old image AFTER new one is uploaded
+            $oldImage = $request->post('old_image');
+            if ($oldImage && File::exists($uploadPath . $oldImage)) {
+                File::delete($uploadPath . $oldImage);
+            }
+        } else {
+            $singleImage = $request->post('old_image');
         }
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/category/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
+    
+        // === Update data ===
+        $data = [
+            'title' => $request->post('title'),
+            'name' => $request->post('name'),
+            'image' => $singleImage,
+            'multiple_image' => $multiple_image,
+        ];
+    
+        $id = $request->post('id');
+        $result = DB::table('category_tb')->where('id', $id)->update($data);
+    
+        if ($result) {
+            session(['message' => 'Category Details Updated Successfully...']);
+        } else {
+            session(['message' => 'Category Details Update Failed. Due To Internal Server Error..']);
         }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
-        
-        $data=array(
-            'title'=>$request->post('title'),
-            'name'=>$request->post('name'), 
-            'image'=>$getimageName,
-            'multiple_image'=>$multiple_image           
-        );
-        $id=$request->post('update');       
-        $result=DB::table('category_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Category Details Update Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Category Details Update   Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
+    
+        return redirect()->back();
     }
+
+
     
     public function delete_category($id)
     {
@@ -258,87 +265,110 @@ class admincontroller extends Controller
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
         $data['category'] = DB::table('category_tb')->orderby('id','desc')->get();
-        $data['subcategory'] = DB::table('subcategory_tb')->orderby('id','desc')->get();
+        $data['subcategory'] = DB::table('subcategory_tb')->orderby('id','desc')->paginate(10);
         return view('admin/subcategory')->with($data);
     }
+
+    // Filter subcategories
+    public function searchSubcategory(Request $request)
+    {
+        $search = $request->get('search');
+        $subcategory = DB::table('subcategory_tb')
+                         ->where('heading', 'like', "%$search%")
+                         ->orWhere('name', 'like', "%$search%")
+                         ->orderby('id', 'desc')
+                         ->paginate(10);
+        return view('admin.subcategory_table_rows', compact('subcategory'))->render();
+    }
+    
     
     public function submit_subcategory(Request $request)
-    {   
-       
-        request()->validate(
-        [
-            'category_id' => 'required',
-            'heading' => 'required',
-            'name' => 'required',
-            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);
-        $images=array();
-        $img=array();
-             
-        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-        $path = public_path('upload/subcategory/'.$getimageName);
-        $img = Image::make($request->file('image')->getRealPath())->save($path);
-            
-        $data=array(
-            'category_id'=>$request->post('category_id'),
-            'heading'=>$request->post('heading'),
-            'name'=>$request->post('name'),
-            'image'=>$getimageName
-        );
+{   
+    // Validate the input
+    $request->validate(
+    [
+        'category_id' => 'required',
+        'heading' => 'required',
+        'name' => 'required',
+        'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);
 
-        $result=DB::table('subcategory_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Sub Category Added Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Sub Category Added Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
+    // Get the original file name and create a unique name for it
+    $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+
+    // Define the path where the image will be stored
+    $path = public_path('upload/subcategory/'.$getimageName);
+
+    // Move the uploaded file to the specified path
+    $request->file('image')->move(public_path('upload/subcategory'), $getimageName);
+
+    // Prepare data to insert into the database
+    $data = [
+        'category_id' => $request->post('category_id'),
+        'heading' => $request->post('heading'),
+        'name' => $request->post('name'),
+        'image' => $getimageName
+    ];
+
+    // Insert the data into the database
+    $result = DB::table('subcategory_tb')->insert($data);
+
+    // Return response based on the result
+    if ($result) {
+        session(['message' => 'Sub Category Added Successfully...']);
+        return redirect()->back();
+    } else {
+        session(['message' => 'Sub Category Addition Failed. Due To Internal Server Error..']);
+        return redirect()->back();
     }
+}
+
     
-    public function update_subcategory(Request $request)
-    {    
-        
-        request()->validate(
-        [
-            'category_id' => 'required',
-            'heading' => 'required',
-            'name' => 'required',
-            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);  
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/subcategory/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+public function update_subcategory(Request $request)
+{    
+    // Validate the input
+    $request->validate(
+    [
+        'category_id' => 'required',
+        'heading' => 'required',
+        'name' => 'required',
+        'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);  
 
-        $data=array(
-            'category_id'=>$request->post('category_id'),
-            'heading'=>$request->post('heading'),
-            'name'=>$request->post('name'),
-            'image'=>$getimageName            
-        );
-        $id=$request->post('update');       
-        $result=DB::table('subcategory_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Sub Category Details Update Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Sub Category Details Update   Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
+    // If a new image is uploaded, process it
+    if ($request->hasFile('image')) {
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        // Define the path to save the new image
+        $path = public_path('upload/subcategory/'.$getimageName);
+        // Move the uploaded file to the specified path
+        $request->file('image')->move(public_path('upload/subcategory'), $getimageName);
+    } else {
+        // If no new image is uploaded, keep the old image
+        $getimageName = $request->post('old_image');
     }
+
+    // Prepare the updated data for the subcategory
+    $data = [
+        'category_id' => $request->post('category_id'),
+        'heading' => $request->post('heading'),
+        'name' => $request->post('name'),
+        'image' => $getimageName            
+    ];
+
+    // Update the subcategory data in the database
+    $id = $request->post('update');
+    $result = DB::table('subcategory_tb')->where('id', $id)->update($data);
+
+    // Return response based on the result
+    if ($result) {
+        session(['message' => 'Sub Category Details Updated Successfully...']);
+        return redirect()->back();
+    } else {
+        session(['message' => 'Sub Category Update Failed Due to Internal Server Error..']);
+        return redirect()->back();
+    }
+}
+
     
     public function delete_subcategory($id)
     {
@@ -346,12 +376,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('subcategory_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Sub Category Details Delete Successfully. ']); 
+            session(['message' =>'Sub Category Details Delete Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Sub Category Details Delete Failed ? Due To Internal Server Error...']); 
+            session(['message' =>'Sub Category Details Delete Failed ? Due To Internal Server Error...']); 
             return redirect()->back();
         }
     }  
@@ -2107,12 +2137,12 @@ class admincontroller extends Controller
         $result=DB::table('license_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'License Added Successfully...']);
+            session(['message' =>'License Saved Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'License Added Failed.']); 
+            session(['message' =>'License Added Failed.']); 
             return redirect()->back();
         }
     }
@@ -2135,28 +2165,27 @@ class admincontroller extends Controller
         $result=DB::table('license_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'License Update Successfully...']);
+            session(['message' =>'License Updated Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'License Update Failed.']); 
+            session(['message' =>'License Update Failed.']); 
             return redirect()->back();
         }
     }
     
     public function delete_License($id)
     {
-        
         $info_delete=DB::table('license_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'License Delete Successfully. ']); 
+            session(['message' =>'License Deleted Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'License Delete Failed']); 
+            session(['message' =>'License Delete Failed']); 
             return redirect()->back();
         }
     }  
@@ -3085,7 +3114,7 @@ class admincontroller extends Controller
     {
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
-        $data['web_hosting'] = DB::table('web_hosting_tb')->orderby('id','asc')->get();
+        $data['web_hosting'] = DB::table('web_hosting_tb')->orderby('id','desc')->get();
         return view('admin/web_hosting')->with($data);
     }
    
@@ -3109,12 +3138,12 @@ class admincontroller extends Controller
         $result=DB::table('web_hosting_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Web Hosting Added Successfully...']);
+            session(['message' =>'Web Hosting Added Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Web Hosting Added Failed.']);
+            session(['message' =>'Web Hosting Added Failed.']);
             return redirect()->back();
         }
     }
@@ -3139,12 +3168,12 @@ class admincontroller extends Controller
         $result=DB::table('web_hosting_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Web Hosting Update Successfully...']);
+            session(['message' =>'Web Hosting Update Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Web Hosting Update Failed.']);
+            session(['message' =>'Web Hosting Update Failed.']);
             return redirect()->back();
         }
     }
@@ -3155,12 +3184,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('web_hosting_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Web Hosting Delete Successfully. ']);
+            session(['message' =>'Web Hosting Delete Successfully. ']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Web Hosting Delete Failed']);
+            session(['message' =>'Web Hosting Delete Failed']);
             return redirect()->back();
         }
     } 
